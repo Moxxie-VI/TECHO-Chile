@@ -1,0 +1,15 @@
+:root {
+  --techo-blue: #009FE3;
+  --techo-blue-dark: #006FA1;
+}
+
+.bg-blue-techo { background-color: var(--techo-blue); }
+.bg-blue-techo-dark { background-color: var(--techo-blue-dark); }
+.text-blue-techo { color: var(--techo-blue); }
+.text-blue-techo-dark { color: var(--techo-blue-dark); }
+.hover\:bg-blue-techo-dark:hover { background-color: var(--techo-blue-dark); }
+
+html {
+  scroll-behavior: smooth;
+}
+
