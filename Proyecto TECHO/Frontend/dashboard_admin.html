@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Panel Administrador | TECHO Chile</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <div class="min-h-screen flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-gradient-to-b from-blue-techo to-blue-techo-dark text-white flex flex-col">
+      <!-- Logo / título -->
+      <div class="px-6 py-5 border-b border-white border-opacity-20 flex items-center space-x-3">
+        <img src="img/logo_techo.png" alt="TECHO" class="h-8">
+        <div class="text-left">
+          <p class="text-sm font-semibold leading-tight">Plataforma Digital</p>
+          <p class="text-xs opacity-80 leading-tight">Recepción y Gestión de Viviendas</p>
+        </div>
+      </div>
+
+      <!-- Menú -->
+      <nav class="flex-1 px-4 py-6 space-y-2 text-sm font-medium">
+        <a class="flex items-center justify-between bg-white bg-opacity-10 rounded-lg px-3 py-2 hover:bg-opacity-20 transition cursor-pointer">
+          <span class="flex items-center space-x-2">
+            <span>🏠</span>
+            <span>Inicio</span>
+          </span>
+          <span class="text-[10px] bg-white bg-opacity-20 px-2 py-[2px] rounded-full">Admin</span>
+        </a>
+
+        <a class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer">
+          <span>🏗️</span>
+          <span>Viviendas</span>
+        </a>
+
+        <a class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer">
+          <span>📝</span>
+          <span>Observaciones</span>
+        </a>
+
+        <a class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer">
+          <span>🔧</span>
+          <span>Postventa</span>
+        </a>
+
+        <a class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer">
+          <span>📊</span>
+          <span>Reportes</span>
+        </a>
+
+        <a class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-white hover:bg-opacity-10 cursor-pointer">
+          <span>❓</span>
+          <span>Ayuda / Tutorial</span>
+        </a>
+      </nav>
+
+      <!-- Botón logout -->
+      <div class="px-4 py-4 border-t border-white border-opacity-20">
+        <button onclick="logout()"
+          class="w-full text-center text-sm font-semibold bg-white text-blue-techo rounded-lg py-2 hover:bg-gray-100 transition">
+          Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="flex-1 p-8">
+
+      <!-- Encabezado -->
+      <section class="bg-white rounded-xl shadow p-6 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="max-w-xl">
+          <h1 class="text-3xl font-bold text-gray-900 leading-tight" id="saludo-admin">
+            Hola, Administrador
+          </h1>
+          <p class="text-gray-600 text-base mt-2">
+            Bienvenido/a al panel de control de TECHO Chile. Aquí puedes gestionar viviendas, revisar observaciones y monitorear el cumplimiento DS49.
+          </p>
+        </div>
+
+        <div class="mt-6 md:mt-0">
+          <!-- Ilustración tipo casa -->
+          <div class="bg-gradient-to-br from-blue-techo/10 to-blue-techo-dark/10 rounded-lg p-4 shadow-inner">
+            <img src="img/home_ilustracion.svg" alt="Ilustración Vivienda" class="h-24 mx-auto">
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección de tarjetas -->
+      <section class="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Columna izquierda: Actualizaciones Recientes -->
+        <div class="lg:col-span-2 bg-white rounded-xl shadow p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Actualizaciones Recientes</h2>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-sm">
+            <!-- tarjeta 1 -->
+            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50">
+              <p class="text-gray-500 text-xs">ID: 1037</p>
+              <div class="mt-2 inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded-lg">
+                En progreso
+              </div>
+            </div>
+
+            <!-- tarjeta 2 -->
+            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50">
+              <p class="text-gray-500 text-xs">ID: 1524</p>
+              <div class="mt-2 inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-lg">
+                Completa
+              </div>
+            </div>
+
+            <!-- tarjeta 3 -->
+            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50">
+              <p class="text-gray-500 text-xs">ID: 0738</p>
+              <div class="mt-2 inline-block bg-gray-200 text-gray-800 text-xs font-semibold px-2 py-1 rounded-lg">
+                Pendiente
+              </div>
+            </div>
+
+            <!-- tarjeta 4 -->
+            <div class="rounded-lg border border-gray-200 p-4 bg-gray-50">
+              <p class="text-gray-500 text-xs">ID: 2461</p>
+              <div class="mt-2 inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded-lg">
+                En progreso
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones rápidas -->
+          <div class="mt-8">
+            <h3 class="text-base font-semibold text-gray-800 mb-3">Acciones Rápidas</h3>
+            <div class="grid md:grid-cols-2 gap-4 text-sm">
+              <button class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 shadow hover:shadow-md transition">
+                <span class="flex items-center space-x-2 text-gray-700 font-medium">
+                  <span class="text-blue-techo font-bold text-xl leading-none">＋</span>
+                  <span>Nueva Observación</span>
+                </span>
+                <span class="text-gray-400 text-xs">Registrar detalle técnico</span>
+              </button>
+
+              <button class="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3 shadow hover:shadow-md transition">
+                <span class="flex items-center space-x-2 text-gray-700 font-medium">
+                  <span class="text-blue-techo">🔎</span>
+                  <span>Buscar Vivienda</span>
+                </span>
+                <span class="text-gray-400 text-xs">Ver historial</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Cumplimiento DS49 -->
+        <div class="bg-white rounded-xl shadow p-6 flex flex-col">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Cumplimiento DS49</h2>
+
+          <div class="flex flex-col items-center">
+            <!-- Círculo de porcentaje -->
+            <div class="relative w-32 h-32 rounded-full flex items-center justify-center"
+                 style="background: conic-gradient(#009FE3 0% 90%, #E5E7EB 90% 100%);">
+              <div class="absolute bg-white rounded-full w-24 h-24 flex items-center justify-center shadow-inner">
+                <span class="text-2xl font-bold text-gray-800">90%</span>
+              </div>
+            </div>
+
+            <p class="text-gray-600 text-sm text-center mt-4 leading-relaxed">
+              El 90% de las observaciones registradas se encuentran gestionadas dentro de los plazos definidos por DS49.
+            </p>
+
+            <div class="mt-6 space-y-2 text-sm w-full">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 font-medium flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                  <span>Completas</span>
+                </span>
+                <span class="text-gray-900 font-semibold">32</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 font-medium flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                  <span>En Progreso</span>
+                </span>
+                <span class="text-gray-900 font-semibold">7</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-gray-700 font-medium flex items-center space-x-2">
+                  <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                  <span>Pendientes</span>
+                </span>
+                <span class="text-gray-900 font-semibold">3</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    // Cuando cargue la página, validamos sesión y pintamos saludo
+    (async () => {
+      const user = await getCurrentUser(); // viene de app.js
+      if (!user) return;
+
+      // Seguridad básica de vista: solo ADMIN puede ver este dashboard
+      if (user.role !== "ADMIN") {
+        // si no es admin lo mandamos a su dashboard
+        if (user.role === "TECHO") {
+          window.location.href = "dashboard_techo.html";
+        } else {
+          window.location.href = "mi_vivienda.html";
+        }
+        return;
+      }
+
+      const saludoEl = document.getElementById("saludo-admin");
+      if (saludoEl) {
+        saludoEl.textContent = `Hola, ${user.email}`;
+      }
+    })();
+  </script>
+</body>
+</html>

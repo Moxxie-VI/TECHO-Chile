@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Recuperar acceso | TECHO Chile</title>
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-800 theme-bg min-h-screen flex flex-col">
+
+  <!-- Header mini -->
+  <header
+    class="w-full border-b border-gray-200 bg-white flex items-center justify-between px-4 sm:px-6 py-4"
+  >
+    <!-- Volver -->
+    <a
+      href="login.html"
+      class="flex items-center text-[12px] font-semibold text-blue-techo hover:underline focus:outline-none focus:ring-2 focus:ring-blue-techo rounded"
+    >
+      <span class="text-base mr-1">⬅</span>
+      Volver
+    </a>
+
+    <!-- Identidad -->
+    <div class="flex items-center space-x-3">
+      <img src="img/logo_techo.png" alt="TECHO Chile" class="h-8 object-contain" />
+      <div class="leading-tight">
+        <p class="text-blue-techo font-bold text-sm tracking-tight">
+          Plataforma Habitacional
+        </p>
+        <p class="text-[10px] text-gray-500 leading-none">
+          Recuperación de acceso
+        </p>
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="flex items-center space-x-2">
+      <button
+        id="theme-toggle"
+        class="text-[11px] px-2 py-2 rounded-lg bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition flex flex-col items-center leading-tight focus:outline-none focus:ring-2 focus:ring-white/50"
+        type="button"
+      >
+        <span id="theme-icon" class="text-base leading-none">🌙</span>
+        <span class="leading-none mt-0.5 font-medium">Tema</span>
+      </button>
+
+      <button
+        id="a11y-toggle"
+        class="text-[11px] px-2 py-2 rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200 transition flex flex-col items-center leading-tight font-medium focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        type="button"
+      >
+        <span class="text-base font-bold leading-none">Aa</span>
+        <span class="leading-none mt-0.5">Accesible</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main class="flex-1 flex items-center justify-center px-6 py-10">
+    <div class="w-full max-w-md rounded-md shadow-xl p-8 border border-gray-200 bg-white hero-card">
+
+      <h1 class="text-xl font-extrabold hero-title mb-2 text-center">
+        Recuperar acceso
+      </h1>
+
+      <p class="text-sm hero-desc text-center mb-6 leading-relaxed">
+        Ingresa tu correo o tu teléfono.
+        <br />
+        Si eres TECHO, usa tu correo corporativo
+        <span class="font-semibold text-blue-techo">@techochile.cl</span>.
+        Si eres familia, usa tu correo personal.
+      </p>
+
+      <!-- cajas de mensaje -->
+      <div
+        id="rec-error"
+        class="hidden mb-4 bg-red-100 border border-red-300 text-red-800 text-[13px] rounded-md px-3 py-2 leading-relaxed"
+      >
+        No encontramos una cuenta con esos datos.
+      </div>
+
+      <div
+        id="rec-success"
+        class="hidden mb-4 bg-green-100 border border-green-300 text-green-800 text-[13px] rounded-md px-3 py-2 leading-relaxed"
+      >
+        Te enviamos un código de verificación. Revisa tu correo o tu teléfono.
+      </div>
+
+      <!-- Paso 1: pedir código -->
+      <form class="space-y-5" id="request-code-form">
+        <div class="flex flex-col">
+          <label for="account_id" class="text-sm font-semibold hero-desc mb-1">
+            Correo o Teléfono
+          </label>
+          <input
+            id="account_id"
+            name="account_id"
+            type="text"
+            placeholder="ej: ric.flores.ad@techochile.cl  /  +56 9 1234 5678  /  familia@gmail.com"
+            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-techo focus:border-blue-techo theme-input"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn-primary w-full text-center py-2 text-sm font-semibold rounded-md shadow focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-techo focus:ring-offset-gray-900 transition"
+        >
+          Enviar código de verificación
+        </button>
+      </form>
+
+      <div class="border-t border-gray-300 my-8 theme-divider"></div>
+
+      <p class="text-[12px] text-center hero-desc leading-relaxed">
+        ¿Ya recibiste tu código de 6 dígitos?
+        <br />
+        Ingrésalo aquí y define tu nueva contraseña.
+      </p>
+
+      <!-- Paso 2: resetear clave -->
+      <form class="space-y-5 mt-4" id="reset-pass-form">
+        <div>
+          <label for="code" class="text-sm font-semibold hero-desc mb-1 block">
+            Código de verificación
+          </label>
+          <input
+            id="code"
+            name="code"
+            type="text"
+            maxlength="6"
+            placeholder="123456"
+            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 tracking-widest text-center font-mono focus:outline-none focus:ring-2 focus:ring-blue-techo focus:border-blue-techo theme-input"
+          />
+        </div>
+
+        <div>
+          <label for="new_password" class="text-sm font-semibold hero-desc mb-1 block">
+            Nueva contraseña
+          </label>
+          <input
+            id="new_password"
+            name="new_password"
+            type="password"
+            placeholder="••••••••"
+            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-techo focus:border-blue-techo theme-input"
+          />
+        </div>
+
+        <div>
+          <label for="confirm_password" class="text-sm font-semibold hero-desc mb-1 block">
+            Confirmar nueva contraseña
+          </label>
+          <input
+            id="confirm_password"
+            name="confirm_password"
+            type="password"
+            placeholder="••••••••"
+            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-techo focus:border-blue-techo theme-input"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn-secondary w-full text-center py-2 text-sm font-semibold rounded-md border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 focus:ring-offset-gray-900 transition"
+        >
+          Guardar nueva contraseña
+        </button>
+      </form>
+
+      <div class="mt-8 text-[11px] text-center hero-desc leading-relaxed">
+        Si sigues con problemas comunícate con tu encargado TECHO o
+        escribe a <span class="font-semibold text-blue-techo">soporte@techochile.cl</span>.
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center text-[10px] text-gray-500 py-4 hero-desc">
+    Recuperación de acceso · Plataforma Habitacional TECHO Chile
+  </footer>
+
+  <script src="assets/theme.js"></script>
+  <script src="assets/a11y.js"></script>
+
+  <!-- Simulación demo de mensajes -->
+  <script>
+    const reqForm = document.getElementById('request-code-form');
+    const recErr = document.getElementById('rec-error');
+    const recOk = document.getElementById('rec-success');
+
+    reqForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Aquí normalmente le pediríamos al backend que envíe el código.
+      // Para demo: mostramos éxito.
+      recErr.classList.add('hidden');
+      recOk.classList.remove('hidden');
+      recOk.textContent =
+        'Te enviamos un código de verificación. Revisa tu correo o tu teléfono.';
+    });
+
+    const resetForm = document.getElementById('reset-pass-form');
+    resetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Para demo puedes simular distintos escenarios:
+      // recErr.classList.remove('hidden');
+      // recErr.textContent = 'El código ingresado no es válido o expiró.';
+      recErr.classList.remove('hidden');
+      recErr.textContent =
+        'Ejemplo demo: el código ingresado no es válido o expiró.';
+    });
+  </script>
+</body>
+</html>

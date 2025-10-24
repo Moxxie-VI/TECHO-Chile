@@ -1,14 +1,38 @@
-const toggleBtn = document.getElementById("theme-toggle");
-const body = document.body;
+(function () {
+  const root = document.documentElement; // <html>
+  const themeBtn = document.getElementById("theme-toggle");
+  const themeIcon = document.getElementById("theme-icon");
 
-if(localStorage.getItem("theme") === "dark"){
-  body.classList.add("dark");
-  toggleBtn.textContent = "🌙";
-}
+  // aplica el modo claro/oscuro visualmente
+  function applyTheme(isDark) {
+    if (isDark) {
+      root.classList.add("theme-dark");  // usamos nuestra propia clase
+      localStorage.setItem("theme", "dark");
+      if (themeIcon) themeIcon.textContent = "☀️"; // estamos en oscuro -> muestro sol
+    } else {
+      root.classList.remove("theme-dark");
+      localStorage.setItem("theme", "light");
+      if (themeIcon) themeIcon.textContent = "🌙"; // estamos en claro -> muestro luna
+    }
+  }
 
-toggleBtn.addEventListener("click", ()=>{
-  body.classList.toggle("dark");
-  const isDark = body.classList.contains("dark");
-  toggleBtn.textContent = isDark ? "🌙" : "☀️";
-  localStorage.setItem("theme", isDark ? "dark" : "light");
-});
+  // al cargar, mira qué guardamos antes
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    applyTheme(true);
+  } else {
+    applyTheme(false);
+  }
+
+  // cuando el usuario hace click
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const isNowDark = !root.classList.contains("theme-dark");
+      applyTheme(isNowDark);
+    });
+  }
+})();
+
+
+
+

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es" class="">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Panel Terreno | TECHO Chile</title>
+
+  <!-- Tailwind -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body class="bg-gray-50 text-gray-800 theme-bg min-h-screen flex flex-col">
+
+  <!-- HEADER TOP (reutilizamos estilo, como en login pero versión app interna) -->
+  <header
+    class="w-full border-b border-gray-200 bg-white flex items-center justify-between px-6 py-4 sticky top-0 z-40"
+  >
+    <!-- Identidad / sección -->
+    <div class="flex items-start space-x-3">
+      <img
+        src="img/logo_techo.png"
+        alt="TECHO Chile"
+        class="h-8 object-contain"
+      />
+      <div class="leading-tight">
+        <p class="text-blue-techo font-bold text-sm tracking-tight">
+          Plataforma Habitacional
+        </p>
+        <p class="text-[10px] text-gray-500 leading-none">
+          Panel Trabajador Terreno
+        </p>
+      </div>
+    </div>
+
+    <!-- Controles -->
+    <div class="flex items-center space-x-4">
+      <!-- quién soy -->
+      <div class="text-right leading-tight text-[11px] hero-desc">
+        <p class="font-semibold text-gray-800 hero-title text-sm">
+          Hola, Juan Pérez
+        </p>
+        <p class="text-gray-500 hero-desc text-[11px]">
+          Proyecto: Condominio Los Alerces · DS49
+        </p>
+      </div>
+
+      <!-- Botón tema -->
+      <button
+        id="theme-toggle"
+        class="text-[11px] px-2 py-2 rounded-lg bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition flex flex-col items-center leading-tight focus:outline-none focus:ring-2 focus:ring-white/50"
+        type="button"
+      >
+        <span id="theme-icon" class="text-base leading-none">🌙</span>
+        <span class="leading-none mt-0.5 font-medium">Tema</span>
+      </button>
+
+      <!-- Botón accesibilidad -->
+      <button
+        id="a11y-toggle"
+        class="text-[11px] px-2 py-2 rounded-lg bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200 transition flex flex-col items-center leading-tight font-medium focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        type="button"
+      >
+        <span class="text-base font-bold leading-none">Aa</span>
+        <span class="leading-none mt-0.5">Accesible</span>
+      </button>
+
+      <!-- Cerrar sesión -->
+      <a
+        href="login.html"
+        class="text-[12px] font-semibold text-red-500 border border-red-300 rounded-md px-3 py-2 hover:bg-red-50 theme-logout transition"
+      >
+        Cerrar sesión
+      </a>
+    </div>
+  </header>
+
+  <!-- CONTENIDO -->
+  <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- BLOQUE 1: Acciones rápidas -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <button
+        class="card-block rounded-lg border border-gray-200 shadow p-5 text-left w-full hover:shadow-lg transition"
+        type="button"
+      >
+        <p class="text-xs uppercase tracking-wide text-gray-500 card-desc mb-1">
+          Nueva acción
+        </p>
+        <p class="text-lg font-bold hero-title">
+          Registrar observación
+        </p>
+        <p class="text-[13px] leading-relaxed hero-desc mt-2">
+          Levanta un problema detectado en una vivienda (filtración, grieta,
+          instalación defectuosa, etc.). Se generará un seguimiento en postventa.
+        </p>
+        <div class="mt-4">
+          <span
+            class="inline-block bg-blue-techo text-white text-[12px] font-semibold px-3 py-1 rounded-md"
+          >
+            + Nueva observación
+          </span>
+        </div>
+      </button>
+
+      <button
+        class="card-block rounded-lg border border-gray-200 shadow p-5 text-left w-full hover:shadow-lg transition"
+        type="button"
+      >
+        <p class="text-xs uppercase tracking-wide text-gray-500 card-desc mb-1">
+          Evidencia
+        </p>
+        <p class="text-lg font-bold hero-title">
+          Subir foto / reparación
+        </p>
+        <p class="text-[13px] leading-relaxed hero-desc mt-2">
+          Adjunta imágenes de la solución realizada por la constructora o el
+          equipo técnico y deja constancia para DS49.
+        </p>
+        <div class="mt-4">
+          <span
+            class="inline-block bg-blue-techo text-white text-[12px] font-semibold px-3 py-1 rounded-md"
+          >
+            Subir evidencia
+          </span>
+        </div>
+      </button>
+
+      <div
+        class="card-block rounded-lg border border-gray-200 shadow p-5 text-left w-full"
+      >
+        <p class="text-xs uppercase tracking-wide text-gray-500 card-desc mb-1">
+          Búsqueda rápida
+        </p>
+        <p class="text-lg font-bold hero-title">
+          Buscar vivienda
+        </p>
+        <p class="text-[13px] leading-relaxed hero-desc mt-2">
+          Consulta el estado de una vivienda específica usando ID, RUT cliente
+          o número de unidad.
+        </p>
+
+        <form class="mt-4 flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Ej: Casa 14 / Rut 12.345.678-9"
+            class="w-full bg-white border border-gray-300 rounded-md px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-techo focus:border-blue-techo theme-input"
+          />
+          <button
+            type="submit"
+            class="btn-secondary text-center px-4 py-2 text-sm font-semibold rounded-md border whitespace-nowrap"
+          >
+            Buscar
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- BLOQUE 2: Observaciones pendientes -->
+    <section class="rounded-lg border border-gray-200 shadow card-block p-6">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
+        <div>
+          <h2 class="text-xl font-bold hero-title leading-tight">
+            Observaciones pendientes
+          </h2>
+          <p class="text-sm hero-desc leading-relaxed">
+            Estas son las observaciones activas asociadas a tu proyecto. Por
+            favor prioriza las con plazo más cercano.
+          </p>
+        </div>
+
+        <div class="text-right">
+          <p class="text-xs card-desc">Proyecto actual</p>
+          <p class="text-sm font-semibold hero-title">
+            Condominio Los Alerces
+          </p>
+          <p class="text-[11px] card-desc">
+            DS49 · Región Metropolitana
+          </p>
+        </div>
+      </div>
+
+      <!-- Tabla/resumen -->
+      <div class="overflow-x-auto -mx-4 md:mx-0">
+        <table class="min-w-full text-left text-sm">
+          <thead>
+            <tr class="text-[12px] uppercase tracking-wide card-desc border-b border-gray-300 theme-divider">
+              <th class="py-2 px-4 whitespace-nowrap">Vivienda</th>
+              <th class="py-2 px-4 whitespace-nowrap">Descripción</th>
+              <th class="py-2 px-4 whitespace-nowrap">Estado</th>
+              <th class="py-2 px-4 whitespace-nowrap">Plazo DS49</th>
+              <th class="py-2 px-4 whitespace-nowrap">Acción</th>
+            </tr>
+          </thead>
+          <tbody class="hero-desc">
+            <tr class="border-b border-gray-200 theme-divider">
+              <td class="py-3 px-4 font-semibold hero-title text-[13px]">
+                Casa 14
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                Filtración en techo dormitorio principal.
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block bg-yellow-100 text-yellow-800 text-[11px] font-semibold px-2 py-1 rounded-md">
+                  Pendiente
+                </span>
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                10/10
+              </td>
+              <td class="py-3 px-4">
+                <button
+                  class="text-[12px] font-semibold text-blue-techo hover:underline"
+                  type="button"
+                >
+                  Ver / Actualizar
+                </button>
+              </td>
+            </tr>
+
+            <tr class="border-b border-gray-200 theme-divider">
+              <td class="py-3 px-4 font-semibold hero-title text-[13px]">
+                Depto 302
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                Problema de cierre en puerta de acceso.
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block bg-blue-100 text-blue-800 text-[11px] font-semibold px-2 py-1 rounded-md">
+                  En progreso
+                </span>
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                11/10
+              </td>
+              <td class="py-3 px-4">
+                <button
+                  class="text-[12px] font-semibold text-blue-techo hover:underline"
+                  type="button"
+                >
+                  Subir evidencia
+                </button>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="py-3 px-4 font-semibold hero-title text-[13px]">
+                Casa 07
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                Grieta visible en muro comedor.
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block bg-green-100 text-green-800 text-[11px] font-semibold px-2 py-1 rounded-md">
+                  Completada
+                </span>
+              </td>
+              <td class="py-3 px-4 text-[13px]">
+                09/10
+              </td>
+              <td class="py-3 px-4">
+                <button
+                  class="text-[12px] font-semibold text-blue-techo hover:underline"
+                  type="button"
+                >
+                  Ver evidencia
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BLOQUE 3: Estado general del proyecto -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="rounded-lg border border-gray-200 shadow card-block p-5">
+        <p class="text-4xl font-extrabold text-blue-techo card-number leading-none">
+          92%
+        </p>
+        <p class="text-sm font-semibold hero-title">
+          Observaciones resueltas
+        </p>
+        <p class="text-[12px] card-desc leading-relaxed mt-2">
+          Cerradas dentro de plazo DS49.
+        </p>
+      </div>
+
+      <div class="rounded-lg border border-gray-200 shadow card-block p-5">
+        <p class="text-4xl font-extrabold text-blue-techo card-number leading-none">
+          18
+        </p>
+        <p class="text-sm font-semibold hero-title">
+          Observaciones activas
+        </p>
+        <p class="text-[12px] card-desc leading-relaxed mt-2">
+          Aún requieren seguimiento y evidencia fotográfica.
+        </p>
+      </div>
+
+      <div class="rounded-lg border border-gray-200 shadow card-block p-5">
+        <p class="text-4xl font-extrabold text-blue-techo card-number leading-none">
+          Última act.
+        </p>
+        <p class="text-sm font-semibold hero-title">
+          06 Oct · 16:40
+        </p>
+        <p class="text-[12px] card-desc leading-relaxed mt-2">
+          Sincronizado con coordinación postventa.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer
+    class="text-center text-[10px] text-gray-500 py-6 hero-desc bg-gray-100 border-t border-gray-200 mt-8"
+  >
+    Plataforma Habitacional TECHO Chile · Uso interno terreno / postventa
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/theme.js"></script>
+  <script src="assets/a11y.js"></script>
+</body>
+</html>

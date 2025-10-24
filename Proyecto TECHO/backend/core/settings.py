@@ -1,11 +1,16 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+
+# Base dir del proyecto Django (la carpeta backend/core está acá)
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR.parent / ".env")
+
+# Cargar variables desde backend/.env
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("DJANGO_SECRET", "dev-secret")
 DEBUG = True
+
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
 INSTALLED_APPS = [
@@ -17,14 +22,13 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # Terceros
+    # Apps externas
     "rest_framework",
     "corsheaders",
 
-    # Tu app
+    # App del proyecto
     "api",
 ]
-
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -37,11 +41,22 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# permitir que el frontend (Live Server) hable con la API
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+]
+
+ROOT_URLCONF = "core.urls"
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],  # si después quieres templates para el admin custom, los agregamos acá
+        "DIRS": [
+            os.path.join(BASE_DIR, "core", "templates"),
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -54,19 +69,9 @@ TEMPLATES = [
     },
 ]
 
-# permitir que el FRONT (servido por Live Server) consuma la API
-CORS_ALLOWED_ORIGINS = [
-  "http://127.0.0.1:5500",
-  "http://localhost:5500",
-]
+WSGI_APPLICATION = "core.wsgi.application"
 
-REST_FRAMEWORK = {
-  "DEFAULT_AUTHENTICATION_CLASSES": (
-    "rest_framework_simplejwt.authentication.JWTAuthentication",
-  )
-}
-
-# PostgreSQL (usa tu DB validada)
+# Base de datos PostgreSQL
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -78,6 +83,24 @@ DATABASES = {
     }
 }
 
-STATIC_URL = "static/"
+# Autenticación REST con JWT (lo usaremos en el login más adelante)
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    )
+}
+
+LANGUAGE_CODE = "es-cl"
+TIME_ZONE = "America/Santiago"
+USE_I18N = True
+USE_TZ = True
+
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR.parent, "frontend", "assets"),
+]
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR.parent / "media"
+MEDIA_ROOT = BASE_DIR / "media"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

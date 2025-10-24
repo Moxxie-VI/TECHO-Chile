@@ -1,22 +1,27 @@
-"""
-URL configuration for core project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from .views import (
+    view_landing,
+    view_login,
+    view_recuperar,
+    view_panel_trabajador,
+    view_panel_admin,
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+
+    # API backend (lo que ya tenías)
+    path("api/", include("api.urls")),
+
+    # Páginas públicas / frontend
+    path("", view_landing, name="landing"),
+    path("login/", view_login, name="login"),
+    path("recuperar/", view_recuperar, name="recuperar"),
+
+    # Paneles internos según tipo de usuario
+    path("panel/trabajador/", view_panel_trabajador, name="panel_trabajador"),
+    path("panel/admin/", view_panel_admin, name="panel_admin"),
 ]
+
+
