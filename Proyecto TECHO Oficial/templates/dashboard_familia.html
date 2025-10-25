@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ panel_title }} · TECHO Chile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg-page: #eef3f8;
+      --bg-card: #ffffff;
+      --bg-sidebar: radial-gradient(circle at 0% 0%, #1d4ed8 0%, #0b1e34 70%);
+      --border-soft: rgba(0,0,0,0.07);
+      --text-main: #1a1a1a;
+      --text-dim: #6b7280;
+      --accent: #2563eb;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --shadow-card: 0 28px 60px rgba(0,0,0,.08);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR estilo más cálido / humano */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-sidebar);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+    }
+
+    .familia-block {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .familia-avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .familia-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: linear-gradient(135deg,#60a5fa,#1e3a8a);
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+    }
+
+    .familia-namebox {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+    .familia-name {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .familia-role {
+      font-size: .7rem;
+      color: #dbeafe;
+      font-weight: 500;
+    }
+
+    .familia-email {
+      font-size: .7rem;
+      line-height: 1.4;
+      color: #fff;
+      opacity: .8;
+      word-break: break-word;
+    }
+
+    .familia-rut {
+      font-size: .7rem;
+      line-height: 1.4;
+      color: #fff;
+      opacity: .8;
+      margin-top: 4px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-section-label {
+      color: rgba(255,255,255,.6);
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin: 16px 0 6px 4px;
+      letter-spacing: .03em;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      font-size: .8rem;
+      line-height: 1.2;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      color: #fff;
+      text-decoration: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      transition: all .15s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.18);
+    }
+
+    .logout-link {
+      margin-top: 20px;
+      font-size: .8rem;
+      color: #fecaca;
+      background: rgba(220,38,38,.18);
+      border-color: rgba(220,38,38,.4);
+    }
+    .logout-link:hover {
+      background: rgba(220,38,38,.35);
+    }
+
+    /* MAIN AREA */
+    .main-area {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 100%;
+    }
+
+    /* BLOQUE DE BIENVENIDA */
+    .hero-card {
+      background: radial-gradient(circle at 20% 20%, #ffffff 0%, #eaf2ff 60%);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 20px 24px 24px;
+    }
+
+    .hero-topline {
+      font-size: .7rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      margin-bottom: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      background: #1e40af;
+      color: #fff;
+      font-size: .65rem;
+      line-height: 1.2;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      box-shadow: 0 16px 32px rgba(0,0,0,.25);
+    }
+
+    .hero-hello {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0b2149;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .hero-text {
+      font-size: .9rem;
+      line-height: 1.5;
+      color: #374151;
+      max-width: 680px;
+    }
+
+    /* GRID INFO VIVIENDA */
+    .info-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(240px,100%),1fr));
+      gap: 16px;
+    }
+
+    .info-card {
+      background: #fff;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 32px rgba(0,0,0,.05);
+      padding: 14px 16px;
+      font-size: .8rem;
+      line-height: 1.4;
+    }
+
+    .info-card-title {
+      font-size: .7rem;
+      color: #6b7280;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      margin-bottom: 4px;
+    }
+
+    .info-card-value {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #111827;
+      word-break: break-word;
+    }
+
+    .estado-pill {
+      display: inline-block;
+      font-size: .75rem;
+      font-weight: 600;
+      line-height: 1.2;
+      border-radius: 999px;
+      padding: 4px 8px;
+      box-shadow: 0 12px 20px rgba(0,0,0,.07);
+    }
+
+    /* Si en el futuro conectamos estado de vivienda real, podemos cambiar color según estado */
+    .estado-ok {
+      background:#dcfce7;
+      color:#065f46;
+      border:1px solid #6ee7b7;
+    }
+    .estado-revision {
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fdba74;
+    }
+    .estado-atencion {
+      background:#fee2e2;
+      color:#991b1b;
+      border:1px solid #fca5a5;
+    }
+
+    /* SECCION DETALLE / EXPLICACIONES */
+    .detalle-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-soft);
+      padding: 20px 24px;
+      font-size: .9rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .detalle-header {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 8px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .detalle-sub {
+      font-size: .8rem;
+      color: #6b7280;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .obs-list {
+      font-size: .85rem;
+      color: #1f2937;
+      line-height: 1.4;
+      padding-left: 20px;
+      margin: 0 0 16px;
+    }
+
+    .alerta-box {
+      background: #fff7ed;
+      border: 1px solid #fdba74;
+      color: #9a3412;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      font-size: .8rem;
+      line-height: 1.4;
+      box-shadow: 0 16px 32px rgba(0,0,0,.05);
+    }
+
+    .contact-card {
+      background: radial-gradient(circle at 0% 0%, #1e3a8a 0%, #0f172a 70%);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 32px 60px rgba(0,0,0,.5);
+      padding: 20px 24px;
+      color: #fff;
+      font-size: .85rem;
+      line-height: 1.5;
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .contact-card h3 {
+      margin: 0 0 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .contact-detail {
+      font-size: .8rem;
+      color: #dbeafe;
+      line-height: 1.4;
+      margin-bottom: 6px;
+    }
+
+    .logout-inline {
+      display: inline-block;
+      color: #fecaca;
+      font-weight: 600;
+      font-size: .8rem;
+      text-decoration: none;
+      background: rgba(220,38,38,.18);
+      border: 1px solid rgba(220,38,38,.4);
+      border-radius: 8px;
+      padding: 6px 10px;
+      box-shadow: 0 16px 32px rgba(0,0,0,.6);
+    }
+
+    .logout-inline:hover {
+      background: rgba(220,38,38,.35);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR LATERAL -->
+  <aside class="sidebar">
+    <div class="familia-block">
+      <div class="familia-avatar-row">
+        <div class="familia-avatar">
+          {% if user.nombre and user.apellido %}
+            {{ user.nombre|first }}{{ user.apellido|first }}
+          {% else %}
+            {{ user.nombre|first }}?
+          {% endif %}
+        </div>
+        <div class="familia-namebox">
+          <div class="familia-name">
+            {{ user.nombre }} {{ user.apellido }}
+          </div>
+          <div class="familia-role">
+            Mi Vivienda
+          </div>
+        </div>
+      </div>
+
+      <div class="familia-email">
+        {{ user.correo }}
+      </div>
+
+      <div class="familia-rut">
+        {% if user.rut and user.rut != "" %}
+          RUT: {{ user.rut }}
+        {% else %}
+          RUT: -
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Tu vivienda</div>
+
+      <a class="nav-item" href="#">
+        🏠&nbsp; Estado general
+      </a>
+
+      <a class="nav-item" href="#">
+        🛠️&nbsp; Reparaciones / postventa
+      </a>
+
+      <a class="nav-item" href="#">
+        📷&nbsp; Evidencias subidas
+      </a>
+
+      <div class="nav-section-label">Ayuda</div>
+
+      <a class="nav-item" href="#">
+        ❔&nbsp; ¿Cómo funciona esto?
+      </a>
+
+      <a class="nav-item logout-link" href="{% url 'logout' %}">
+        🔒&nbsp; Cerrar sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main-area">
+
+    <!-- Tarjeta de bienvenida -->
+    <section class="hero-card">
+      <div class="hero-topline">
+        <div>{{ panel_title|default:"Mi Vivienda" }}</div>
+        <div class="hero-badge">Acompañamiento TECHO</div>
+      </div>
+
+      <div class="hero-hello">
+        Hola {{ user.nombre }} {{ user.apellido }},
+      </div>
+
+      <div class="hero-text">
+        Bienvenida/o al panel de tu vivienda. Aquí puedes revisar el estado
+        de las reparaciones, saber si hay observaciones pendientes y ver
+        el avance que TECHO está gestionando contigo.
+        <br /><br />
+        La idea es que nunca más te sientas sola/o después de recibir la casa:
+        puedes ver qué se reportó, qué se arregló y qué sigue pendiente.
+      </div>
+
+      <div class="info-grid">
+
+        <!-- Estado de vivienda -->
+        <div class="info-card">
+          <div class="info-card-title">Estado de tu vivienda</div>
+          <div class="info-card-value">
+            <!-- ejemplo visual: -->
+            <span class="estado-pill estado-revision">
+              En seguimiento postventa
+            </span>
+          </div>
+        </div>
+
+        <!-- Responsable TECHO -->
+        <div class="info-card">
+          <div class="info-card-title">Profesional a cargo</div>
+          <div class="info-card-value">
+            Equipo TECHO Postventa<br/>
+            <!-- más adelante esto viene de la BD -->
+            <span style="color:#6b7280; font-size:.75rem;">
+              (Puedes escribirle si algo empeora)
+            </span>
+          </div>
+        </div>
+
+        <!-- Última actualización -->
+        <div class="info-card">
+          <div class="info-card-title">Última actualización</div>
+          <div class="info-card-value">
+            24/10/2025<br/>
+            <span style="color:#6b7280; font-size:.75rem;">
+              Se registró filtración en techo dormitorio.
+            </span>
+          </div>
+        </div>
+
+        <!-- Prioridad -->
+        <div class="info-card">
+          <div class="info-card-title">Prioridad actual</div>
+          <div class="info-card-value">
+            <span class="estado-pill estado-atencion">
+              Alta
+            </span><br/>
+            <span style="color:#6b7280; font-size:.75rem;">
+              Riesgo de humedad interior.
+            </span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Detalle de observaciones -->
+    <section class="detalle-card">
+      <div class="detalle-header">
+        Observaciones reportadas en tu hogar
+        <span style="font-size:.7rem; font-weight:400; color:#6b7280;">
+          (ejemplo de vista)
+        </span>
+      </div>
+
+      <div class="detalle-sub">
+        Estas son las cosas que se han reportado en tu vivienda y su estado.
+        Cuando algo esté marcado como "resuelto", significa que el equipo
+        constructor o TECHO ya intervino.
+      </div>
+
+      <ul class="obs-list">
+        <li>
+          Filtración en dormitorio de los niños → <strong>En reparación</strong>.
+          <br/>
+          <span style="color:#6b7280; font-size:.75rem;">Fecha ingreso: 21/10/2025</span>
+        </li>
+        <li>
+          Goteras sector cocina → <strong>Resuelto</strong>.
+          <br/>
+          <span style="color:#6b7280; font-size:.75rem;">Reparado el 18/10/2025</span>
+        </li>
+        <li>
+          Puerta principal no cierra bien → <strong>Pendiente visita</strong>.
+          <br/>
+          <span style="color:#6b7280; font-size:.75rem;">Visita programada</span>
+        </li>
+      </ul>
+
+      <div class="alerta-box">
+        Si aparece algo urgente (por ejemplo, riesgo eléctrico o filtración grande),
+        por favor avísanos de inmediato. No esperes a la visita programada.
+      </div>
+    </section>
+
+    <!-- Contacto TECHO -->
+    <section class="contact-card">
+      <h3>¿Necesitas ayuda ahora?</h3>
+
+      <div class="contact-detail">
+        Puedes comunicarte con el equipo TECHO asignado a tu comunidad.
+      </div>
+
+      <div class="contact-detail">
+        Correo de contacto: <strong>postventa@techochile.cl</strong>
+      </div>
+
+      <div class="contact-detail">
+        Horario de respuesta: Lunes a Viernes, 09:00 - 18:00.
+      </div>
+
+      <div class="contact-detail" style="margin-top:12px;">
+        <a class="logout-inline" href="{% url 'logout' %}">Cerrar sesión</a>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
