@@ -1,0 +1,173 @@
+REATE TABLE casa (
+    idcasa        NUMBER NOT NULL,
+    modelocasa    VARCHAR2(1000 BYTE) NOT NULL,
+    cantcuarto    NUMBER(10) NOT NULL,
+    cantbanno     NUMBER(5) NOT NULL,
+    livicomecoci  VARCHAR2(1000 BYTE) NOT NULL,
+    piso          VARCHAR2(100 BYTE) NOT NULL,
+    plano         BLOB NOT NULL
+);
+
+ALTER TABLE casa ADD CONSTRAINT casa_pk PRIMARY KEY ( idcasa );
+
+CREATE TABLE cliente (
+    idcliente                     NUMBER NOT NULL,
+    rutcliente                    VARCHAR2(10 BYTE) NOT NULL,
+    nombrecli                     VARCHAR2(100 BYTE) NOT NULL,
+    apellidocli                   VARCHAR2(100 BYTE) NOT NULL,
+    telefono                      NUMBER(9) NOT NULL,
+    correo                        VARCHAR2(100 BYTE) NOT NULL,
+    contrasenna                   VARCHAR2(1000 BYTE) NOT NULL,
+    registro_posventa_idregistro  NUMBER NOT NULL
+);
+
+ALTER TABLE cliente ADD CONSTRAINT cliente_pkv1 PRIMARY KEY ( idcliente );
+
+ALTER TABLE cliente ADD CONSTRAINT cliente_rutcliente_correo_un UNIQUE ( rutcliente,
+                                                                         correo );
+
+CREATE TABLE constructora (
+    idconstructora    NUMBER NOT NULL,
+    rut_constructora  VARCHAR2(10 BYTE) NOT NULL,
+    nomconstuct       VARCHAR2(1000 BYTE) NOT NULL,
+    direccion         VARCHAR2(1000 BYTE) NOT NULL,
+    correo            VARCHAR2(100 BYTE) NOT NULL
+);
+
+ALTER TABLE constructora ADD CONSTRAINT constructora_pk PRIMARY KEY ( idconstructora );
+
+
+--  ERROR: UK name length exceeds maximum allowed length(30) 
+
+ALTER TABLE constructora ADD CONSTRAINT constructora_rut_constructora_un UNIQUE ( rut_constructora );
+
+CREATE TABLE departamento (
+    iddepartamento      NUMBER NOT NULL,
+    modelodepartamento  VARCHAR2(1000 BYTE) NOT NULL,
+    cantcuarto          NUMBER(10) NOT NULL,
+    cantbanno           NUMBER(5) NOT NULL,
+    livicomecoci        VARCHAR2(1000 BYTE) NOT NULL,
+    piso                VARCHAR2(100 BYTE) NOT NULL,
+    plano               BLOB NOT NULL
+);
+
+ALTER TABLE departamento ADD CONSTRAINT departamento_pk PRIMARY KEY ( iddepartamento );
+
+CREATE TABLE estado_inmueble (
+    idestado                   NUMBER NOT NULL,
+    folioinmueble              NUMBER NOT NULL,
+    estado                     VARCHAR2(4000 BYTE) NOT NULL,
+    observacion                VARCHAR2(4000 BYTE) NOT NULL,
+    ficha_inmueble_idinmueble  NUMBER NOT NULL
+);
+
+ALTER TABLE estado_inmueble ADD CONSTRAINT estado_inmueble_pk PRIMARY KEY ( idestado );
+
+CREATE TABLE ficha_inmueble (
+    idinmueble                   NUMBER NOT NULL,
+    tipoinmueble                 VARCHAR2(100 BYTE) NOT NULL,
+    proyecto_idproyecto          NUMBER NOT NULL,
+    casa_idcasa                  NUMBER NOT NULL,
+    departamento_iddepartamento  NUMBER NOT NULL
+);
+
+ALTER TABLE ficha_inmueble ADD CONSTRAINT ficha_inmueble_pk PRIMARY KEY ( idinmueble );
+
+CREATE TABLE privilegio (
+    id_privilegio   NUMBER NOT NULL,
+    tipoprivilegio  VARCHAR2(100 BYTE) NOT NULL
+);
+
+ALTER TABLE privilegio ADD CONSTRAINT privilegio_pk PRIMARY KEY ( id_privilegio );
+
+CREATE TABLE proyecto (
+    idproyecto                   NUMBER NOT NULL,
+    codigoproyecto               VARCHAR2(1000 BYTE) NOT NULL,
+    nomproyecto                  VARCHAR2(1000 BYTE) NOT NULL,
+    ubicacion                    VARCHAR2(1000 BYTE) NOT NULL,
+    fechainicio                  DATE NOT NULL,
+    fechaestimtermi              DATE NOT NULL,
+    constructora_idconstructora  NUMBER NOT NULL
+);
+
+ALTER TABLE proyecto ADD CONSTRAINT proyecto_pk PRIMARY KEY ( idproyecto );
+
+CREATE TABLE registro_posventa (
+    idregistro           NUMBER NOT NULL,
+    tipocatastro         VARCHAR2(4000 BYTE) NOT NULL,
+    observacion          VARCHAR2(4000 BYTE) NOT NULL,
+    imagen               BLOB NOT NULL,
+    proyecto_idproyecto  NUMBER NOT NULL
+);
+
+ALTER TABLE registro_posventa ADD CONSTRAINT registro_posventa_pk PRIMARY KEY ( idregistro );
+
+CREATE TABLE reporte (
+    idreporte            NUMBER NOT NULL,
+    reporteestado        VARCHAR2(4000 BYTE) NOT NULL,
+    reporteproyecto      VARCHAR2(4000 BYTE) NOT NULL,
+    proyecto_idproyecto  NUMBER NOT NULL
+);
+
+CREATE TABLE trabajador (
+    idtrabajador              NUMBER NOT NULL,
+    ruttrabajador             VARCHAR2(10 BYTE) NOT NULL,
+    nombretrab                VARCHAR2(100 BYTE) NOT NULL,
+    apellidotrab              VARCHAR2(100 BYTE) NOT NULL,
+    telefono                  NUMBER(9) NOT NULL,
+    area                      VARCHAR2(100 BYTE) NOT NULL,
+    cargo                     VARCHAR2(100 BYTE) NOT NULL,
+    correo                    VARCHAR2(100 BYTE) NOT NULL,
+    contrasenna               VARCHAR2(1000 BYTE) NOT NULL,
+    privilegio_id_privilegio  NUMBER NOT NULL,
+    proyecto_idproyecto       NUMBER NOT NULL
+);
+
+ALTER TABLE trabajador ADD CONSTRAINT trabajador_pk PRIMARY KEY ( idtrabajador );
+
+
+--  ERROR: UK name length exceeds maximum allowed length(30) 
+
+ALTER TABLE trabajador ADD CONSTRAINT trabajador_ruttrabajador_correo_un UNIQUE ( ruttrabajador,
+                                                                                  correo );
+
+ALTER TABLE cliente
+    ADD CONSTRAINT cliente_registro_posventa_fk FOREIGN KEY ( registro_posventa_idregistro )
+        REFERENCES registro_posventa ( idregistro );
+
+--  ERROR: FK name length exceeds maximum allowed length(30) 
+ALTER TABLE estado_inmueble
+    ADD CONSTRAINT estado_inmueble_ficha_inmueble_fk FOREIGN KEY ( ficha_inmueble_idinmueble )
+        REFERENCES ficha_inmueble ( idinmueble );
+
+ALTER TABLE ficha_inmueble
+    ADD CONSTRAINT ficha_inmueble_casa_fk FOREIGN KEY ( casa_idcasa )
+        REFERENCES casa ( idcasa );
+
+ALTER TABLE ficha_inmueble
+    ADD CONSTRAINT ficha_inmueble_departamento_fk FOREIGN KEY ( departamento_iddepartamento )
+        REFERENCES departamento ( iddepartamento );
+
+ALTER TABLE ficha_inmueble
+    ADD CONSTRAINT ficha_inmueble_proyecto_fk FOREIGN KEY ( proyecto_idproyecto )
+        REFERENCES proyecto ( idproyecto );
+
+ALTER TABLE proyecto
+    ADD CONSTRAINT proyecto_constructora_fk FOREIGN KEY ( constructora_idconstructora )
+        REFERENCES constructora ( idconstructora );
+
+ALTER TABLE registro_posventa
+    ADD CONSTRAINT registro_posventa_proyecto_fk FOREIGN KEY ( proyecto_idproyecto )
+        REFERENCES proyecto ( idproyecto );
+
+ALTER TABLE reporte
+    ADD CONSTRAINT reporte_proyecto_fk FOREIGN KEY ( proyecto_idproyecto )
+        REFERENCES proyecto ( idproyecto );
+
+ALTER TABLE trabajador
+    ADD CONSTRAINT trabajador_privilegio_fk FOREIGN KEY ( privilegio_id_privilegio )
+        REFERENCES privilegio ( id_privilegio );
+
+ALTER TABLE trabajador
+    ADD CONSTRAINT trabajador_proyecto_fk FOREIGN KEY ( proyecto_idproyecto )
+        REFERENCES proyecto ( idproyecto );
