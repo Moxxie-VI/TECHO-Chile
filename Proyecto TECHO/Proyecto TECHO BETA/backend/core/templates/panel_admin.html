@@ -1,0 +1,1172 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Administración | TECHO Chile</title>
+
+  <!-- Tailwind -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+
+  <style>
+    :root {
+      --techo-blue: #0072ff;
+      --techo-blue-dark: #002a6d;
+      --panel-bg: radial-gradient(circle at 20% 10%, #ffffff 0%, #eef6ff 40%, #e8eefc 70%, #e3ecff 100%);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--panel-bg);
+      background-attachment: fixed;
+      color: #1e293b;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Roboto", "Helvetica Neue", sans-serif;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar-wrapper {
+      background: radial-gradient(circle at -20% -20%, #2f6fff 0%, #001227 60%);
+      color: #fff;
+      box-shadow: 8px 0 32px rgba(0,0,0,0.45);
+    }
+    .sidebar-open   { width: 17rem; } /* 272px */
+    .sidebar-closed { width: 4.5rem; } /* 72px  */
+    .sidebar-transition { transition: width 0.25s ease; }
+
+    .sb-visible   { opacity: 1; max-width: 200px; }
+    .sb-hidden    { opacity: 0; max-width: 0; }
+    .sb-anim      { transition: opacity .2s linear, max-width .2s linear; white-space:nowrap; overflow:hidden; }
+
+    .avatar-frame {
+      background: radial-gradient(circle at 30% 30%, #ffffff 0%, #dbeafe 40%, #93c5fd 70%);
+      box-shadow: 0 12px 36px rgba(0,0,0,.5);
+    }
+
+    .menu-btn {
+      border-radius: .6rem;
+      transition: background .15s, box-shadow .15s;
+    }
+    .menu-btn-active {
+      background-color: rgba(255,255,255,0.14);
+      box-shadow: 0 12px 24px rgba(0,0,0,.45);
+    }
+    .menu-btn:hover {
+      background-color: rgba(255,255,255,0.08);
+      box-shadow: 0 10px 20px rgba(0,0,0,.4);
+    }
+
+    .menu-icon-bubble {
+      background-color: rgba(255,255,255,0.12);
+      border-radius: .75rem;
+      width: 2rem;
+      height: 2rem;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .9rem;
+      font-weight: 600;
+      line-height: 1rem;
+      color: #fff;
+    }
+
+    /* ===== CONTENT WRAPPER ===== */
+    .content-shell {
+      background-color: rgba(255,255,255,0.75);
+      backdrop-filter: blur(8px) saturate(1.2);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 1rem 1rem 0 0;
+      box-shadow:
+        0 50px 80px -20px rgba(0,0,0,.2),
+        0 4px 8px rgba(0,0,0,.05);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== TOP HEADER ===== */
+    .top-header {
+      background-color: rgba(255,255,255,0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-radius: 1rem 1rem 0 0;
+      box-shadow: 0 24px 40px -16px rgba(0,0,0,.15);
+    }
+
+    .badge-role {
+      background-color: #e0edff;
+      color: #003b8f;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: .4rem;
+      line-height: 1rem;
+    }
+
+    /* ===== CARDS ===== */
+    .admin-card {
+      background-color: #fff;
+      border-radius: .75rem;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow:
+        0 30px 60px -16px rgba(15,23,42,.2),
+        0 2px 3px rgba(0,0,0,.04);
+    }
+
+    .stat-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+    .stat-value-red    { color:#dc2626; font-size:1.75rem; font-weight:800; line-height:2rem; }
+    .stat-value-yellow { color:#d97706; font-size:1.75rem; font-weight:800; line-height:2rem; }
+    .stat-value-green  { color:#059669; font-size:1.75rem; font-weight:800; line-height:2rem; }
+
+    .chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1rem;
+      border-radius: 9999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+
+    /* ===== NOVEDADES ===== */
+    .news-card {
+      background: linear-gradient(
+        135deg,
+        #ffffff 0%,
+        #eef6ff 40%,
+        #e6f0ff 100%
+      );
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: .75rem;
+      box-shadow:
+        0 30px 60px -16px rgba(15,23,42,.25),
+        0 2px 4px rgba(0,0,0,.08);
+    }
+    .news-label {
+      background: #1e40af;
+      color:#fff;
+      font-size:10px;
+      font-weight:600;
+      padding:2px 6px;
+      border-radius:9999px;
+    }
+
+    /* ===== FOOTER SIDEBAR ===== */
+    .sidebar-footer {
+      font-size: .6rem;
+      line-height: .9rem;
+      color: rgba(255,255,255,0.5);
+    }
+
+    /* ===== MODAL TUTORIAL ===== */
+    .modal-overlay {
+      background: rgba(0,0,0,0.5);
+    }
+    .modal-card {
+      max-width: 480px;
+      width: 90%;
+      background: #fff;
+      border-radius: .75rem;
+      box-shadow:
+        0 40px 80px rgba(0,0,0,.45),
+        0 4px 6px rgba(0,0,0,.2);
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    /* ===== PROFILE SLIDE-OVER ===== */
+    #profilePanel {
+      right: 0;
+      top: 0;
+      height: 100vh;
+      max-width: 26rem; /* 416px */
+      width: 100%;
+      transform: translateX(110%);
+      transition: transform .28s cubic-bezier(.2,.9,.2,1);
+    }
+    #profilePanel.open {
+      transform: translateX(0%);
+    }
+    #profilePanelOverlay {
+      transition: opacity .25s ease;
+      opacity: 0;
+      pointer-events: none;
+    }
+    #profilePanelOverlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #profilePanelAvatar {
+      background: linear-gradient(135deg,#e6f0ff,#cfe6ff);
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body class="flex">
+
+  <!-- ========================================================= -->
+  <!-- SIDEBAR -->
+  <!-- ========================================================= -->
+  <aside
+    id="sidebar"
+    class="sidebar-wrapper sidebar-open sidebar-transition flex flex-col text-white"
+  >
+    <!-- TOP: usuario + toggle + flecha perfil -->
+    <div class="px-4 py-4 border-b border-white/20 flex items-start">
+      <div class="flex-1 flex items-start space-x-3 overflow-hidden">
+
+        <!-- Avatar -->
+        <div class="relative flex-shrink-0">
+          {% if avatar_url %}
+            <img
+              id="sidebarAvatarImg"
+              src="{{ avatar_url }}"
+              alt="Foto perfil"
+              class="h-12 w-12 rounded-xl object-cover border-2 border-white shadow-lg"
+            />
+          {% else %}
+            <div
+              id="sidebarAvatarImg"
+              class="h-12 w-12 rounded-xl border-2 border-white shadow-lg avatar-frame text-gray-900 font-bold text-sm uppercase flex items-center justify-center"
+            >
+              {% if nombre and apellido %}
+                {{ nombre|slice:":1" }}{{ apellido|slice:":1" }}
+              {% else %}
+                AD
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Cambiar foto -->
+          <label
+            for="upload-avatar"
+            class="absolute -bottom-1 -right-1 bg-white text-gray-700 text-[10px] font-semibold rounded-full px-1.5 py-0.5 border border-gray-300 shadow cursor-pointer hover:bg-gray-100"
+            title="Cambiar foto"
+          >
+            ✎
+          </label>
+          <input id="upload-avatar" type="file" accept="image/*" class="hidden" />
+        </div>
+
+        <!-- Info usuario -->
+        <div class="leading-tight overflow-hidden">
+          <div class="flex items-center gap-2">
+            <p class="text-white text-sm font-bold tracking-tight sb-anim sb-visible truncate">
+              {{ nombre }} {{ apellido }}
+            </p>
+
+            <!-- Flecha -> abre panel perfil -->
+            <button
+              id="openProfilePanel"
+              class="ml-1 text-white/80 hover:text-white focus:outline-none p-1 rounded"
+              title="Ver perfil"
+            >
+              <svg id="openArrowIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          <p class="text-[11px] text-blue-200 font-semibold leading-tight sb-anim sb-visible truncate">
+            {{ role }} · TECHO Chile
+          </p>
+          <p class="text-[10px] text-white/80 leading-tight sb-anim sb-visible break-all">
+            {{ email }}
+          </p>
+          <p class="text-[10px] text-green-300 font-semibold flex items-center gap-1 mt-1 sb-anim sb-visible">
+            <span class="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            Conectado
+          </p>
+        </div>
+      </div>
+
+      <button
+        id="sidebarToggle"
+        class="ml-2 flex-shrink-0 text-white/70 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 rounded-lg p-2"
+        title="Expandir / Colapsar menú"
+      >
+        <span class="text-xl leading-none">≡</span>
+      </button>
+    </div>
+
+    <!-- MENU -->
+    <nav class="flex-1 px-3 py-4 text-[13px] font-medium overflow-y-auto space-y-1">
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn menu-btn-active">
+        <div class="menu-icon-bubble">📊</div>
+        <span class="sb-anim sb-visible">Resumen general</span>
+      </button>
+
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn">
+        <div class="menu-icon-bubble">🏠</div>
+        <span class="sb-anim sb-visible">Proyectos y viviendas</span>
+      </button>
+
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn">
+        <div class="menu-icon-bubble">🛠</div>
+        <span class="sb-anim sb-visible">Postventa / Reparaciones</span>
+      </button>
+
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn">
+        <div class="menu-icon-bubble">📄</div>
+        <span class="sb-anim sb-visible">Reportes DS49</span>
+      </button>
+
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn">
+        <div class="menu-icon-bubble">👥</div>
+        <span class="sb-anim sb-visible">Usuarios / Roles</span>
+      </button>
+
+      <button class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn">
+        <div class="menu-icon-bubble">🏡</div>
+        <span class="sb-anim sb-visible">Comunidades / Familias</span>
+      </button>
+
+      <!-- Tutorial -->
+      <button
+        id="openTutorial"
+        class="w-full flex items-center space-x-3 text-left text-white px-3 py-2 menu-btn"
+      >
+        <div class="menu-icon-bubble">🎥</div>
+        <span class="sb-anim sb-visible">Tutorial / Ayuda</span>
+      </button>
+    </nav>
+
+    <!-- FOOTER -->
+    <div class="px-4 py-4 border-t border-white/20 text-[12px]">
+      <form id="logoutForm" class="mb-3">
+        <button
+          type="submit"
+          class="w-full flex items-center justify-center gap-2 text-red-200 hover:text-red-100 bg-red-900/30 hover:bg-red-900/40 transition font-semibold rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-400"
+        >
+          <span class="text-lg leading-none">⏻</span>
+          <span class="sb-anim sb-visible whitespace-nowrap">
+            Cerrar sesión
+          </span>
+        </button>
+      </form>
+
+      <div class="sidebar-footer sb-anim sb-visible">
+        Plataforma Habitacional<br />
+        TECHO Chile · Uso interno
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================= -->
+  <!-- CONTENIDO PRINCIPAL -->
+  <!-- ========================================================= -->
+  <section class="flex-1 min-h-screen flex flex-col">
+
+    <div class="content-shell flex-1">
+
+      <!-- HEADER SUPERIOR -->
+      <header class="top-header px-4 sm:px-6 py-4 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+        <!-- IZQUIERDA: saludo -->
+        <div class="flex-1 min-w-0">
+          <p class="text-[12px] font-semibold text-blue-700 uppercase tracking-wide flex items-center gap-2">
+            <span>PANEL ADMINISTRACIÓN</span>
+            <span class="badge-role">{{ role }}</span>
+          </p>
+
+          <h1 class="text-2xl font-extrabold text-gray-900 leading-snug flex flex-wrap items-baseline gap-2">
+            Hola, {{ nombre }} {{ apellido }}
+          </h1>
+
+          <p class="text-[13px] text-gray-700 leading-relaxed max-w-xl mt-2">
+            Monitorea el avance de proyectos de vivienda, revisa alertas de postventa
+            y controla el cumplimiento DS49. Esta vista es exclusiva para
+            administración TECHO.
+          </p>
+        </div>
+
+        <!-- DERECHA: Últimas novedades -->
+        <div class="w-full lg:w-auto flex-shrink-0">
+          <div class="news-card p-4 max-w-sm">
+            <div class="flex items-start gap-3">
+              <div
+                class="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-md"
+                aria-hidden="true"
+              >
+                ℹ
+              </div>
+              <div class="flex-1 min-w-0 leading-tight">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="text-[12px] text-gray-600 font-semibold uppercase tracking-wide">
+                    Últimas novedades
+                  </p>
+                  <span class="news-label">NUEVO</span>
+                </div>
+
+                <p class="text-[13px] text-gray-900 font-semibold leading-snug mt-1">
+                  Ajuste de plazos DS49 Biobío
+                </p>
+                <p class="text-[12px] text-gray-700 leading-snug mt-1">
+                  Se fijaron 7 días hábiles para filtrar reportes críticos de
+                  filtración en baños. Revisión obligatoria en terreno.
+                </p>
+
+                <button
+                  class="text-[12px] font-semibold text-blue-700 hover:text-blue-800 hover:underline mt-2 focus:outline-none"
+                >
+                  Ver más comunicados internos →
+                </button>
+              </div>
+            </div>
+
+            <!-- mini listado interno -->
+            <div class="mt-4 text-[11px] text-gray-600 border-t border-blue-100 pt-3 space-y-2">
+              <div class="flex items-start gap-2">
+                <span class="bg-yellow-100 text-yellow-800 text-[10px] font-semibold rounded px-2 py-[2px] flex-shrink-0">Plazo</span>
+                <span class="leading-snug">
+                  Recordatorio: Villa Nuevo Futuro cierra inspección final en 7 días.
+                </span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="bg-green-100 text-green-700 text-[10px] font-semibold rounded px-2 py-[2px] flex-shrink-0">Avance</span>
+                <span class="leading-snug">
+                  90% de familias con acceso al seguimiento en línea.
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="px-4 sm:px-6 py-6 space-y-6">
+
+        <!-- BLOQUE DE MÉTRICAS CLAVE -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <!-- Plazos críticos -->
+          <div class="admin-card p-4">
+            <p class="stat-title">Plazos críticos DS49</p>
+            <p class="stat-value-red mt-1">5</p>
+            <p class="text-[12px] text-gray-600 mt-2 leading-relaxed">
+              Casos con riesgo de incumplimiento en menos de 7 días.
+            </p>
+            <button class="mt-3 text-[12px] font-semibold text-red-600 hover:text-red-700 hover:underline">
+              Revisar urgentes →
+            </button>
+          </div>
+
+          <!-- Observaciones abiertas -->
+          <div class="admin-card p-4">
+            <p class="stat-title">Observaciones abiertas</p>
+            <p class="stat-value-yellow mt-1">37</p>
+            <p class="text-[12px] text-gray-600 mt-2 leading-relaxed">
+              Observaciones reportadas en terreno que aún requieren acción.
+            </p>
+            <button class="mt-3 text-[12px] font-semibold text-yellow-600 hover:text-yellow-700 hover:underline">
+              Ver lista completa →
+            </button>
+          </div>
+
+          <!-- Familias activas -->
+          <div class="admin-card p-4">
+            <p class="stat-title">Familias activas</p>
+            <p class="stat-value-green mt-1">80</p>
+            <p class="text-[12px] text-gray-600 mt-2 leading-relaxed">
+              Familias con acceso habilitado para ver estado de su vivienda.
+            </p>
+            <button class="mt-3 text-[12px] font-semibold text-green-600 hover:text-green-700 hover:underline">
+              Gestionar accesos →
+            </button>
+          </div>
+        </section>
+
+        <!-- BLOQUE PROYECTOS + OBSERVACIONES -->
+        <section class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+          <!-- Proyectos recientes -->
+          <div class="admin-card p-4 flex flex-col">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h2 class="text-[14px] font-bold text-gray-900 leading-tight">
+                  Proyectos recientes
+                </h2>
+                <p class="text-[12px] text-gray-500 leading-relaxed">
+                  Últimos proyectos ingresados o actualizados.
+                </p>
+              </div>
+              <button
+                class="text-[12px] font-semibold text-blue-600 hover:text-blue-700 hover:underline focus:outline-none"
+              >
+                Ver todos
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-[12px]">
+                <thead class="text-gray-500 border-b border-gray-200">
+                  <tr>
+                    <th class="py-2 pr-4 font-semibold">Proyecto</th>
+                    <th class="py-2 pr-4 font-semibold">Ubicación</th>
+                    <th class="py-2 pr-4 font-semibold">Estado</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-4">
+                      Condominio Los Alerces
+                      <span class="block text-[11px] text-gray-500">
+                        Código: DS49-VALP-014
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">Valparaíso</td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-blue-100 text-blue-700 border-blue-300">
+                        En recepción
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-4">
+                      Villa Nuevo Futuro
+                      <span class="block text-[11px] text-gray-500">
+                        Código: DS49-BIOB-022
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">Biobío</td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-green-100 text-green-700 border-green-300">
+                        Cerrado
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="py-2 pr-4">
+                      Barrio Esperanza
+                      <span class="block text-[11px] text-gray-500">
+                        Código: DS49-RM-031
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">RM</td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-yellow-100 text-yellow-700 border-yellow-300">
+                        Postventa
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          <!-- Observaciones críticas -->
+          <div class="admin-card p-4 flex flex-col">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <h2 class="text-[14px] font-bold text-gray-900 leading-tight">
+                  Observaciones críticas
+                </h2>
+                <p class="text-[12px] text-gray-500 leading-relaxed">
+                  Reportes de falla constructiva en seguimiento.
+                </p>
+              </div>
+              <button
+                class="text-[12px] font-semibold text-blue-600 hover:text-blue-700 hover:underline focus:outline-none"
+              >
+                Ver todas
+              </button>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-[12px]">
+                <thead class="text-gray-500 border-b border-gray-200">
+                  <tr>
+                    <th class="py-2 pr-4 font-semibold">Familia</th>
+                    <th class="py-2 pr-4 font-semibold">Descripción</th>
+                    <th class="py-2 pr-4 font-semibold">Plazo</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-4">
+                      Pérez / Dpto 302
+                      <span class="block text-[11px] text-gray-500">
+                        Valparaíso
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">
+                      Filtración en baño principal
+                    </td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-red-100 text-red-700 border-red-300">
+                        Urgente (3 días)
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr class="border-b border-gray-100">
+                    <td class="py-2 pr-4">
+                      Castillo / Casa 14
+                      <span class="block text-[11px] text-gray-500">
+                        Biobío
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">
+                      Grieta en muro dormitorio niños
+                    </td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-yellow-100 text-yellow-700 border-yellow-300">
+                        7 días
+                      </span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="py-2 pr-4">
+                      Muñoz / Casa 7
+                      <span class="block text-[11px] text-gray-500">
+                        RM
+                      </span>
+                    </td>
+                    <td class="py-2 pr-4">
+                      Puerta de acceso no cierra bien
+                    </td>
+                    <td class="py-2 pr-4">
+                      <span class="chip bg-blue-100 text-blue-700 border-blue-300">
+                        En gestión
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- BLOQUE AYUDA -->
+        <section class="admin-card p-4">
+          <h2 class="text-[14px] font-bold text-gray-900 leading-tight mb-2">
+            ¿Qué puedo hacer desde aquí?
+          </h2>
+          <p class="text-[13px] text-gray-700 leading-relaxed">
+            • Validar estado de recepción y generar reportes DS49.<br />
+            • Dar seguimiento a observaciones levantadas por el equipo en terreno.<br />
+            • Coordinar reparaciones postventa y documentar evidencia.<br />
+            • Habilitar cuentas para nuevas familias y nuevos trabajadores TECHO.<br />
+            • Revisar plazos críticos asociados a cada proyecto habitacional.
+          </p>
+        </section>
+
+      </main>
+
+      <!-- FOOTER -->
+      <footer class="px-4 sm:px-6 py-4 text-[11px] text-gray-500 border-t border-gray-200 bg-white bg-opacity-70 backdrop-filter backdrop-blur">
+        Plataforma Habitacional TECHO Chile · Uso interno
+      </footer>
+
+    </div> <!-- /content-shell -->
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- PROFILE SLIDE-OVER (panel tipo menú cuenta) -->
+  <!-- ========================================================= -->
+  <div id="profilePanelOverlay" class="fixed inset-0 z-60 bg-black bg-opacity-40 hidden"></div>
+
+  <aside
+    id="profilePanel"
+    class="fixed right-0 top-0 h-full w-96 bg-white z-70 transform shadow-2xl overflow-auto hidden"
+  >
+    <div class="p-5">
+      <div class="flex items-start justify-between">
+        <div class="flex items-start gap-4">
+          <div class="relative">
+            <img
+              id="profilePanelAvatar"
+              src="{{ avatar_url|default:'' }}"
+              alt="Avatar"
+              class="h-16 w-16 rounded-md object-cover border"
+            />
+            <label
+              for="upload-avatar-2"
+              class="absolute -bottom-2 -right-2 bg-white px-2 py-1 rounded shadow cursor-pointer text-xs border"
+            >
+              Cambiar
+            </label>
+            <input id="upload-avatar-2" type="file" accept="image/*" class="hidden" />
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold text-gray-900">
+              {{ nombre }} {{ apellido }}
+            </h3>
+            <p class="text-sm text-gray-600">
+              RUT: <strong id="profileRut">{{ rut|default:"-" }}</strong>
+            </p>
+            <p class="text-sm text-gray-600">
+              Cargo: <strong id="profileRole">{{ role|default:"-" }}</strong>
+            </p>
+            <p class="text-sm text-gray-600">
+              Correo: <strong id="profileEmail">{{ email }}</strong>
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <button
+            id="closeProfilePanel"
+            class="text-gray-500 hover:text-gray-800 text-xl font-bold"
+            title="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+
+      <hr class="my-4" />
+
+      <!-- Form editar perfil -->
+      <form id="profileEditForm" class="space-y-3">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Nombre</label>
+          <input
+            name="nombre"
+            id="inputNombre"
+            value="{{ nombre }}"
+            class="w-full border rounded px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Apellido</label>
+          <input
+            name="apellido"
+            id="inputApellido"
+            value="{{ apellido }}"
+            class="w-full border rounded px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">RUT</label>
+          <input
+            name="rut"
+            id="inputRut"
+            value="{{ rut|default:'' }}"
+            class="w-full border rounded px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">Correo</label>
+          <input
+            name="email"
+            id="inputEmail"
+            value="{{ email }}"
+            class="w-full border rounded px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div class="flex items-center gap-2 mt-2">
+          <button
+            type="submit"
+            class="px-4 py-2 bg-blue-600 text-white rounded font-semibold"
+          >
+            Guardar cambios
+          </button>
+          <button
+            type="button"
+            id="cancelProfileEdit"
+            class="px-4 py-2 border rounded text-gray-700"
+          >
+            Cancelar
+          </button>
+        </div>
+
+        <p
+          id="profileMsg"
+          class="text-sm text-green-600 mt-2 hidden"
+        ></p>
+      </form>
+
+      <hr class="my-4" />
+
+      <div class="space-y-2">
+        <button
+          id="goToProfilePage"
+          class="w-full text-left px-3 py-2 rounded hover:bg-gray-50"
+        >
+          Ver perfil completo
+        </button>
+        <button
+          id="logoutBtnSmall"
+          class="w-full text-left px-3 py-2 rounded hover:bg-gray-50 text-red-600 font-semibold"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================================= -->
+  <!-- MODAL TUTORIAL -->
+  <!-- ========================================================= -->
+  <div
+    id="tutorialModal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay"
+  >
+    <div class="modal-card relative p-5 bg-white">
+      <button
+        id="closeTutorial"
+        class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl font-bold leading-none focus:outline-none"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+      <h3 class="text-lg font-bold text-gray-900">
+        Tutorial de uso de la plataforma
+      </h3>
+      <p class="text-[13px] text-gray-600 mt-2 leading-relaxed">
+        Aquí podrás ver paso a paso cómo usar la plataforma:
+        cómo iniciar sesión, registrar observaciones, generar reportes DS49 y
+        dar seguimiento a las viviendas.
+      </p>
+
+      <div class="mt-4 w-full h-40 bg-gray-100 border border-gray-300 rounded flex items-center justify-center text-gray-500 text-[12px] font-medium">
+        (Aquí irá el video explicativo para trabajadores y administradores. 🎥)
+      </div>
+
+      <p class="text-[12px] text-gray-500 mt-4">
+        Si necesitas ayuda urgente, comunícate con tu coordinador TECHO o
+        escribe a soporte interno.
+      </p>
+
+      <div class="mt-5 flex justify-end">
+        <button
+          id="closeTutorial2"
+          class="px-3 py-2 text-[12px] font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JS -->
+  <!-- ========================================================= -->
+
+  <script>
+    // Utilidad CSRF (para logout / futuras llamadas)
+    function getCookie(name) {
+      const value = "; " + document.cookie;
+      const parts = value.split("; " + name + "=");
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return null;
+    }
+
+    (function () {
+      // --------------------------------------
+      // LOGOUT (botón del sidebar grande)
+      // --------------------------------------
+      const logoutForm = document.getElementById("logoutForm");
+      if (logoutForm) {
+        logoutForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const csrftoken = getCookie("csrftoken");
+
+          try {
+            await fetch("/api/auth/logout/", {
+              method: "POST",
+              headers: {
+                "X-CSRFToken": csrftoken || "",
+              },
+            });
+          } catch (err) {
+            console.warn("Error al cerrar sesión (fetch):", err);
+          }
+
+          localStorage.removeItem("techo_keep_session");
+          window.location.href = "/login/";
+        });
+      }
+
+      // --------------------------------------
+      // SIDEBAR TOGGLE (colapsar/expandir)
+      // --------------------------------------
+      const sidebar   = document.getElementById("sidebar");
+      const toggleBtn = document.getElementById("sidebarToggle");
+      const sbTexts   = document.querySelectorAll(".sb-anim");
+
+      let sbOpen = true; // estado inicial: abierto
+
+      function applySidebarState() {
+        if (sbOpen) {
+          sidebar.classList.remove("sidebar-closed");
+          sidebar.classList.add("sidebar-open");
+
+          sbTexts.forEach((el) => {
+            el.classList.remove("sb-hidden");
+            el.classList.add("sb-visible");
+          });
+        } else {
+          sidebar.classList.remove("sidebar-open");
+          sidebar.classList.add("sidebar-closed");
+
+          sbTexts.forEach((el) => {
+            el.classList.remove("sb-visible");
+            el.classList.add("sb-hidden");
+          });
+        }
+      }
+
+      if (toggleBtn) {
+        toggleBtn.addEventListener("click", () => {
+          sbOpen = !sbOpen;
+          applySidebarState();
+        });
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        sbTexts.forEach((el) => {
+          el.classList.add("sb-visible");
+        });
+      });
+
+      // --------------------------------------
+      // TUTORIAL MODAL
+      // --------------------------------------
+      const openTutorialBtn  = document.getElementById("openTutorial");
+      const tutorialModal    = document.getElementById("tutorialModal");
+      const closeTutorialBtn = document.getElementById("closeTutorial");
+      const closeTutorial2   = document.getElementById("closeTutorial2");
+
+      function openTutorial() {
+        if (tutorialModal) tutorialModal.classList.remove("hidden");
+      }
+      function closeTutorial() {
+        if (tutorialModal) tutorialModal.classList.add("hidden");
+      }
+
+      if (openTutorialBtn) openTutorialBtn.addEventListener("click", openTutorial);
+      if (closeTutorialBtn) closeTutorialBtn.addEventListener("click", closeTutorial);
+      if (closeTutorial2) closeTutorial2.addEventListener("click", closeTutorial);
+
+      if (tutorialModal) {
+        tutorialModal.addEventListener("click", (e) => {
+          if (e.target === tutorialModal) {
+            closeTutorial();
+          }
+        });
+      }
+
+      // --------------------------------------
+      // PROFILE PANEL (slide-over tipo "flecha al lado del nombre")
+      // --------------------------------------
+      const openProfileBtn = document.getElementById("openProfilePanel");
+      const profilePanel = document.getElementById("profilePanel");
+      const profileOverlay = document.getElementById("profilePanelOverlay");
+      const closeProfileBtn = document.getElementById("closeProfilePanel");
+
+      function openProfile() {
+        if (!profilePanel || !profileOverlay) return;
+        profilePanel.classList.remove("hidden");
+        profileOverlay.classList.remove("hidden");
+
+        // animación
+        requestAnimationFrame(() => {
+          profilePanel.classList.add("open");
+          profileOverlay.classList.add("open");
+        });
+      }
+
+      function closeProfile() {
+        if (!profilePanel || !profileOverlay) return;
+        profilePanel.classList.remove("open");
+        profileOverlay.classList.remove("open");
+
+        // esperar la transicion para esconder
+        setTimeout(() => {
+          profilePanel.classList.add("hidden");
+          profileOverlay.classList.add("hidden");
+        }, 250);
+      }
+
+      if (openProfileBtn) openProfileBtn.addEventListener("click", openProfile);
+      if (closeProfileBtn) closeProfileBtn.addEventListener("click", closeProfile);
+      if (profileOverlay) profileOverlay.addEventListener("click", closeProfile);
+
+      // --------------------------------------
+      // AVATAR PREVIEW (sidebar + panel)
+      // --------------------------------------
+      const uploadInput  = document.getElementById("upload-avatar");
+      const uploadInput2 = document.getElementById("upload-avatar-2");
+      const profileAvatarMain   = document.getElementById("sidebarAvatarImg");
+      const profilePanelAvatar  = document.getElementById("profilePanelAvatar");
+
+      function handleImagePreview(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const src = e.target.result;
+          if (profileAvatarMain) {
+            if (profileAvatarMain.tagName === "IMG") {
+              profileAvatarMain.src = src;
+            } else {
+              profileAvatarMain.style.backgroundImage = `url('${src}')`;
+              profileAvatarMain.style.backgroundSize = "cover";
+              profileAvatarMain.style.backgroundPosition = "center";
+              profileAvatarMain.textContent = "";
+            }
+          }
+          if (profilePanelAvatar) profilePanelAvatar.src = src;
+        };
+        reader.readAsDataURL(file);
+
+        // Aquí puedes subir al backend con fetch+FormData si quieres guardar
+        /*
+        const fd = new FormData();
+        fd.append('avatar', file);
+        fetch('/api/users/me/avatar/', {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': getCookie('csrftoken') || ''
+          },
+          body: fd
+        }).then(r => r.json())
+         .then(data => console.log('avatar actualizado', data));
+        */
+      }
+
+      if (uploadInput) {
+        uploadInput.addEventListener("change", (ev) => {
+          const f = ev.target.files && ev.target.files[0];
+          handleImagePreview(f);
+        });
+      }
+      if (uploadInput2) {
+        uploadInput2.addEventListener("change", (ev) => {
+          const f = ev.target.files && ev.target.files[0];
+          handleImagePreview(f);
+        });
+      }
+
+      // --------------------------------------
+      // EDITAR PERFIL (form dentro del slide-over)
+      // --------------------------------------
+      const profileForm = document.getElementById("profileEditForm");
+      const profileMsg = document.getElementById("profileMsg");
+      const cancelProfileEdit = document.getElementById("cancelProfileEdit");
+      const logoutBtnSmall = document.getElementById("logoutBtnSmall");
+
+      if (profileForm) {
+        profileForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(profileForm);
+
+          // mensaje visual de "guardando..."
+          profileMsg.textContent = "Guardando...";
+          profileMsg.classList.remove("hidden");
+          profileMsg.classList.remove("text-red-600");
+          profileMsg.classList.add("text-green-600");
+
+          // Ejemplo demo local. Aquí harías tu PUT/PATCH real a /api/users/me/
+          // usando fetch y csrftoken.
+          /*
+          try {
+            const res = await fetch('/api/users/me/', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken') || '',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                nombre:   formData.get('nombre'),
+                apellido: formData.get('apellido'),
+                rut:      formData.get('rut'),
+                email:    formData.get('email')
+              })
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error('Error guardando');
+          } catch(err) {
+            profileMsg.textContent = "Error al guardar. Intente nuevamente.";
+            profileMsg.classList.remove("text-green-600");
+            profileMsg.classList.add("text-red-600");
+            return;
+          }
+          */
+
+          // Simulación local:
+          setTimeout(() => {
+            const nuevoNombre = document.getElementById("inputNombre").value || "";
+            const nuevoApellido = document.getElementById("inputApellido").value || "";
+            const nuevoRut = document.getElementById("inputRut").value || "";
+            const nuevoEmail = document.getElementById("inputEmail").value || "";
+
+            // Sidebar: nombre y email
+            const sidebarNameEl = document.querySelector("#sidebar .text-white.text-sm.font-bold");
+            if (sidebarNameEl) {
+              sidebarNameEl.textContent = (nuevoNombre + " " + nuevoApellido).trim();
+            }
+            const sidebarEmailEl = Array.from(
+              document.querySelectorAll("#sidebar p.text-[10px]")
+            ).find(p => p.textContent && p.textContent.includes("@"));
+            if (sidebarEmailEl) sidebarEmailEl.textContent = nuevoEmail;
+
+            // Panel perfil: rut y correo
+            const profileRutEl = document.getElementById("profileRut");
+            if (profileRutEl) profileRutEl.textContent = nuevoRut;
+            const profileEmailEl = document.getElementById("profileEmail");
+            if (profileEmailEl) profileEmailEl.textContent = nuevoEmail;
+
+            profileMsg.textContent = "Guardado correctamente.";
+            setTimeout(() => {
+              profileMsg.classList.add("hidden");
+            }, 2000);
+          }, 1000);
+        });
+      }
+
+      // Botón cancelar: restaura valores originales renderizados por Django
+      if (cancelProfileEdit) {
+        cancelProfileEdit.addEventListener("click", () => {
+          document.getElementById("inputNombre").value   = "{{ nombre|escapejs }}";
+          document.getElementById("inputApellido").value = "{{ apellido|escapejs }}";
+          document.getElementById("inputRut").value      = "{{ rut|default:''|escapejs }}";
+          document.getElementById("inputEmail").value    = "{{ email|escapejs }}";
+          if (profileMsg) profileMsg.classList.add("hidden");
+        });
+      }
+
+      // Logout pequeño dentro del panel perfil
+      if (logoutBtnSmall) {
+        logoutBtnSmall.addEventListener("click", async () => {
+          try {
+            await fetch("/api/auth/logout/", {
+              method: "POST",
+              headers: { "X-CSRFToken": getCookie("csrftoken") || "" }
+            });
+          } catch (err) {
+            /* ignore */
+          }
+          localStorage.removeItem("techo_keep_session");
+          window.location.href = "/login/";
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

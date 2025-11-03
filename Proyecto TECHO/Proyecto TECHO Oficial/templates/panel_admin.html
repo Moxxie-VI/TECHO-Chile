@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ panel_title }} · TECHO Chile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg-page: #f5f6fa;
+      --bg-card: #ffffff;
+      --bg-sidebar: radial-gradient(circle at 0% 0%, #0f1e46 0%, #00132e 70%);
+      --border-soft: rgba(0,0,0,0.07);
+      --text-main: #1a1a1a;
+      --text-dim: #6b7280;
+      --accent: #2563eb;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-card: 0 28px 60px rgba(0,0,0,.08);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 250px;
+      background: var(--bg-sidebar);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+
+    .user-block {
+      display: flex;
+      flex-direction: column;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.17);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 20px;
+    }
+
+    .user-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .avatar-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: linear-gradient(135deg,#1e40af,#60a5fa);
+      color: #fff;
+      font-size: .8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .user-main {
+      flex: 1;
+      padding-left: 10px;
+    }
+
+    .user-name {
+      font-size: .8rem;
+      line-height: 1.2;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .user-role {
+      font-size: .7rem;
+      line-height: 1.2;
+      color: #c7d2fe;
+    }
+
+    .status-row {
+      display: flex;
+      align-items: center;
+      margin-top: 6px;
+      font-size: .7rem;
+      color: #c7d2fe;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background-color: #10b981; /* conectado = verde */
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .user-email {
+      font-size: .7rem;
+      color: #fff;
+      opacity: .8;
+      word-break: break-all;
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-section-label {
+      color: rgba(255,255,255,.5);
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin: 14px 0 6px 4px;
+      letter-spacing: .03em;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      font-size: .8rem;
+      line-height: 1.2;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      color: #fff;
+      text-decoration: none;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: all .15s;
+    }
+
+    .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .logout-link {
+      margin-top: 16px;
+      font-size: .8rem;
+      color: #fecaca;
+      background: rgba(220,38,38,.15);
+      border-color: rgba(220,38,38,.4);
+    }
+    .logout-link:hover {
+      background: rgba(220,38,38,.3);
+    }
+
+    /* MAIN WRAPPER */
+    .main-area {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* HEADER PANEL */
+    .header-card {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-soft);
+      padding: 20px 24px;
+    }
+
+    .header-topline {
+      font-size: .75rem;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .header-topline .badge-role {
+      background: #1e40af;
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .hello-row {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .hello-row span {
+      color: #111827;
+    }
+
+    .account-grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(min(220px,100%),1fr));
+      gap: 16px;
+    }
+
+    .account-card {
+      background: #fff;
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 32px rgba(0,0,0,.03);
+      padding: 12px 16px;
+      font-size: .8rem;
+      line-height: 1.4;
+    }
+
+    .account-card-title {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing:.03em;
+      color: #6b7280;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .account-card-value {
+      font-size: .85rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      word-break: break-word;
+    }
+
+    /* PLACEHOLDER DE CONTENIDO */
+    .panel-content {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-soft);
+      padding: 20px 24px;
+      font-size: .85rem;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .panel-content h2 {
+      font-size: .9rem;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: #111827;
+    }
+
+    .panel-content p {
+      margin: 0 0 12px;
+    }
+
+    .panel-content small {
+      font-size: .75rem;
+      color: #6b7280;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="user-block">
+      <div class="user-row-top">
+        <div class="avatar-circle">
+          {% comment %}
+          Iniciales del usuario: por ejemplo "RF" → podemos derivar de nombre/apellido
+          {% endcomment %}
+          {% if user.nombre and user.apellido %}
+            {{ user.nombre|first }}{{ user.apellido|first }}
+          {% else %}
+            {{ user.nombre|first }}?
+          {% endif %}
+        </div>
+        <!-- podríamos poner un icono de "▼" para abrir perfil en el futuro -->
+        <div style="color:#fff; font-size:.8rem; font-weight:600;">▼</div>
+      </div>
+
+      <div class="user-main">
+        <div class="user-name">
+          {{ user.nombre }} {{ user.apellido }}
+        </div>
+        <div class="user-role">
+          {{ user.rol }}
+        </div>
+
+        <div class="status-row">
+          <div class="status-dot"
+            {% if user.estado == "ausente" %}
+              style="background:#facc15; box-shadow:0 0 8px #facc15;"
+            {% elif user.estado == "ocupado" %}
+              style="background:#ef4444; box-shadow:0 0 8px #ef4444;"
+            {% elif user.estado == "desconectado" %}
+              style="background:#9ca3af; box-shadow:0 0 8px #9ca3af;"
+            {% else %}
+              style="background:#10b981; box-shadow:0 0 8px #10b981;"
+            {% endif %}
+          ></div>
+
+          <div>
+            {% if user.estado == "conectado" %}Conectado
+            {% elif user.estado == "ausente" %}Ausente
+            {% elif user.estado == "ocupado" %}Ocupado
+            {% elif user.estado == "desconectado" %}Desconectado
+            {% else %}-
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="user-email">
+          {{ user.correo }}
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-label">Navegación</div>
+
+      <a class="nav-item" href="#">
+        📊&nbsp; Resumen general
+      </a>
+      <a class="nav-item" href="#">
+        🏠&nbsp; Proyectos y viviendas
+      </a>
+      <a class="nav-item" href="#">
+        🛠️&nbsp; Postventa / Reparaciones
+      </a>
+      <a class="nav-item" href="#">
+        📑&nbsp; Reportes DS49
+      </a>
+      <a class="nav-item" href="#">
+        👤&nbsp; Usuarios / Roles
+      </a>
+      <a class="nav-item" href="#">
+        🏘️&nbsp; Comunidades / Familias
+      </a>
+      <a class="nav-item" href="#">
+        ❔&nbsp; Tutorial / Ayuda
+      </a>
+
+      <a class="nav-item logout-link" href="{% url 'logout' %}">
+        🔒&nbsp; Cerrar sesión
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <main class="main-area">
+
+    <!-- Header de bienvenida + datos cuenta -->
+    <section class="header-card">
+      <div class="header-topline">
+        <div>{{ panel_title|default:"Panel" }}</div>
+        <div class="badge-role">{{ user.rol }}</div>
+      </div>
+
+      <div class="hello-row">
+        Hola, <span>{{ user.nombre }} {{ user.apellido }}</span>
+      </div>
+
+      <div style="color:#6b7280; font-size:.8rem; margin-top:4px; line-height:1.4;">
+        Bienvenido/a al panel de gestión. Aquí puedes revisar proyectos,
+        observaciones, postventa y el cumplimiento DS49.
+      </div>
+
+      <div class="account-grid" style="margin-top:20px;">
+
+        <div class="account-card">
+          <div class="account-card-title">RUT</div>
+          <div class="account-card-value">
+            {% if user.rut and user.rut != "" %}
+              {{ user.rut }}
+            {% else %}
+              -
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="account-card">
+          <div class="account-card-title">Correo</div>
+          <div class="account-card-value">{{ user.correo }}</div>
+        </div>
+
+        <div class="account-card">
+          <div class="account-card-title">Cargo / Rol</div>
+          <div class="account-card-value">
+            {% if user.rol == "ADMIN" %}Administrador TECHO
+            {% elif user.rol == "TRABAJADOR" %}Trabajador TECHO
+            {% elif user.rol == "FAMILIA" %}Familia / Beneficiario
+            {% else %}{{ user.rol }}{% endif %}
+          </div>
+        </div>
+
+        <div class="account-card">
+          <div class="account-card-title">Estado actual</div>
+          <div class="account-card-value">
+            {% if user.estado == "conectado" %}Conectado
+            {% elif user.estado == "ausente" %}Ausente
+            {% elif user.estado == "ocupado" %}Ocupado
+            {% elif user.estado == "desconectado" %}Desconectado
+            {% else %}-{% endif %}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Contenido del panel / módulos -->
+    <section class="panel-content">
+      <h2>Resumen operativo</h2>
+      <p>
+        (Acá más adelante vamos a poner métricas como:
+        “Plazos críticos DS49”, “Observaciones abiertas”, “Familias activas”, etc,
+        igual que en tu mockup anterior).
+      </p>
+
+      <small>
+        Esta sección es visible solo para {{ user.rol }}.
+      </small>
+    </section>
+
+  </main>
+</body>
+</html>

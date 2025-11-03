@@ -1,0 +1,411 @@
+:root {
+  --techo-blue: #009FE3;
+  --techo-blue-dark: #006FA1;
+}
+
+.bg-blue-techo { background-color: var(--techo-blue); }
+.bg-blue-techo-dark { background-color: var(--techo-blue-dark); }
+
+.text-blue-techo { color: var(--techo-blue); }
+.text-blue-techo-dark { color: var(--techo-blue-dark); }
+
+
+:root {
+  --techo-blue: #009FE3;
+  --techo-blue-dark: #006FA1;
+}
+
+/* helpers para Tailwind custom classes */
+.bg-blue-techo {
+  background-color: var(--techo-blue);
+}
+
+.bg-blue-techo-dark {
+  background-color: var(--techo-blue-dark);
+}
+
+.text-blue-techo {
+  color: var(--techo-blue);
+}
+
+.text-blue-techo-dark {
+  color: var(--techo-blue-dark);
+}
+
+:root {
+  --techo-blue: #009fe3;
+  --techo-blue-dark: #006fa1;
+}
+
+/* Colores corporativos TECHO */
+.bg-blue-techo {
+  background-color: var(--techo-blue);
+}
+.bg-blue-techo-dark {
+  background-color: var(--techo-blue-dark);
+}
+.text-blue-techo {
+  color: var(--techo-blue);
+}
+.text-blue-techo-dark {
+  color: var(--techo-blue-dark);
+}
+
+/* Modo accesible (a11y = accessibility) */
+.a11y-highcontrast {
+  /* texto un poquito más grande en toda la página */
+  font-size: 1.1em;
+}
+
+.a11y-highcontrast body {
+  /* forzamos más contraste en modo accesible */
+  color: #000 !important;
+  background-color: #fff !important;
+}
+
+.a11y-highcontrast .dark body {
+  /* si está en dark + accesible -> texto claro sobre fondo oscuro */
+  color: #fff !important;
+  background-color: #000 !important;
+}
+
+/* También podemos reforzar contraste de botones azules en modo accesible */
+.a11y-highcontrast .bg-blue-techo {
+  filter: brightness(1.1) contrast(1.2);
+}
+
+/* Colores base TECHO */
+:root {
+  --techo-blue: #009fe3;
+  --techo-blue-dark: #006fa1;
+}
+
+/* Clases utilitarias que ya usabas */
+.bg-blue-techo { background-color: var(--techo-blue); }
+.bg-blue-techo-dark { background-color: var(--techo-blue-dark); }
+.text-blue-techo { color: var(--techo-blue); }
+.text-blue-techo-dark { color: var(--techo-blue-dark); }
+
+/* ------------------------- */
+/*  MODO ALTO CONTRASTE (a11y)
+    (esto ya lo tenías en idea)
+*/
+.a11y-highcontrast {
+  font-size: 1.1em;
+}
+.a11y-highcontrast body {
+  color: #000 !important;
+  background-color: #fff !important;
+}
+.a11y-highcontrast.theme-dark body {
+  color: #fff !important;
+  background-color: #000 !important;
+}
+
+/* ------------------------- */
+/*  MODO OSCURO PERSONALIZADO */
+/*  Esta clase se aplica en <html> como .theme-dark */
+/*  No depende de Tailwind dark: */
+
+/* MODO OSCURO GENERAL */
+.theme-dark body {
+  background-color: #1f2937;       /* gris oscuro */
+  color: #f3f4f6;                  /* texto claro */
+}
+
+/* NAVBAR */
+.theme-dark header {
+  background-color: #1f2937 !important;
+  color: #f3f4f6 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+.theme-dark header a {
+  color: #f3f4f6 !important;
+}
+.theme-dark header a:hover {
+  color: var(--techo-blue) !important;
+}
+.theme-dark #theme-toggle {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+  border-color: #4b5563 !important;
+}
+.theme-dark #a11y-toggle {
+  background-color: #facc15 !important; /* amarillo accesible */
+  color: #1f2937 !important;
+  border-color: #eab308 !important;
+}
+
+/* SECCIONES GRANDES (impacto / historias) */
+.theme-dark .section-block {
+  background-color: #1f2937 !important; /* igual que body */
+  border-color: #374151 !important;
+}
+.theme-dark .section-title {
+  color: #fff !important;
+}
+.theme-dark .section-text {
+  color: #d1d5db !important;           /* gris claro */
+}
+
+/* TARJETAS (métricas e historias, contenedores con borde) */
+.theme-dark .card-block {
+  background-color: #374151 !important; /* gris medio */
+  border-color: #4b5563 !important;
+  color: #f3f4f6 !important;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4) !important;
+}
+
+/* Texto dentro de tarjetas */
+.theme-dark .card-number {
+  color: var(--techo-blue) !important;
+}
+.theme-dark .card-label,
+.theme-dark .card-label-strong {
+  color: #fff !important;
+}
+.theme-dark .card-desc {
+  color: #d1d5db !important;
+}
+.theme-dark .card-footnote {
+  color: #9ca3af !important;
+  font-style: italic;
+}
+
+/* BOTONES outline (Anterior / Siguiente del carrusel, etc.) */
+.button-outline {
+  background-color: #fff;
+  color: #1f2937;
+  border: 1px solid #d1d5db;
+}
+.button-outline:hover {
+  background-color: #f3f4f6;
+}
+
+/* versión oscura */
+.theme-dark .button-outline {
+  background-color: #374151 !important;
+  color: #f3f4f6 !important;
+  border: 1px solid #4b5563 !important;
+}
+.theme-dark .button-outline:hover {
+  background-color: #4b5563 !important;
+}
+
+/* FOOTER */
+.theme-dark footer {
+  background-color: #111827 !important;
+  color: #9ca3af !important;
+  border-top: 1px solid #374151 !important;
+}
+
+/* CONTACTO (el bloque azul de contacto al final) */
+#contacto {
+  background-color: var(--techo-blue);
+  color: #fff;
+}
+#contacto a {
+  background-color: #fff;
+  color: var(--techo-blue-dark);
+  border-radius: 0.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  display: inline-block;
+}
+#contacto a:hover {
+  filter: brightness(0.95);
+}
+/* en oscuro queremos más contraste todavía */
+.theme-dark #contacto {
+  background-color: var(--techo-blue-dark) !important;
+  color: #fff !important;
+}
+.theme-dark #contacto a {
+  background-color: #fff !important;
+  color: var(--techo-blue-dark) !important;
+}
+
+/* -------------------------------------- */
+/* AJUSTE DE TIPOGRAFÍA EN MODO OSCURO    */
+/* Mejora lectura en secciones oscuras    */
+/* -------------------------------------- */
+
+/* TITULOS GRANDES tipo h1/h2/h3, héroe y secciones */
+.theme-dark h1,
+.theme-dark h2,
+.theme-dark h3,
+.theme-dark .section-title,
+.theme-dark .hero-title {
+  color: #ffffff !important;
+}
+
+/* Texto descriptivo normal (párrafos generales en hero, impacto, historias...) */
+.theme-dark p,
+.theme-dark .section-text,
+.theme-dark .card-desc,
+.theme-dark .card-footnote {
+  color: #d1d5db !important; /* gris clarito */
+}
+
+/* Texto que debe destacar dentro de tarjeta (ej: "Viviendas acompañadas", títulos de cada métrica) */
+.theme-dark .card-label,
+.theme-dark .card-label-strong,
+.theme-dark .metric-label {
+  color: #ffffff !important;
+}
+
+/* Los numerazos (+1200, 92%, +80) ya les pusimos azul TECHO */
+.theme-dark .card-number {
+  color: var(--techo-blue) !important;
+}
+
+/* Texto súper tenue, tipo pie de gráfica o aclaración chica */
+.theme-dark .muted-note,
+.theme-dark .soft-note {
+  color: #9ca3af !important; /* gris medio claro */
+}
+
+/* Botones principales azules ya están bien, pero los botoncitos blancos secundarios del hero se hacían medio oscuros sobre oscuro.
+   Les forzamos borde y texto visibles en dark sin arruinar el claro.
+*/
+.theme-dark .btn-secondary-hero {
+  background-color: transparent !important;
+  border: 1px solid #9ca3af !important;
+  color: #f3f4f6 !important;
+}
+.theme-dark .btn-secondary-hero:hover {
+  background-color: #374151 !important;
+}
+
+/* Hero text block (lado izquierdo del hero) */
+.theme-dark .hero-wrapper {
+  color: #e5e7eb !important;
+}
+.theme-dark .hero-wrapper p {
+  color: #d1d5db !important;
+}
+
+/* ---------- HERO TEXT STYLES ---------- */
+
+.hero-title {
+  color: #0f172a; /* gris casi negro para modo claro */
+}
+.hero-desc {
+  color: #334155; /* gris oscuro azulado para modo claro */
+}
+.hero-quote {
+  color: #94a3b8; /* gris azulado suave */
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Modo oscuro (cuando .theme-dark está en <html>) */
+.theme-dark .hero-title {
+  color: #f8fafc !important; /* blanco casi puro */
+}
+.theme-dark .hero-desc {
+  color: #d1d5db !important; /* gris claro legible */
+}
+.theme-dark .hero-quote {
+  color: #cbd5e1 !important; /* gris muy claro */
+}
+
+/* ---------- BUTTONS ---------- */
+
+/* Botón azul principal */
+.btn-primary {
+  background-color: var(--techo-blue);
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+}
+.btn-primary:hover {
+  background-color: var(--techo-blue-dark);
+}
+
+/* Dark mode mantiene azul techo igual, para consistencia marca */
+.theme-dark .btn-primary {
+  background-color: var(--techo-blue) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+.theme-dark .btn-primary:hover {
+  background-color: var(--techo-blue-dark) !important;
+}
+
+/* Botón secundario (borde gris en claro, borde gris azulado en oscuro) */
+.btn-secondary {
+  background-color: transparent;
+  color: #1e293b;           /* gris azulado oscuro */
+  border: 1px solid #cbd5e1; /* gris clarito */
+  border-radius: 0.5rem;
+}
+.btn-secondary:hover {
+  background-color: #f1f5f9; /* gris muy clarito */
+}
+
+/* Dark mode del botón secundario */
+.theme-dark .btn-secondary {
+  color: #f8fafc !important;             /* casi blanco */
+  background-color: transparent !important;
+  border: 1px solid #64748b !important;   /* gris azulado medio */
+}
+.theme-dark .btn-secondary:hover {
+  background-color: #374151 !important;  /* gris oscuro para hover */
+}
+
+/* ---------- HERO CARD ---------- */
+
+/* Hero card ya tiene bg oscuro directo (#2b323b) porque en tu captura se ve brutal en dark.
+   En modo claro queremos un equivalente clarito con borde suave. */
+.hero-card {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #1e293b;
+}
+.theme-dark .hero-card {
+  background-color: #2b323b !important;
+  border-color: #3b434f !important;
+  color: #f8fafc !important;
+}
+
+/* Que el texto adentro de la tarjeta en modo claro no quede gris muy oscuro */
+.hero-card .hero-quote {
+  color: #475569;
+}
+.theme-dark .hero-card .hero-quote {
+  color: #cbd5e1 !important;
+}
+
+/* Evitar selección rara del título mientras lo mostramos en proyector/presentación */
+.hero-title {
+  -webkit-user-select: text;
+  user-select: text;
+}
+#profilePanel {
+  right: 0;
+  top: 0;
+  height: 100vh;
+  max-width: 26rem; /* 416px */
+  transform: translateX(110%);
+  transition: transform .28s cubic-bezier(.2,.9,.2,1);
+}
+#profilePanel.open {
+  transform: translateX(0%);
+}
+#profilePanelOverlay {
+  transition: opacity .25s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+#profilePanelOverlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* avatar fallback */
+#profilePanelAvatar {
+  background: linear-gradient(135deg,#e6f0ff,#cfe6ff);
+  display: inline-block;
+  object-fit: cover;
+}
