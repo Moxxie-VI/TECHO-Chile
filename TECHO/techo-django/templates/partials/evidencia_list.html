@@ -1,0 +1,14 @@
+
+<div class="mt-3">
+  <h6>Evidencias</h6>
+  <ul class="list-group">
+    {% for e in evidencias %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <div><i class="bi bi-paperclip me-1"></i> {{ e.comentario|default:"(sin comentario)" }}</div>
+      <a class="btn btn-sm btn-outline-secondary" href="{{ e.archivo.url }}" target="_blank">Ver</a>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">Sin evidencias aún</li>
+    {% endfor %}
+  </ul>
+</div>

@@ -1,0 +1,159 @@
+{% load static %}
+<!doctype html>
+<html lang="es" data-theme="light" data-font="base">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Panel · TECHO{% endblock %}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+  :root{
+    --bg:#ffffff; --fg:#0f172a; --muted:#64748b;
+    --sidebar:#0ea5e9; --sidebar-fg:#fff; --card:#fff; --border:#e2e8f0;
+    --head-h:56px; --foot-h:56px;
+  }
+  [data-theme="dark"]{
+    --bg:#0b1220; --fg:#e5e7eb; --muted:#9aa5b1;
+    --sidebar:#0b84c6; --sidebar-fg:#fff; --card:#121a2b; --border:#1f2937;
+  }
+  [data-font="base"]{ --fs:16px } [data-font="lg"]{ --fs:18px } [data-font="xl"]{ --fs:20px }
+
+  html,body{height:100%}
+  body{display:flex;font-size:var(--fs);background:var(--bg);color:var(--fg);}
+
+  .sidebar{width:270px;background:var(--sidebar);color:var(--sidebar-fg);transition:width .2s ease;overflow:hidden}
+  .sidebar a{color:var(--sidebar-fg);text-decoration:none}
+  .sidebar .active{background:rgba(255,255,255,.15);border-radius:10px}
+  .sb-collapsed .sidebar{width:72px}
+  .sb-collapsed .sidebar .text{display:none}
+
+  .content{flex:1;display:flex;flex-direction:column;min-height:100vh}
+  header{height:var(--head-h);background:var(--card);border-bottom:1px solid var(--border)}
+  main{flex:1}               /* 👈 asegura el footer al fondo */
+  footer{height:var(--foot-h);background:var(--sidebar);color:#eaf6ff}
+
+  .intro{background:linear-gradient(135deg,#e0f2fe 0,#fff 100%);border:1px solid var(--border);border-radius:12px}
+  [data-theme="dark"] .intro{background:linear-gradient(135deg,#0b84c633 0,#0b1220 100%)}
+  .fade-in{animation:fade .4s ease-in-out}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+  <aside id="sb" class="sidebar p-3">
+    <div class="d-flex align-items-center mb-3">
+      <img src="{% static 'img/techo_logo_white.png' %}" height="34" class="me-2" alt="TECHO">
+      <strong class="text">Gestión Habitacional</strong>
+      <button id="btnCollapseAside" class="btn btn-sm btn-outline-light ms-auto" title="Contraer/expandir">
+       <i class="bi bi-layout-sidebar-inset"></i>
+      </button>
+    </div>
+    <nav class="d-grid gap-2">
+      <a href="/dashboard/" class="btn btn-sm btn-link text-start {% if request.path == '/dashboard/' %}active{% endif %}">
+        <i class="bi bi-speedometer2 me-2"></i><span class="text">Dashboard</span>
+      </a>
+      <a href="/tutorial/" class="btn btn-sm btn-link text-start {% if request.path == '/tutorial/' %}active{% endif %}">
+        <i class="bi bi-mortarboard me-2"></i><span class="text">Tutorial</span>
+      </a>
+      <a href="/ayuda/" class="btn btn-sm btn-link text-start {% if request.path == '/ayuda/' %}active{% endif %}">
+        <i class="bi bi-life-preserver me-2"></i><span class="text">Ayuda</span>
+      </a>
+      <a href="/perfil/" class="btn btn-sm btn-link text-start {% if request.path == '/perfil/' %}active{% endif %}">
+        <i class="bi bi-person-circle me-2"></i><span class="text">Perfil</span>
+      </a>
+      {% if rol == 'Admin' %}
+        <a href="/panel/admin/proyectos/" class="btn btn-sm btn-link text-start"><i class="bi bi-diagram-3 me-2"></i><span class="text">Proyectos</span></a>
+        <a href="/reportes/" class="btn btn-sm btn-link text-start"><i class="bi bi-file-earmark-pdf me-2"></i><span class="text">Reportes</span></a>
+        <a href="/admin/" class="btn btn-sm btn-link text-start"><i class="bi bi-gear me-2"></i><span class="text">Admin Django</span></a>
+      {% elif rol == 'Trabajador' %}
+        <a href="/proyectos/" class="btn btn-sm btn-link text-start"><i class="bi bi-diagram-3 me-2"></i><span class="text">Mi proyecto</span></a>
+        <a href="/viviendas/" class="btn btn-sm btn-link text-start"><i class="bi bi-houses me-2"></i><span class="text">Viviendas</span></a>
+      {% elif rol == 'Familia' %}
+        <a href="/dashboard/" class="btn btn-sm btn-link text-start"><i class="bi bi-house-heart me-2"></i><span class="text">Mi vivienda</span></a>
+      {% endif %}
+      <a href="/logout/" class="btn btn-sm btn-outline-light text-start mt-3"><i class="bi bi-box-arrow-right me-2"></i><span class="text">Salir</span></a>
+    </nav>
+  </aside>
+
+  <div class="content">
+    <header>
+      <button id="btnCollapseTop" class="btn btn-sm btn-outline-secondary" title="Contraer/expandir menú">
+         <i class="bi bi-layout-sidebar-inset-reverse"></i>
+      </button>
+      <div class="container-fluid py-2 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-info text-dark">Rol: {{ rol }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <!-- Accesibilidad -->
+          <button id="fBase" class="btn btn-sm btn-outline-secondary" title="Tamaño normal">A</button>
+          <button id="fLg" class="btn btn-sm btn-outline-secondary" title="Letra grande">A+</button>
+          <button id="fXl" class="btn btn-sm btn-outline-secondary" title="Letra muy grande">A++</button>
+          <!-- Tema -->
+          <button id="btnTheme" class="btn btn-sm btn-outline-secondary" title="Cambiar tema">
+            <i class="bi bi-moon"></i>
+          </button>
+          <span class="text-muted small">Usuario: {{ request.user.username }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Intro/banner de la página -->
+    {% block page_intro %}{% endblock %}
+
+    <main class="container-fluid py-3 fade-in">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-3">
+      <div class="container-fluid d-flex justify-content-between small">
+        <div>© 2025 TECHO Chile — Plataforma de Recepción y Postventa</div>
+        <div class="d-flex gap-3">
+          <a class="link-light" href="#">Privacidad</a>
+          <a class="link-light" href="#">Términos</a>
+          <a class="link-light" href="#">Accesibilidad</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+  // CSRF para HTMX (necesario para POST/DELETE)
+  document.body.addEventListener('htmx:configRequest', (evt) => {
+    const getCookie = (name) => {
+      const v = document.cookie.split('; ').find(row => row.startsWith(name+'='));
+      return v ? decodeURIComponent(v.split('=')[1]) : null;
+    };
+    evt.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
+  });
+
+  // Preferencias tema y fuente
+  const root = document.documentElement;
+  const loadPref = () => {
+    root.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
+    root.setAttribute('data-font', localStorage.getItem('font') || 'base');
+    if (localStorage.getItem('sb-collapsed') === '1') document.body.classList.add('sb-collapsed');
+  };
+  loadPref();
+  document.getElementById('btnTheme').onclick = () => {
+    const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+    root.setAttribute('data-theme', next); localStorage.setItem('theme', next);
+  };
+  const setFont = f => { root.setAttribute('data-font', f); localStorage.setItem('font', f); };
+  document.getElementById('fBase').onclick = () => setFont('base');
+  document.getElementById('fLg').onclick  = () => setFont('lg');
+  document.getElementById('fXl').onclick  = () => setFont('xl');
+
+  // Toggle sidebar (funciona colapsado y desde header)
+  const toggleSB = () => {
+    document.body.classList.toggle('sb-collapsed');
+    localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed') ? '1' : '0');
+  };
+  document.getElementById('btnCollapseAside').onclick = toggleSB;
+  document.getElementById('btnCollapseTop').onclick   = toggleSB;
+</script>
+
+</body>
+</html>
+

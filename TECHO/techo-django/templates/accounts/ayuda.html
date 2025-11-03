@@ -1,0 +1,51 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Ayuda · TECHO{% endblock %}
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <img src="{% static 'img/help.png' %}" height="64" alt="">
+    <div>
+      <h5 class="mb-1">Centro de ayuda</h5>
+      <div class="text-muted">¿Tienes un problema? Escríbenos y un desarrollador te contacta.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        {% if enviado %}
+          <div class="alert alert-success">Tu mensaje fue enviado. Te contactaremos.</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">Asunto</label>
+            {{ form.asunto }}
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Mensaje</label>
+            {{ form.mensaje }}
+          </div>
+          <button class="btn btn-primary">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6>Información de contacto</h6>
+        <div class="text-muted small">
+          Soporte TECHO · soporte@techo.cl<br>
+          Lunes a Viernes 9:00–18:00<br>
+          <a href="https://www.techo.org/chile/" target="_blank">Sitio institucional</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

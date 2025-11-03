@@ -1,0 +1,18 @@
+
+<form method="post" enctype="multipart/form-data"
+      hx-post="/trabajo/registro/{{ reg.id }}/evidencia/"
+      hx-target="#evidencias-{{ reg.id }}" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="mb-2">
+    <label class="form-label">Archivo</label>
+    {{ form.archivo }}
+  </div>
+  <div class="mb-2">
+    <label class="form-label">Comentario</label>
+    {{ form.comentario }}
+  </div>
+  <button class="btn btn-primary btn-sm">Subir</button>
+</form>
+<div id="evidencias-{{ reg.id }}">
+  {% include "partials/evidencias_list.html" with evidencias=reg.evidencias.all %}
+</div>

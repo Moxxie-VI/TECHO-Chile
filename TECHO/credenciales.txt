@@ -1,0 +1,13 @@
+Credenciales de prueba (por rol)
+
+Admin:
+Usuario: admin@techo.cl
+Contraseña: Admin#2025
+
+Trabajador:
+Usuario: trabajador@techo.cl
+Contraseña: Trabajador#2025
+
+Familia:
+Usuario: familia@techo.cl
+Contraseña: Familia#2025

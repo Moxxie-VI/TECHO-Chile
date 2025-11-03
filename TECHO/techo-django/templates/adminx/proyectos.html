@@ -1,0 +1,67 @@
+{% extends "layout/base.html" %}
+{% block title %}Proyectos (Admin) · TECHO{% endblock %}
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <i class="bi bi-diagram-3" style="font-size:42px"></i>
+    <div>
+      <h5 class="mb-1">Gestión de Proyectos</h5>
+      <div class="text-muted">Crea, edita o elimina proyectos sin salir de esta página.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h3 class="m-0">Proyectos</h3>
+  <button class="btn btn-primary"
+          hx-get="{% url 'admin_proyecto_new' %}"
+          hx-target="#modal-body" data-bs-toggle="modal" data-bs-target="#modal">
+    <i class="bi bi-plus-lg"></i> Nuevo
+  </button>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table align-middle mb-0">
+      <thead class="table-light"><tr><th>Código</th><th>Nombre</th><th>Ubicación</th><th>Constructora</th><th></th></tr></thead>
+      <tbody id="tb-proy">
+        {% for p in proyectos %}
+        <tr id="proy-{{ p.id }}">
+          <td><b>{{ p.codigo }}</b></td>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.ubicacion|default:"s/i" }}</td>
+          <td>{{ p.constructora.nombre|default:"s/i" }}</td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-secondary"
+                    hx-get="{% url 'admin_proyecto_edit' p.id %}"
+                    hx-target="#modal-body" data-bs-toggle="modal" data-bs-target="#modal">
+              Editar
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+                    hx-post="{% url 'admin_proyecto_delete' p.id %}"
+                    hx-confirm="¿Eliminar proyecto?"
+                    hx-target="#proy-{{ p.id }}" hx-swap="outerHTML">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-muted">Sin proyectos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Proyecto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

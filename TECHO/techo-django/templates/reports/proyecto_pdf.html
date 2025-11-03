@@ -1,0 +1,80 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { size: A4; margin: 20mm; }
+    body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color:#0f172a; }
+    .header { display:flex; align-items:center; margin-bottom: 16px; }
+    .logo { width: 120px; }
+    h1 { font-size: 20px; margin: 0; color:#0ea5e9; }
+    h2 { font-size: 14px; margin: 4px 0 0 0; color:#334155; }
+    .muted { color: #64748b; }
+    .badge { display:inline-block; padding: 3px 8px; border:1px solid #0ea5e9; color:#0ea5e9; border-radius: 12px; font-size: 10px; }
+    .grid { width:100%; border-collapse: collapse; margin-top: 10px; }
+    .grid th, .grid td { border:1px solid #e2e8f0; padding:6px; }
+    .grid th { background:#e0f2fe; text-align:left; }
+    .section { margin-top: 16px; }
+    .right { text-align:right; }
+    .small { font-size: 10px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img class="logo" src="{% static 'img/techo_logo.png' %}">
+    <div style="margin-left:12px">
+      <h1>Informe de Proyecto</h1>
+      <h2>{{ proyecto.codigo }} — {{ proyecto.nombre }}</h2>
+      <div class="muted small">Ubicación: {{ proyecto.ubicacion|default:"s/i" }} · Constructora: {{ proyecto.constructora.nombre|default:"s/i" }}</div>
+      <div class="muted small">Generado: {{ generado_en }}</div>
+    </div>
+    <div class="right" style="margin-left:auto">
+      <span class="badge">TECHO Chile</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <table>
+      <tr>
+        <td><b>Viviendas registradas:</b> {{ stats.viviendas }}</td>
+        <td><b>Registros postventa:</b> {{ stats.registros }}</td>
+        <td><b>Observ. urgentes:</b> {{ stats.urgentes }}</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h3>Observaciones de Postventa</h3>
+    <table class="grid">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Recinto</th>
+          <th>Descripción</th>
+          <th>Urgencia</th>
+          <th>Creado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in registros %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ r.recinto|default:"s/i" }}</td>
+          <td>{{ r.observacion|default:"" }}</td>
+          <td>{{ r.urgencia }}</td>
+          <td>{{ r.creado_en|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="small muted">No hay registros</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section small muted">
+    <p>Este informe fue generado automáticamente por la Plataforma de Recepción y Postventa de TECHO Chile.</p>
+    <p>Privacidad: este documento puede contener información sensible. Su difusión está restringida a usuarios autorizados.</p>
+  </div>
+</body>
+</html>

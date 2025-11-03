@@ -1,0 +1,49 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Tutorial · TECHO{% endblock %}
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <img src="{% static 'img/tutorial.png' %}" height="64" alt="">
+    <div>
+      <h5 class="mb-1">Tutorial de uso</h5>
+      <div class="text-muted">Aprende en minutos a usar la plataforma.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="accordion" id="tut">
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#t1">1. Iniciar sesión</button></h2>
+        <div id="t1" class="accordion-collapse collapse show" data-bs-parent="#tut">
+          <div class="accordion-body">Usa tu correo institucional para entrar. Si olvidaste la clave, solicita un restablecimiento al admin.</div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t2">2. Navegar por el panel</button></h2>
+        <div id="t2" class="accordion-collapse collapse" data-bs-parent="#tut">
+          <div class="accordion-body">Usa el menú lateral para acceder a Dashboard, Reportes, Proyectos y Perfil. Puedes colapsar el menú y cambiar el tema.</div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t3">3. Subir evidencias (Trabajador)</button></h2>
+        <div id="t3" class="accordion-collapse collapse" data-bs-parent="#tut">
+          <div class="accordion-body">Desde el listado de registros, presiona “Evidencia”, adjunta tu archivo y un comentario. Quedará asociado al caso.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h6>Video</h6>
+        <div class="ratio ratio-16x9 bg-dark rounded"></div>
+        <div class="text-muted small mt-2">Próximamente añadiremos un video explicativo.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

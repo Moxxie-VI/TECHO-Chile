@@ -1,0 +1,306 @@
+{% load static %}
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>TECHO Chile · Recepción y Postventa Habitacional</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="index,follow">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="{% static 'css/base.css' %}" rel="stylesheet">
+  <style>
+    .hero {
+      position: relative; overflow: hidden; background: #0ea5e9;
+      color: #fff; min-height: 68vh; display:flex; align-items:center;
+    }
+    .hero::before {
+      content:""; position:absolute; inset:0;
+      background: url("{% static 'img/hero.jpg' %}") center/cover no-repeat;
+      opacity:.3;
+    }
+    .hero .content { position:relative; z-index:2; }
+    .glass {
+      background: rgba(255,255,255,.7); backdrop-filter: blur(8px);
+      border-radius: 16px;
+    }
+    .badge-trust {
+      display:inline-flex; align-items:center; gap:.5rem; padding:.5rem .75rem;
+      border-radius:999px; background: #e0f2fe; color:#0369a1; font-weight:600;
+    }
+    .partner-logos img { height: 42px; opacity:.8; filter: grayscale(100%); }
+    .partner-logos img:hover { filter:none; opacity:1; }
+    .a11y-toolbar { position: fixed; right: 1rem; bottom: 1rem; z-index: 9999; }
+    .icon { width: 22px; height: 22px; }
+  </style>
+</head>
+<body>
+  <!-- Barra Accesibilidad -->
+  <div class="a11y-toolbar glass shadow-sm p-2" role="toolbar" aria-label="Accesibilidad">
+    <button id="font-dec" class="btn btn-sm btn-outline-secondary" aria-label="Reducir tamaño">A-</button>
+    <span id="font-val" class="mx-2">100%</span>
+    <button id="font-inc" class="btn btn-sm btn-outline-secondary" aria-label="Aumentar tamaño">A+</button>
+    <button id="theme-toggle" class="btn btn-sm btn-outline-primary ms-2" aria-label="Cambiar tema">☀︎/☾</button>
+    <button id="hc-toggle" class="btn btn-sm btn-outline-dark ms-1" aria-label="Alto contraste">AC</button>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm" aria-label="Principal">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="/" aria-label="Inicio">
+        <img src="{% static 'img/techo_logo.png' %}" alt="TECHO Chile" height="44" class="me-2">
+        <span class="fw-bold text-primary">Gestión Habitacional</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Abrir navegación">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navMain" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="#seguridad">Seguridad</a></li>
+          <li class="nav-item"><a class="nav-link" href="#como-funciona">Cómo funciona</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">Preguntas</a></li>
+          <li class="nav-item ms-lg-3">
+            <a class="btn primary" href="/login/">Iniciar sesión</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="container content">
+      <div class="row align-items-center">
+        <div class="col-lg-7" data-aos="fade-up">
+          <span class="badge-trust mb-3">
+            <img src="{% static 'img/lock.svg' %}" class="icon" alt=""> Conexiones seguras y control de acceso
+          </span>
+          <h1 class="display-5 fw-bold">Transformamos la recepción y postventa en una experiencia digital, humana y eficiente.</h1>
+          <p class="lead mt-3">
+            Plataforma TECHO Chile para registrar observaciones, adjuntar evidencias y dar seguimiento con transparencia.
+          </p>
+          <div class="mt-3 d-flex gap-2">
+            <a href="/login/" class="btn btn-primary btn-lg px-4 mt-3">Comenzar ahora</a>
+            <a href="#seguridad" class="btn btn-outline-light btn-lg">Ver medidas de confianza</a>
+          </div>
+        </div>
+        <div class="col-lg-5 mt-4 mt-lg-0" data-aos="zoom-in" data-aos-delay="150">
+          <img src="{% static 'img/hero_side.png' %}" class="img-fluid rounded-4 shadow" alt="Familias y viviendas">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Beneficios -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <div class="row text-center mb-5">
+        <h2 data-aos="fade-down">Simple, claro y accesible para todos</h2>
+        <p class="text-secondary">Diseño inclusivo: modo oscuro/claro, letras ajustables y navegación por teclado.</p>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="fade-up">
+          <div class="card border-0 shadow-sm h-100">
+            <img src="{% static 'img/card_accesible.jpg' %}" class="card-img-top" alt="Accesibilidad">
+            <div class="card-body">
+              <h4 class="text-primary">Accesibilidad real</h4>
+              <p>Alto contraste, etiquetas ARIA y foco visible. Pensado para familias y equipos técnicos.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="card border-0 shadow-sm h-100">
+            <img src="{% static 'img/card_trazabilidad.jpg' %}" class="card-img-top" alt="Trazabilidad">
+            <div class="card-body">
+              <h4 class="text-primary">Trazabilidad</h4>
+              <p>Seguimiento claro de tareas y observaciones, desde la recepción hasta el cierre de postventa.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="card border-0 shadow-sm h-100">
+            <img src="{% static 'img/card_confianza.jpg' %}" class="card-img-top" alt="Confianza">
+            <div class="card-body">
+              <h4 class="text-primary">Confianza</h4>
+              <p>Buenas prácticas, privacidad y controles de acceso. Hecho para TECHO Chile y sus familias.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona (sin datos, solo pasos) -->
+  <section id="como-funciona" class="py-5">
+    <div class="container">
+      <div class="row text-center mb-5">
+        <h2 data-aos="fade-down">Cómo funciona</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-3" data-aos="fade-up">
+          <div class="glass p-4 shadow-sm h-100">
+            <h5 class="mb-2">1) Ingreso</h5>
+            <p>Usuarios autorizados acceden con sus credenciales.</p>
+          </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass p-4 shadow-sm h-100">
+            <h5 class="mb-2">2) Registro</h5>
+            <p>Creación de observaciones con evidencias (fotos/documentos).</p>
+          </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+          <div class="glass p-4 shadow-sm h-100">
+            <h5 class="mb-2">3) Seguimiento</h5>
+            <p>Estados claros y tiempos de resolución visibles para el equipo.</p>
+          </div>
+        </div>
+        <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+          <div class="glass p-4 shadow-sm h-100">
+            <h5 class="mb-2">4) Cierre</h5>
+            <p>Generación de reportes para descargar o enviar por correo.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seguridad & Confianza -->
+  <section id="seguridad" class="py-5 bg-light">
+    <div class="container">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6" data-aos="fade-right">
+          <img src="{% static 'img/security.jpg' %}" class="img-fluid rounded-4 shadow-sm" alt="Seguridad">
+        </div>
+        <div class="col-lg-6" data-aos="fade-left">
+          <h2>Seguridad y privacidad</h2>
+          <ul class="list-unstyled mt-3">
+            <li class="mb-2"><strong>Conexión segura (HTTPS/SSL)</strong> y autenticación por roles.</li>
+            <li class="mb-2">Mínima exposición de datos: <em>no se muestran datos públicos</em>.</li>
+            <li class="mb-2">Control de acceso, bitácora de acciones y buenas prácticas de protección.</li>
+            <li class="mb-2">Cumplimiento de lineamientos TECHO y normativa vigente.</li>
+          </ul>
+          <div class="mt-3">
+            <span class="badge bg-success me-2">SSL Activo</span>
+            <span class="badge bg-primary me-2">Roles: Admin / Trabajador / Familia</span>
+            <span class="badge bg-secondary">Privacidad</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aliados / Sellos -->
+  <section class="py-4">
+    <div class="container text-center">
+      <p class="text-muted mb-3">Apoyado por equipos y procesos de TECHO Chile</p>
+      <div class="d-flex flex-wrap gap-4 justify-content-center partner-logos">
+        <img src="{% static 'img/techo_logo.png' %}" alt="TECHO">
+        <img src="{% static 'img/logo_serviu_mono.jpg' %}" alt="SERVIU">
+        <img src="{% static 'img/logo_minvu_mono.png' %}" alt="MINVU">
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios (texto general, sin datos sensibles) -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-4" data-aos="fade-down">Lo que buscamos</h2>
+      <div class="row g-4">
+        <div class="col-md-4" data-aos="zoom-in">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <p class="mb-0">“Mayor claridad en el proceso y mejor comunicación entre familia, TECHO y constructora.”</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <p class="mb-0">“Seguimiento transparente que ayude a resolver observaciones a tiempo.”</p>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+          <div class="card border-0 shadow-sm h-100 p-3">
+            <p class="mb-0">“Experiencia simple, accesible y confiable para todas las personas.”</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-5 text-center">
+    <div class="container" data-aos="fade-up">
+      <h2 class="mb-3">¿Eres parte del equipo o familia beneficiaria?</h2>
+      <p class="text-secondary">Accede con tus credenciales para registrar o hacer seguimiento.</p>
+      <a href="/login/" class="btn btn-primary btn-lg">Iniciar sesión</a>
+    </div>
+  </section>
+
+  <!-- Footer con redes y confianza -->
+  <footer class="bg-dark text-white pt-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <img src="{% static 'img/techo_logo_white.png' %}" alt="TECHO Chile" height="40" class="mb-3">
+          <p>Plataforma de TECHO Chile para recepción y postventa habitacional. Construimos confianza con procesos claros y seguros.</p>
+          <div class="d-flex gap-2">
+            <span class="badge bg-success">SSL</span>
+            <span class="badge bg-secondary">Privacidad</span>
+            <span class="badge bg-info text-dark">Accesibilidad</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h5>Contacto</h5>
+          <ul class="list-unstyled">
+            <li>Email: <a class="link-light" href="mailto:contacto@techo.cl">contacto@techo.cl</a></li>
+            <li>Teléfono: +56 2 1234 5678</li>
+            <li>Dirección: Santiago, Chile</li>
+          </ul>
+          <h5 class="mt-3">Redes</h5>
+          <div class="d-flex gap-3">
+            <a class="link-light" href="#" aria-label="Facebook"><img src="{% static 'img/social_facebook.svg' %}" class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="Instagram"><img src="{% static 'img/social_instagram.svg' %}" class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="LinkedIn"><img src="{% static 'img/social_linkedin.svg' %}" class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="YouTube"><img src="{% static 'img/social_youtube.svg' %}" class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="X/Twitter"><img src="{% static 'img/social_x.svg' %}" class="icon" alt=""></a>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h5>Información</h5>
+          <ul class="list-unstyled">
+            <li><a class="link-light" href="#" aria-label="Política de privacidad">Política de privacidad</a></li>
+            <li><a class="link-light" href="#" aria-label="Términos y condiciones">Términos y condiciones</a></li>
+            <li><a class="link-light" href="#" aria-label="Declaración de accesibilidad">Declaración de accesibilidad</a></li>
+          </ul>
+          <p class="small text-secondary mt-3">Este sitio no expone datos personales. Para acceder a la información de proyectos o viviendas se requiere autenticación.</p>
+        </div>
+      </div>
+      <div class="border-top border-secondary mt-4 py-3 text-center small text-secondary">
+        © 2025 TECHO Chile — Todos los derechos reservados
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init();</script>
+  <script>
+    (function(){
+      const html=document.documentElement, val=document.getElementById('font-val');
+      const dec=document.getElementById('font-dec'), inc=document.getElementById('font-inc');
+      const tgl=document.getElementById('theme-toggle'), hc=document.getElementById('hc-toggle');
+      let size=+localStorage.getItem('fontSize')||100;
+      let theme=localStorage.getItem('theme')||'light';
+      let high=localStorage.getItem('hc')==='1';
+      function apply(){
+        html.style.fontSize=size+'%'; val.textContent=size+'%';
+        html.setAttribute('data-theme', theme); html.classList.toggle('hc', high);
+      }
+      dec.onclick=()=>{ size=Math.max(85,size-10); localStorage.setItem('fontSize',size); apply(); };
+      inc.onclick=()=>{ size=Math.min(140,size+10); localStorage.setItem('fontSize',size); apply(); };
+      tgl.onclick=()=>{ theme = theme==='light'?'dark':'light'; localStorage.setItem('theme',theme); apply(); };
+      hc.onclick=()=>{ high=!high; localStorage.setItem('hc', high?'1':'0'); apply(); };
+      apply();
+    })();
+  </script>
+</body>
+</html>

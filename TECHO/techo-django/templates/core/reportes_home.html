@@ -1,0 +1,42 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Reportes · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <img src="{% static 'img/report.png' %}" height="60" alt="">
+    <div>
+      <h5 class="mb-1">Reportes</h5>
+      <div class="text-muted">Genera o envía PDF con datos reales del proyecto seleccionado.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form class="row g-2" method="get" action="">
+      <div class="col-md-6">
+        <label class="form-label">Proyecto</label>
+        <select class="form-select" name="proyecto_id" required>
+          <option value="">-- Selecciona --</option>
+          {% for p in proyectos %}
+            <option value="{{ p.id }}">{{ p.codigo }} — {{ p.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Enviar a (correo)</label>
+        <input class="form-control" type="email" name="to" placeholder="alguien@techo.cl">
+      </div>
+      <div class="col-12 d-flex gap-2 mt-2">
+        <button formaction="/reportes/proyecto/pdf/" class="btn btn-primary"><i class="bi bi-download me-1"></i>Descargar PDF</button>
+        <button formaction="/reportes/proyecto/enviar/" class="btn btn-success"><i class="bi bi-send me-1"></i>Enviar PDF</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

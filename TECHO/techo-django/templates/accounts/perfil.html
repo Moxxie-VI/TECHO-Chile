@@ -1,0 +1,58 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Mi perfil · TECHO{% endblock %}
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <img src="{% static 'img/user_card.png' %}" height="64" alt="">
+    <div>
+      <h5 class="mb-1">Mi perfil</h5>
+      <div class="text-muted">Datos personales, correo y foto de perfil.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body text-center">
+        {% if request.user.perfil.avatar %}
+          <img src="{{ request.user.perfil.avatar.url }}" class="rounded-circle" width="140" height="140" style="object-fit:cover">
+        {% else %}
+          <i class="bi bi-person-circle" style="font-size:140px"></i>
+        {% endif %}
+        <div class="mt-2"><b>{{ request.user.username }}</b></div>
+        <div class="text-muted small">Rol: {{ rol }}</div>
+        <div class="text-muted small">Correo institucional: {{ request.user.email|default:request.user.username }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header">Editar datos</div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Correo personal</label>
+              {{ form.correo_personal }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teléfono</label>
+              {{ form.telefono }}
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Foto de perfil</label>
+              {{ form.avatar }}
+            </div>
+          </div>
+          <button class="btn btn-primary mt-3">Guardar cambios</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

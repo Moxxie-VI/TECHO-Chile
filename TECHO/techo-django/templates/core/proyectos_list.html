@@ -1,0 +1,23 @@
+{% load static %}
+<!doctype html><html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Proyectos · TECHO</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head><body>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4">Proyectos</h1>
+    <a class="btn btn-outline-secondary" href="/dashboard/">Volver</a>
+  </div>
+  <ul class="list-group shadow-sm">
+    {% for p in proyectos %}
+      <li class="list-group-item d-flex justify-content-between">
+        <span><b>{{ p.codigo }}</b> — {{ p.nombre }} ({{ p.ubicacion|default:"s/i" }})</span>
+        <span class="text-muted small">Inicio: {{ p.fecha_inicio|date:"d/m/Y" }}</span>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-center text-muted">Sin registros</li>
+    {% endfor %}
+  </ul>
+</div>
+</body></html>

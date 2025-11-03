@@ -1,0 +1,164 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Dashboard · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <img src="{% static 'img/house_hero.png' %}" height="68" alt="">
+    <div>
+      <h5 class="mb-1">Panel de {{ rol }}</h5>
+      <div class="text-muted">Resumen de tu actividad, accesos rápidos y últimas modificaciones.</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+
+{% if mensaje %}
+  <div class="alert alert-warning">{{ mensaje }}</div>
+{% endif %}
+
+{% if rol == "Admin" %}
+  <div class="row g-3">
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="text-muted small">Proyectos</div>
+          <div class="display-6">{{ proyectos|length }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Viviendas</div>
+        <div class="display-6">{{ viviendas|length }}</div>
+      </div></div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Registros (últimos 20)</div>
+        <div class="display-6">{{ registros|length }}</div>
+      </div></div>
+    </div>
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100"><div class="card-body">
+        <div class="text-muted small">Actividad</div>
+        <div class="display-6">{{ actividad|length }}</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="row g-3 mt-2">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header">Últimos registros</div>
+        <ul class="list-group list-group-flush">
+          {% for r in registros %}
+          <li class="list-group-item d-flex justify-content-between">
+            <div><b>{{ r.proyecto.codigo }}</b> — {{ r.recinto|default:"s/i" }} — {{ r.urgencia }}</div>
+            <span class="text-muted small">{{ r.creado_en|date:"d/m H:i" }}</span>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Sin registros</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header">Actividad reciente (evidencias)</div>
+        <ul class="list-group list-group-flush">
+          {% for e in actividad %}
+          <li class="list-group-item">
+            <i class="bi bi-paperclip me-1"></i> Evidencia en {{ e.registro.proyecto.codigo }}
+            <div class="small text-muted">{{ e.creado_en|date:"d/m H:i" }} — {{ e.subido_por.username|default:"s/i" }}</div>
+          </li>
+          {% empty %}
+          <li class="list-group-item text-muted">Sin actividad</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% if rol == "Trabajador" %}
+  <div class="card shadow-sm mb-3">
+    <div class="card-header">Registros de postventa (mi proyecto)</div>
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th>Recinto</th><th>Urgencia</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <tbody>
+          {% for r in registros %}
+          <tr id="row-reg-{{ r.id }}">
+            <td>{{ r.recinto|default:"s/i" }}</td>
+            <td>{{ r.urgencia }}</td>
+            <td>
+              <form hx-post="/trabajo/registro/{{ r.id }}/estado/" hx-target="#row-reg-{{ r.id }}" hx-swap="none">
+                <select name="estado" class="form-select form-select-sm" onchange="this.form.requestSubmit()">
+                  <option value="ABIERTA" {% if r.estado == "ABIERTA" %}selected{% endif %}>Abierta</option>
+                  <option value="EN_GESTION" {% if r.estado == "EN_GESTION" %}selected{% endif %}>En gestión</option>
+                  <option value="RESUELTA" {% if r.estado == "RESUELTA" %}selected{% endif %}>Resuelta</option>
+                </select>
+              </form>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-primary"
+                      hx-get="/trabajo/registro/{{ r.id }}/evidencia/"
+                      hx-target="#modal-body" hx-trigger="click" data-bs-toggle="modal" data-bs-target="#modal">
+                <i class="bi bi-paperclip"></i> Evidencia
+              </button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="text-muted">No hay registros</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endif %}
+
+{% if rol == "Familia" %}
+  <div class="card shadow-sm mb-3">
+    <div class="card-header">Mi vivienda</div>
+    <div class="card-body">
+      {% if viviendas %}
+        {% with v=viviendas.0 %}
+          <div><b>{{ v.tipo }}</b> — {{ v.modelo }}</div>
+          <div class="text-muted">Proyecto: {{ v.proyecto.codigo }} — {{ v.proyecto.nombre }}</div>
+        {% endwith %}
+      {% else %}
+        <span class="text-muted">Aún no asignada.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header">Mis observaciones</div>
+    <ul class="list-group list-group-flush">
+      {% for r in registros %}
+      <li class="list-group-item d-flex justify-content-between">
+        <div><b>{{ r.recinto|default:"s/i" }}</b> — {{ r.urgencia }} <div class="small text-muted">{{ r.observacion }}</div></div>
+        <span class="text-muted small">{{ r.creado_en|date:"d/m H:i" }}</span>
+      </li>
+      {% empty %}
+      <li class="list-group-item text-muted">No hay observaciones</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<!-- Modal genérico para HTMX -->
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header"><h5 class="modal-title">Acción</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
