@@ -13,13 +13,13 @@ class Command(BaseCommand):
     def handle(self, *args, **opts):
         path = opts["file"]
         df = pd.read_excel(path, sheet_name=opts["sheet"])
-        self.stdout.write(f"✅ Archivo leído: {path} ({len(df)} filas)")
+        self.stdout.write(f"[OK] Archivo leido: {path} ({len(df)} filas)")
 
         # Mapea las columnas reales del Excel de TECHO
         required = ["PYTO_COD", "PYTO_NOMBRE", "CONSTRUCTORA", "COMUNA", "VDA_CODIGO", "VDA_TIPOLOGIA"]
         faltan = [c for c in required if c not in df.columns]
         if faltan:
-            self.stderr.write(self.style.ERROR(f"❌ Faltan columnas requeridas: {faltan}"))
+            self.stderr.write(self.style.ERROR(f"[ERROR] Faltan columnas requeridas: {faltan}"))
             return
 
         count_p = 0
@@ -84,7 +84,7 @@ class Command(BaseCommand):
 
         # --- Resumen final ---
         self.stdout.write(self.style.SUCCESS(
-            f"✅ Importación completa:\n"
+            f"[OK] Importacion completa:\n"
             f"   Constructoras nuevas: {count_c}\n"
             f"   Proyectos nuevos: {count_p}\n"
             f"   Viviendas creadas: {count_v}\n"

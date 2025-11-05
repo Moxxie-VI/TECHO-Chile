@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
   :root{
@@ -28,10 +29,16 @@
   .sidebar .active{background:rgba(255,255,255,.15);border-radius:10px}
   .sb-collapsed .sidebar{width:72px}
   .sb-collapsed .sidebar .text{display:none}
+  .sb-collapsed .sidebar #btnCollapseAside{display:none}
+  .sidebar .logo-container{display:flex;align-items:center;transition:all .2s ease}
+  .sidebar .logo-container img{transition:all .2s ease}
+  .sb-collapsed .sidebar .logo-container img{height:28px;width:auto}
+  .sb-collapsed .sidebar .logo-container{justify-content:center}
 
   .content{flex:1;display:flex;flex-direction:column;min-height:100vh}
-  header{height:var(--head-h);background:var(--card);border-bottom:1px solid var(--border)}
-  main{flex:1}               /* 👈 asegura el footer al fondo */
+  header{height:var(--head-h);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center}
+  header .container-fluid{display:flex;justify-content:space-between;align-items:center;width:100%}
+  main{flex:1}               /* asegura el footer al fondo */
   footer{height:var(--foot-h);background:var(--sidebar);color:#eaf6ff}
 
   .intro{background:linear-gradient(135deg,#e0f2fe 0,#fff 100%);border:1px solid var(--border);border-radius:12px}
@@ -42,7 +49,7 @@
 </head>
 <body>
   <aside id="sb" class="sidebar p-3">
-    <div class="d-flex align-items-center mb-3">
+    <div class="logo-container mb-3">
       <img src="{% static 'img/techo_logo_white.png' %}" height="34" class="me-2" alt="TECHO">
       <strong class="text">Gestión Habitacional</strong>
       <button id="btnCollapseAside" class="btn btn-sm btn-outline-light ms-auto" title="Contraer/expandir">
@@ -78,11 +85,11 @@
 
   <div class="content">
     <header>
-      <button id="btnCollapseTop" class="btn btn-sm btn-outline-secondary" title="Contraer/expandir menú">
-         <i class="bi bi-layout-sidebar-inset-reverse"></i>
-      </button>
       <div class="container-fluid py-2 d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
+        <button id="btnCollapseTop" class="btn btn-sm btn-outline-secondary" title="Contraer/expandir menú">
+          <i class="bi bi-layout-sidebar-inset-reverse"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2 ms-3">
           <span class="badge bg-info text-dark">Rol: {{ rol }}</span>
         </div>
         <div class="d-flex align-items-center gap-2">

@@ -1,10 +1,14 @@
 from django.contrib import admin
 from django.urls import path
-from core.views import home, viviendas_list, proyectos_list, reportes_home, reporte_proyecto_pdf, reporte_proyecto_enviar
-from accounts.views import login_view, logout_view, dashboard,perfil, ayuda, tutorial
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import admin_proyectos, admin_proyecto_form, admin_proyecto_delete, subir_evidencia, cambiar_estado_registro
+from core.views import (
+    home, viviendas_list, proyectos_list, reportes_home, 
+    reporte_proyecto_pdf, reporte_proyecto_enviar,
+    admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
+    subir_evidencia, cambiar_estado_registro
+)
+from accounts.views import login_view, logout_view, dashboard, perfil, ayuda, tutorial
 
 urlpatterns = [
     path("", home, name="home"),

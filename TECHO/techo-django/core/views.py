@@ -3,8 +3,11 @@ from django.contrib.auth.decorators import login_required
 from accounts.decorators import require_role
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.core.mail import EmailMessage
 from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS
+from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
     return render(request, "core/home.html")
@@ -18,10 +21,6 @@ def viviendas_list(request):
 def proyectos_list(request):
     qs = Proyecto.objects.all()[:100]
     return render(request, "core/proyectos_list.html", {"proyectos": qs})
-
-@login_required
-def reportes_home(request):
-    return render(request, "core/reportes_home.html")
 
 @login_required
 def reportes_home(request):
@@ -108,6 +107,9 @@ def reporte_proyecto_enviar(request):
 @require_role("Admin")
 def admin_proyectos(request):
     qs = Proyecto.objects.all().order_by("codigo")
+    # Si es una petición HTMX para solo el tbody, devolver solo eso
+    if request.headers.get('HX-Request') and request.headers.get('HX-Target') == 'tb-proy':
+        return render(request, "partials/proyectos_table.html", {"proyectos": qs})
     return render(request, "adminx/proyectos.html", {"proyectos": qs})
 
 @login_required
@@ -117,8 +119,15 @@ def admin_proyecto_form(request, pk=None):
     if request.method == "POST":
         form = ProyectoForm(request.POST, instance=obj)
         if form.is_valid():
-            form.save()
-            return render(request, "partials/ok.html", {"msg":"Proyecto guardado"})
+            proyecto = form.save()
+            # Si es una petición HTMX, devolver script para cerrar modal y actualizar tabla
+            if request.headers.get('HX-Request'):
+                proyectos = Proyecto.objects.all().order_by("codigo")
+                return render(request, "partials/proyecto_saved.html", {
+                    "proyectos": proyectos,
+                    "proyecto": proyecto
+                })
+            return redirect("admin_proyectos")
         return render(request, "partials/form_proyecto.html", {"form": form}, status=400)
     form = ProyectoForm(instance=obj)
     return render(request, "partials/form_proyecto.html", {"form": form})
@@ -127,8 +136,12 @@ def admin_proyecto_form(request, pk=None):
 @require_role("Admin")
 @require_POST
 def admin_proyecto_delete(request, pk):
-    get_object_or_404(Proyecto, pk=pk).delete()
-    return render(request, "partials/ok.html", {"msg":"Proyecto eliminado"})
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    proyecto.delete()
+    # Si es una petición HTMX, devolver un string vacío para eliminar la fila
+    if request.headers.get('HX-Request'):
+        return HttpResponse("")
+    return redirect("admin_proyectos")
 
 # --- Trabajador: subir evidencia a un registro ---
 @login_required

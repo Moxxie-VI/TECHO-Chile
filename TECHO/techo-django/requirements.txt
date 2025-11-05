@@ -10,6 +10,7 @@ PyJWT==2.10.1
 pyngrok==7.4.1
 python-dotenv==1.1.1
 PyYAML==6.0.3
-reportlab==4.4.4
+reportlab>=4.0.4,<4.1
+xhtml2pdf==0.2.15
 sqlparse==0.5.3
 tzdata==2025.2

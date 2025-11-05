@@ -1,10 +1,58 @@
-<form method="post" hx-post="" hx-target="this" hx-swap="outerHTML">
+<form method="post" 
+      {% if form.instance.pk %}
+      hx-post="{% url 'admin_proyecto_edit' form.instance.pk %}"
+      {% else %}
+      hx-post="{% url 'admin_proyecto_new' %}"
+      {% endif %}
+      hx-target="#modal-body" 
+      hx-swap="innerHTML">
   {% csrf_token %}
-  <div class="row g-2">
-    {{ form.as_p }}
+  <div class="mb-3">
+    <label for="{{ form.codigo.id_for_label }}" class="form-label">Código *</label>
+    {{ form.codigo }}
+    {% if form.codigo.errors %}
+    <div class="text-danger small">{{ form.codigo.errors }}</div>
+    {% endif %}
   </div>
-  <div class="d-flex gap-2">
-    <button class="btn btn-primary">Guardar</button>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+  <div class="mb-3">
+    <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
+    {{ form.nombre }}
+    {% if form.nombre.errors %}
+    <div class="text-danger small">{{ form.nombre.errors }}</div>
+    {% endif %}
+  </div>
+  <div class="mb-3">
+    <label for="{{ form.ubicacion.id_for_label }}" class="form-label">Ubicación</label>
+    {{ form.ubicacion }}
+    {% if form.ubicacion.errors %}
+    <div class="text-danger small">{{ form.ubicacion.errors }}</div>
+    {% endif %}
+  </div>
+  <div class="mb-3">
+    <label for="{{ form.constructora.id_for_label }}" class="form-label">Constructora</label>
+    {{ form.constructora }}
+    {% if form.constructora.errors %}
+    <div class="text-danger small">{{ form.constructora.errors }}</div>
+    {% endif %}
+  </div>
+  <div class="row g-2 mb-3">
+    <div class="col-md-6">
+      <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">Fecha Inicio</label>
+      {{ form.fecha_inicio }}
+      {% if form.fecha_inicio.errors %}
+      <div class="text-danger small">{{ form.fecha_inicio.errors }}</div>
+      {% endif %}
+    </div>
+    <div class="col-md-6">
+      <label for="{{ form.fecha_estimada_termino.id_for_label }}" class="form-label">Fecha Estimada Término</label>
+      {{ form.fecha_estimada_termino }}
+      {% if form.fecha_estimada_termino.errors %}
+      <div class="text-danger small">{{ form.fecha_estimada_termino.errors }}</div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="d-flex gap-2 justify-content-end">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+    <button type="submit" class="btn btn-primary">Guardar</button>
   </div>
 </form>
