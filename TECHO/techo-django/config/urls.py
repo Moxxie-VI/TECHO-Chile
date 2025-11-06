@@ -8,7 +8,7 @@ from core.views import (
     admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
     subir_evidencia, cambiar_estado_registro
 )
-from accounts.views import login_view, logout_view, dashboard, perfil, ayuda, tutorial
+from accounts.views import login_view, logout_view, dashboard, perfil, ayuda, tutorial, crear_usuario
 
 urlpatterns = [
     path("", home, name="home"),
@@ -28,6 +28,7 @@ urlpatterns = [
     path("perfil/", perfil, name="perfil"),
     path("ayuda/", ayuda, name="ayuda"),
     path("tutorial/", tutorial, name="tutorial"),
+    path("usuarios/crear/", crear_usuario, name="crear_usuario"),
     path("trabajo/registro/<int:reg_id>/evidencia/", subir_evidencia, name="subir_evidencia"),
     path("trabajo/registro/<int:reg_id>/estado/", cambiar_estado_registro, name="cambiar_estado_registro"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

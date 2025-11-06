@@ -1,32 +1,211 @@
 {% extends "layout/base.html" %}
 {% block title %}Proyectos (Admin) · TECHO{% endblock %}
 {% block page_intro %}
-<div class="container-fluid pt-3">
-  <div class="intro p-3 d-flex align-items-center gap-3">
-    <i class="bi bi-diagram-3" style="font-size:42px"></i>
-    <div>
-      <h5 class="mb-1">Gestión de Proyectos</h5>
-      <div class="text-muted">Crea, edita o elimina proyectos sin salir de esta página.</div>
+<div class="container-fluid pt-4">
+  <div class="dashboard-header proyectos-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon proyectos-icon">
+          <i class="bi bi-diagram-3-fill"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Gestión de Proyectos</h1>
+          <p class="mb-0" style="opacity: 0.9;">Administra todos los proyectos habitacionales del sistema</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-action btn-action-primary"
+                hx-get="{% url 'admin_proyecto_new' %}"
+                hx-target="#modal-body"
+                hx-swap="innerHTML">
+          <i class="bi bi-plus-circle-fill"></i>
+          Nuevo Proyecto
+        </button>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <h3 class="m-0">Proyectos</h3>
-  <button class="btn btn-primary"
-          hx-get="{% url 'admin_proyecto_new' %}"
-          hx-target="#modal-body"
-          hx-swap="innerHTML">
-    <i class="bi bi-plus-lg"></i> Nuevo
-  </button>
-</div>
+<style>
+  .proyectos-header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .proyectos-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+  }
+  
+  .header-actions .btn-action-primary {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0284c7;
+    border: none;
+    padding: 0.875rem 1.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-actions .btn-action-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    background: white;
+  }
+  
+  .projects-table-card {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+  }
+  
+  .table {
+    margin: 0;
+    color: var(--fg);
+    background: var(--card);
+  }
+  
+  .table thead {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  }
+  
+  [data-theme="dark"] .table thead {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%);
+  }
+  
+  .table th {
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .table th {
+    color: var(--fg);
+  }
+  
+  .table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--fg);
+  }
+  
+  [data-theme="dark"] .table td {
+    color: var(--fg);
+  }
+  
+  .table tbody tr {
+    transition: all 0.2s ease;
+    background: var(--card);
+  }
+  
+  .table tbody tr:hover {
+    background: rgba(14, 165, 233, 0.05);
+  }
+  
+  [data-theme="dark"] .table tbody tr:hover {
+    background: rgba(14, 165, 233, 0.1);
+  }
+  
+  .btn-sm {
+    padding: 0.5rem 0.875rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    background: var(--card);
+    color: var(--fg);
+    border: 1px solid var(--border);
+  }
+  
+  .btn-sm:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  
+  [data-theme="dark"] .btn-sm {
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .btn-sm:hover {
+    background: var(--accent);
+    color: white;
+  }
+  
+  .btn-warning {
+    background: #f59e0b;
+    color: white;
+    border-color: #f59e0b;
+  }
+  
+  .btn-warning:hover {
+    background: #d97706;
+    border-color: #d97706;
+  }
+  
+  .btn-danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+  }
+  
+  .btn-danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+  
+  @media (max-width: 768px) {
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
 
-<div class="card shadow-sm">
+<div class="projects-table-card">
   <div class="table-responsive">
-    <table class="table align-middle mb-0">
-      <thead class="table-light"><tr><th>Código</th><th>Nombre</th><th>Ubicación</th><th>Constructora</th><th></th></tr></thead>
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Constructora</th>
+          <th style="width: 140px;">Acciones</th>
+        </tr>
+      </thead>
       {% include "partials/proyectos_table.html" %}
     </table>
   </div>

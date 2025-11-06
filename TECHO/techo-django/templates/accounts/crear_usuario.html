@@ -1,0 +1,415 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Crear Usuario · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-3">
+  <div class="intro p-3 d-flex align-items-center gap-3">
+    <i class="bi bi-person-plus-fill" style="font-size:48px; color: var(--accent);"></i>
+    <div>
+      <h5 class="mb-1">Crear Nuevo Usuario</h5>
+      <div class="text-muted">Crea usuarios con roles de Trabajador o Familia y asígnalos a proyectos o viviendas</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  .user-form-card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    padding: 2rem;
+  }
+  
+  .form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  .form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .form-section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .form-section-title i {
+    color: var(--accent);
+    font-size: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+  
+  .form-label {
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .form-label .required {
+    color: #ef4444;
+  }
+  
+  .form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    color: var(--fg);
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+  
+  .form-control:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    outline: none;
+  }
+  
+  .role-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+  
+  .role-option {
+    position: relative;
+  }
+  
+  .role-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+  }
+  
+  .role-option label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--card);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+  
+  .role-option label i {
+    font-size: 2.5rem;
+    color: var(--muted);
+    transition: all 0.3s ease;
+  }
+  
+  .role-option label .role-name {
+    font-weight: 700;
+    color: var(--fg);
+    font-size: 1.1rem;
+  }
+  
+  .role-option label .role-desc {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+  
+  .role-option input:checked + label {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(14, 165, 233, 0.1) 100%);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+  }
+  
+  .role-option input:checked + label i {
+    color: var(--accent);
+    transform: scale(1.1);
+  }
+  
+  .role-option label:hover {
+    border-color: var(--accent);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .conditional-field {
+    display: none;
+    animation: fadeIn 0.4s ease-out;
+  }
+  
+  .conditional-field.show {
+    display: block;
+  }
+  
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border: none;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  }
+  
+  .btn-submit i {
+    font-size: 1.25rem;
+  }
+  
+  .info-box {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+  }
+  
+  .info-box i {
+    color: var(--accent-dark);
+    font-size: 1.5rem;
+    margin-top: 0.125rem;
+  }
+  
+  .info-box-content h6 {
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 0.5rem;
+  }
+  
+  .info-box-content p {
+    margin: 0;
+    color: #075985;
+    font-size: 0.95rem;
+  }
+  
+  [data-theme="dark"] .info-box {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%);
+  }
+  
+  [data-theme="dark"] .info-box-content h6,
+  [data-theme="dark"] .info-box-content p {
+    color: var(--fg);
+  }
+</style>
+
+{% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}x-circle{% else %}info-circle{% endif %} me-2"></i>
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+{% endif %}
+
+<div class="user-form-card">
+  <div class="info-box">
+    <i class="bi bi-lightbulb-fill"></i>
+    <div class="info-box-content">
+      <h6>Información importante</h6>
+      <p>Los usuarios <strong>Trabajadores</strong> deben tener un proyecto asignado. Las <strong>Familias</strong> deben tener una vivienda asignada. Los <strong>Administradores</strong> tienen acceso completo al sistema.</p>
+    </div>
+  </div>
+  
+  <form method="post" novalidate>
+    {% csrf_token %}
+    
+    <!-- Sección 1: Información Básica -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <i class="bi bi-person-badge"></i>
+        Información Básica
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-envelope"></i>
+              Correo Electrónico <span class="required">*</span>
+            </label>
+            <input type="email" name="correo" class="form-control" placeholder="ejemplo@techochile.org" required>
+            <small class="text-muted">Este será el nombre de usuario para iniciar sesión</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-key"></i>
+              Contraseña <span class="required">*</span>
+            </label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            <small class="text-muted">Mínimo 8 caracteres recomendados</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-person"></i>
+              Nombre <span class="required">*</span>
+            </label>
+            <input type="text" name="nombre" class="form-control" placeholder="Juan" required>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-person"></i>
+              Apellido <span class="required">*</span>
+            </label>
+            <input type="text" name="apellido" class="form-control" placeholder="Pérez" required>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección 2: Rol -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <i class="bi bi-shield-check"></i>
+        Rol del Usuario
+      </h3>
+      
+      <div class="role-selector">
+        <div class="role-option">
+          <input type="radio" name="rol" value="Admin" id="rol-admin">
+          <label for="rol-admin">
+            <i class="bi bi-shield-fill-check"></i>
+            <div class="role-name">Administrador</div>
+            <div class="role-desc">Acceso total al sistema</div>
+          </label>
+        </div>
+        
+        <div class="role-option">
+          <input type="radio" name="rol" value="Trabajador" id="rol-trabajador" checked>
+          <label for="rol-trabajador">
+            <i class="bi bi-tools"></i>
+            <div class="role-name">Trabajador (CT)</div>
+            <div class="role-desc">Gestión de proyectos</div>
+          </label>
+        </div>
+        
+        <div class="role-option">
+          <input type="radio" name="rol" value="Familia" id="rol-familia">
+          <label for="rol-familia">
+            <i class="bi bi-house-heart"></i>
+            <div class="role-name">Familia</div>
+            <div class="role-desc">Consulta de vivienda</div>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección 3: Asignaciones -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <i class="bi bi-link-45deg"></i>
+        Asignaciones
+      </h3>
+      
+      <div class="conditional-field" id="field-proyecto">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-diagram-3"></i>
+            Proyecto Asignado
+          </label>
+          <select name="proyecto_id" class="form-select">
+            <option value="">-- Seleccionar proyecto --</option>
+            {% for p in proyectos %}
+            <option value="{{ p.id }}">{{ p.codigo }} — {{ p.nombre }}</option>
+            {% endfor %}
+          </select>
+          <small class="text-muted">Requerido para rol Trabajador</small>
+        </div>
+      </div>
+      
+      <div class="conditional-field" id="field-vivienda">
+        <div class="form-group">
+          <label class="form-label">
+            <i class="bi bi-house-door"></i>
+            Vivienda Asignada
+          </label>
+          <select name="vivienda_id" class="form-select">
+            <option value="">-- Seleccionar vivienda --</option>
+            {% for v in viviendas %}
+            <option value="{{ v.id }}">{{ v.proyecto.codigo }} — {{ v.tipo|default:"Vivienda" }}</option>
+            {% endfor %}
+          </select>
+          <small class="text-muted">Requerido para rol Familia</small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botón de envío -->
+    <div class="text-end">
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-person-plus-fill"></i>
+        Crear Usuario
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const roleInputs = document.querySelectorAll('input[name="rol"]');
+  const fieldProyecto = document.getElementById('field-proyecto');
+  const fieldVivienda = document.getElementById('field-vivienda');
+  
+  function updateConditionalFields() {
+    const selectedRole = document.querySelector('input[name="rol"]:checked').value;
+    
+    // Ocultar todos
+    fieldProyecto.classList.remove('show');
+    fieldVivienda.classList.remove('show');
+    
+    // Mostrar según rol
+    if (selectedRole === 'Trabajador') {
+      fieldProyecto.classList.add('show');
+    } else if (selectedRole === 'Familia') {
+      fieldVivienda.classList.add('show');
+    }
+  }
+  
+  // Ejecutar al cargar
+  updateConditionalFields();
+  
+  // Ejecutar al cambiar
+  roleInputs.forEach(input => {
+    input.addEventListener('change', updateConditionalFields);
+  });
+});
+</script>
+{% endblock %}
+

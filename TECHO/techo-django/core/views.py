@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from accounts.decorators import require_role
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.mail import EmailMessage
+from django.db.models import Count
 from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm
 from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS
 from .pdf_utils import render_to_pdf, pdf_http_response
@@ -38,18 +40,54 @@ def reporte_proyecto_pdf(request):
     except Proyecto.DoesNotExist:
         return HttpResponseBadRequest("Proyecto no existe")
 
-    registros = (RegistroPostventa.objects
+    # Obtener registros de postventa (primero el queryset completo, sin slice)
+    registros_qs = (RegistroPostventa.objects
+                    .filter(proyecto=proyecto)
+                    .select_related('proyecto')
+                    .order_by("-creado_en"))
+    
+    # Calcular estadísticas generales (ANTES del slice)
+    total_registros = registros_qs.count()
+    urgentes = registros_qs.filter(urgencia="ALTA").count()
+    
+    # Calcular distribución por urgencia (ANTES del slice)
+    por_urgencia = []
+    if total_registros > 0:
+        urgencia_counts = registros_qs.values('urgencia').annotate(total=Count('id'))
+        for item in urgencia_counts:
+            urgencia = item['urgencia'] or 'BAJA'
+            total = item['total']
+            porcentaje = (total / total_registros) * 100
+            por_urgencia.append({
+                'urgencia': urgencia,
+                'total': total,
+                'porcentaje': porcentaje
+            })
+    
+    # AHORA SÍ aplicar el slice para limitar los registros en el PDF
+    registros = list(registros_qs[:200])
+    
+    # Obtener viviendas con información adicional
+    viviendas = (Vivienda.objects
                  .filter(proyecto=proyecto)
-                 .order_by("-creado_en")[:200])
+                 .prefetch_related('perfilusuario_set')
+                 .annotate(num_registros=Count('fichainmueble__registropostventa')))
+    
+    # Contar evidencias
+    evidencias_count = Evidencia.objects.filter(registro__proyecto=proyecto).count()
+    
     stats = {
-        "viviendas": Vivienda.objects.filter(proyecto=proyecto).count(),
-        "registros": registros.count(),
-        "urgentes": registros.filter(urgencia="ALTA").count(),
+        "viviendas": viviendas.count(),
+        "registros": total_registros,
+        "urgentes": urgentes,
+        "evidencias": evidencias_count,
+        "por_urgencia": por_urgencia,
     }
 
     ctx = {
         "proyecto": proyecto,
         "registros": registros,
+        "viviendas": list(viviendas[:50]),  # Limitar a 50 viviendas para el PDF
         "stats": stats,
         "generado_en": timezone.localtime(),
     }
@@ -58,7 +96,7 @@ def reporte_proyecto_pdf(request):
     if not pdf_bytes:
         return HttpResponseBadRequest("No se pudo generar PDF")
 
-    filename = f"reporte_{proyecto.codigo}.pdf"
+    filename = f"reporte_{proyecto.codigo}_{timezone.now().strftime('%Y%m%d')}.pdf"
     return pdf_http_response(filename, pdf_bytes, as_attachment=True)
 
 @login_required
@@ -73,18 +111,54 @@ def reporte_proyecto_enviar(request):
     except Proyecto.DoesNotExist:
         return HttpResponseBadRequest("Proyecto no existe")
 
-    registros = (RegistroPostventa.objects
+    # Obtener registros de postventa (primero el queryset completo, sin slice)
+    registros_qs = (RegistroPostventa.objects
+                    .filter(proyecto=proyecto)
+                    .select_related('proyecto')
+                    .order_by("-creado_en"))
+    
+    # Calcular estadísticas generales (ANTES del slice)
+    total_registros = registros_qs.count()
+    urgentes = registros_qs.filter(urgencia="ALTA").count()
+    
+    # Calcular distribución por urgencia (ANTES del slice)
+    por_urgencia = []
+    if total_registros > 0:
+        urgencia_counts = registros_qs.values('urgencia').annotate(total=Count('id'))
+        for item in urgencia_counts:
+            urgencia = item['urgencia'] or 'BAJA'
+            total = item['total']
+            porcentaje = (total / total_registros) * 100
+            por_urgencia.append({
+                'urgencia': urgencia,
+                'total': total,
+                'porcentaje': porcentaje
+            })
+    
+    # AHORA SÍ aplicar el slice para limitar los registros en el PDF
+    registros = list(registros_qs[:200])
+    
+    # Obtener viviendas con información adicional
+    viviendas = (Vivienda.objects
                  .filter(proyecto=proyecto)
-                 .order_by("-creado_en")[:200])
+                 .prefetch_related('perfilusuario_set')
+                 .annotate(num_registros=Count('fichainmueble__registropostventa')))
+    
+    # Contar evidencias
+    evidencias_count = Evidencia.objects.filter(registro__proyecto=proyecto).count()
+    
     stats = {
-        "viviendas": Vivienda.objects.filter(proyecto=proyecto).count(),
-        "registros": registros.count(),
-        "urgentes": registros.filter(urgencia="ALTA").count(),
+        "viviendas": viviendas.count(),
+        "registros": total_registros,
+        "urgentes": urgentes,
+        "evidencias": evidencias_count,
+        "por_urgencia": por_urgencia,
     }
 
     ctx = {
         "proyecto": proyecto,
         "registros": registros,
+        "viviendas": list(viviendas[:50]),  # Limitar a 50 viviendas para el PDF
         "stats": stats,
         "generado_en": timezone.localtime(),
     }
@@ -93,13 +167,44 @@ def reporte_proyecto_enviar(request):
     if not pdf_bytes:
         return HttpResponseBadRequest("No se pudo generar PDF")
 
-    # Enviar email (por ahora usa console backend si así está en settings)
-    subject = f"Reporte Proyecto {proyecto.codigo} — {proyecto.nombre}"
-    body = "Adjunto reporte PDF generado desde la plataforma TECHO."
-    email = EmailMessage(subject=subject, body=body, to=[to_addr])
-    email.attach(filename=f"reporte_{proyecto.codigo}.pdf", content=pdf_bytes, mimetype="application/pdf")
-    email.send(fail_silently=False)
+    # Preparar email con información detallada
+    fecha_generacion = timezone.localtime().strftime("%d de %B de %Y a las %H:%M")
+    filename = f"reporte_{proyecto.codigo}_{timezone.now().strftime('%Y%m%d')}.pdf"
+    
+    body = f"""Estimado/a,
 
+Adjunto encontrará el Informe de Recepción y Postventa del Proyecto:
+
+• Código: {proyecto.codigo}
+• Nombre: {proyecto.nombre}
+• Ubicación: {proyecto.ubicacion or 'No especificada'}
+
+RESUMEN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Total de Viviendas: {stats['viviendas']}
+• Registros de Postventa: {stats['registros']}
+• Observaciones Urgentes: {stats['urgentes']}
+• Evidencias Adjuntas: {stats['evidencias']}
+
+Este reporte fue generado automáticamente el {fecha_generacion}.
+
+Para cualquier consulta, no dude en contactarnos.
+
+Saludos cordiales,
+TECHO Chile
+Plataforma de Recepción y Postventa Habitacional
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Este correo y sus adjuntos contienen información confidencial.
+"""
+    
+    # Enviar email
+    subject = f"Reporte Proyecto {proyecto.codigo} - {proyecto.nombre}"
+    email = EmailMessage(subject=subject, body=body, to=[to_addr])
+    email.attach(filename=filename, content=pdf_bytes, mimetype="application/pdf")
+    email.send(fail_silently=False)
+    
+    messages.success(request, f"✓ Reporte enviado exitosamente a {to_addr}")
     return redirect("reportes_home")
 
 # --- Admin: Proyectos (HTMX modales) ---

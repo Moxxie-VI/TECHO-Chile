@@ -3,37 +3,284 @@
 {% block title %}Reportes · TECHO{% endblock %}
 
 {% block page_intro %}
-<div class="container-fluid pt-3">
-  <div class="intro p-3 d-flex align-items-center gap-3">
-    <img src="{% static 'img/report.png' %}" height="60" alt="">
-    <div>
-      <h5 class="mb-1">Reportes</h5>
-      <div class="text-muted">Genera o envía PDF con datos reales del proyecto seleccionado.</div>
+<div class="container-fluid pt-4">
+  <div class="dashboard-header reportes-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon reportes-icon">
+          <i class="bi bi-file-earmark-pdf-fill"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Reportes PDF</h1>
+          <p class="mb-0" style="opacity: 0.9;">Genera y descarga reportes de cierre de proyectos habitacionales</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="card shadow-sm">
-  <div class="card-body">
-    <form class="row g-2" method="get" action="">
-      <div class="col-md-6">
-        <label class="form-label">Proyecto</label>
-        <select class="form-select" name="proyecto_id" required>
-          <option value="">-- Selecciona --</option>
-          {% for p in proyectos %}
-            <option value="{{ p.id }}">{{ p.codigo }} — {{ p.nombre }}</option>
-          {% endfor %}
-        </select>
+<style>
+  .reportes-header {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+  }
+  
+  .reportes-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+  }
+  
+  .report-form-card {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+  }
+  
+  .report-form-header {
+    background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%);
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid #fecaca;
+  }
+  
+  [data-theme="dark"] .report-form-header {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(153, 27, 27, 0.1) 100%);
+    border-bottom-color: rgba(220, 38, 38, 0.3);
+  }
+  
+  .report-form-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  [data-theme="dark"] .report-form-header h3 {
+    color: #fca5a5;
+  }
+  
+  .report-form-header p {
+    margin: 0.5rem 0 0 0;
+    color: #991b1b;
+    opacity: 0.8;
+  }
+  
+  [data-theme="dark"] .report-form-header p {
+    color: #fca5a5;
+  }
+  
+  .report-form-body {
+    padding: 2.5rem 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+  
+  .form-label {
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .form-label i {
+    color: #dc2626;
+    font-size: 1.25rem;
+  }
+  
+  .form-select, .form-control {
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-select:focus, .form-control:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1);
+    outline: none;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--border);
+  }
+  
+  .btn-report {
+    flex: 1;
+    padding: 1rem 2rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+  }
+  
+  .btn-report i {
+    font-size: 1.25rem;
+  }
+  
+  .btn-download {
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  
+  .btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  }
+  
+  .btn-send {
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+  }
+  
+  .btn-send:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+  }
+  
+  .info-banner {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    border: 2px solid #0ea5e9;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+  }
+  
+  [data-theme="dark"] .info-banner {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%);
+  }
+  
+  .info-banner i {
+    color: #0284c7;
+    font-size: 1.75rem;
+    margin-top: 0.125rem;
+  }
+  
+  .info-banner-content h5 {
+    font-weight: 700;
+    color: #0c4a6e;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  [data-theme="dark"] .info-banner-content h5 {
+    color: #7dd3fc;
+  }
+  
+  .info-banner-content p {
+    margin: 0;
+    color: #075985;
+    font-size: 0.95rem;
+  }
+  
+  [data-theme="dark"] .info-banner-content p {
+    color: #bae6fd;
+  }
+  
+  @media (max-width: 768px) {
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .report-form-body {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<div class="info-banner">
+  <i class="bi bi-info-circle-fill"></i>
+  <div class="info-banner-content">
+    <h5>¿Qué es la Ficha de Cierre?</h5>
+    <p>Documento oficial que resume el estado completo de un proyecto habitacional al final del período de postventa (120 días DS 49). Incluye todas las observaciones, evidencias y resoluciones del proyecto.</p>
+  </div>
+</div>
+
+<div class="report-form-card">
+  <div class="report-form-header">
+    <h3>
+      <i class="bi bi-file-earmark-text"></i>
+      Generar Reporte de Proyecto
+    </h3>
+    <p>Selecciona el proyecto y opción de exportación</p>
+  </div>
+  
+  <div class="report-form-body">
+    <form method="get" action="">
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-diagram-3-fill"></i>
+              Proyecto
+            </label>
+            <select class="form-select" name="proyecto_id" required>
+              <option value="">-- Selecciona un proyecto --</option>
+              {% for p in proyectos %}
+                <option value="{{ p.id }}">{{ p.codigo }} — {{ p.nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-envelope-at-fill"></i>
+              Enviar a (opcional)
+            </label>
+            <input class="form-control" type="email" name="to" placeholder="correo@techochile.org">
+            <small class="text-muted">Deja vacío si solo quieres descargar</small>
+          </div>
+        </div>
       </div>
-      <div class="col-md-6">
-        <label class="form-label">Enviar a (correo)</label>
-        <input class="form-control" type="email" name="to" placeholder="alguien@techo.cl">
-      </div>
-      <div class="col-12 d-flex gap-2 mt-2">
-        <button formaction="/reportes/proyecto/pdf/" class="btn btn-primary"><i class="bi bi-download me-1"></i>Descargar PDF</button>
-        <button formaction="/reportes/proyecto/enviar/" class="btn btn-success"><i class="bi bi-send me-1"></i>Enviar PDF</button>
+      
+      <div class="action-buttons">
+        <button formaction="/reportes/proyecto/pdf/" class="btn-report btn-download">
+          <i class="bi bi-download"></i>
+          Descargar PDF
+        </button>
+        <button formaction="/reportes/proyecto/enviar/" class="btn-report btn-send">
+          <i class="bi bi-send-fill"></i>
+          Enviar por Email
+        </button>
       </div>
     </form>
   </div>

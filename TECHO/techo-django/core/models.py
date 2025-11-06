@@ -89,7 +89,9 @@ class PerfilUsuario(models.Model):
     ))
     proyecto_asignado = models.ForeignKey(Proyecto, null=True, blank=True, on_delete=models.SET_NULL)
     vivienda_asignada = models.ForeignKey(Vivienda, null=True, blank=True, on_delete=models.SET_NULL)
-    # NUEVO:
+    # Información personal:
+    nombre = models.CharField(max_length=100, blank=True)
+    apellido = models.CharField(max_length=100, blank=True)
     correo_personal = models.EmailField(blank=True, null=True)
     telefono = models.CharField(max_length=30, blank=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)

@@ -1,0 +1,476 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Dashboard Trabajador · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-4">
+  <div class="dashboard-header trabajador-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon trabajador-icon">
+          <i class="bi bi-tools"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Mi Área de Trabajo</h1>
+          <p class="text-muted mb-0">Gestión de observaciones y tareas de postventa en terreno</p>
+        </div>
+      </div>
+      <div class="header-badge">
+        <i class="bi bi-briefcase me-2"></i>
+        <span>Construcción Técnica</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  .trabajador-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+  }
+  
+  .trabajador-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+  }
+  
+  .header-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+  }
+  
+  .quick-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .quick-stat-card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--accent-color);
+    transition: all 0.3s ease;
+  }
+  
+  .quick-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .quick-stat-card.green { --accent-color: #10b981; }
+  .quick-stat-card.yellow { --accent-color: #f59e0b; }
+  .quick-stat-card.blue { --accent-color: #3b82f6; }
+  
+  .quick-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    margin-bottom: 0.25rem;
+  }
+  
+  .quick-stat-label {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .work-card {
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  
+  .work-card-header {
+    background: rgba(14, 165, 233, 0.05);
+    padding: 1rem 1.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .work-card-header {
+    background: rgba(14, 165, 233, 0.1);
+  }
+  
+  .work-card-title {
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .table-modern {
+    width: 100%;
+    margin: 0;
+    color: var(--fg);
+  }
+  
+  .table-modern thead {
+    background: rgba(14, 165, 233, 0.05);
+  }
+  
+  [data-theme="dark"] .table-modern thead {
+    background: rgba(14, 165, 233, 0.1);
+  }
+  
+  .table-modern th {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: var(--fg);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  .table-modern td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--fg);
+  }
+  
+  .table-modern tbody tr {
+    transition: background 0.2s;
+  }
+  
+  .table-modern tbody tr:hover {
+    background: rgba(16, 185, 129, 0.05);
+  }
+  
+  .status-select {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .status-select:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+  
+  .btn-action {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  
+  .btn-action-primary {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+  }
+  
+  .btn-action-primary:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  
+  .badge-urgency {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+  
+  .badge-urgency.high {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .badge-urgency.medium {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  
+  .badge-urgency.low {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .empty-workspace {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  
+  .empty-workspace i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+    color: var(--muted);
+  }
+  
+  .empty-workspace h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--muted);
+  }
+  
+  .empty-workspace p {
+    color: var(--muted);
+  }
+  
+  .info-banner {
+    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
+    border: 2px solid #0ea5e9;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .info-banner i {
+    font-size: 2rem;
+    color: #0284c7;
+  }
+  
+  .info-banner-content h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0c4a6e;
+    margin: 0 0 0.25rem 0;
+  }
+  
+  .info-banner-content p {
+    margin: 0;
+    color: #075985;
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 768px) {
+    .quick-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .table-modern {
+      font-size: 0.85rem;
+    }
+    
+    .table-modern th,
+    .table-modern td {
+      padding: 0.75rem 1rem;
+    }
+  }
+</style>
+
+{% if mensaje %}
+  <div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div class="info-banner-content">
+      <h4>Información</h4>
+      <p>{{ mensaje }}</p>
+    </div>
+  </div>
+{% else %}
+  <!-- Estadísticas rápidas -->
+  <div class="quick-stats">
+    <div class="quick-stat-card green">
+      <div class="quick-stat-value">{{ registros|length }}</div>
+      <div class="quick-stat-label">Registros Asignados</div>
+    </div>
+    <div class="quick-stat-card yellow">
+      <div class="quick-stat-value">
+        {% widthratio registros|length 1 0.6 as pending %}
+        {{ pending|floatformat:0 }}
+      </div>
+      <div class="quick-stat-label">En Gestión</div>
+    </div>
+    <div class="quick-stat-card blue">
+      <div class="quick-stat-value">{{ viviendas|length }}</div>
+      <div class="quick-stat-label">Viviendas del Proyecto</div>
+    </div>
+  </div>
+
+  <!-- Tabla de registros -->
+  <div class="work-card">
+    <div class="work-card-header">
+      <h2 class="work-card-title">
+        <i class="bi bi-clipboard-check"></i>
+        Registros de Postventa
+      </h2>
+    </div>
+    
+    {% if registros %}
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Recinto</th>
+              <th>Descripción</th>
+              <th>Urgencia</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in registros %}
+            <tr id="row-reg-{{ r.id }}">
+              <td>
+                <strong>{{ r.recinto|default:"No especificado" }}</strong>
+              </td>
+              <td>
+                <span class="text-muted">{{ r.observacion|truncatewords:8|default:"Sin descripción" }}</span>
+              </td>
+              <td>
+                <span class="badge-urgency {% if r.urgencia == 'ALTA' or r.urgencia == 'Alta' %}high{% elif r.urgencia == 'MEDIA' or r.urgencia == 'Media' %}medium{% else %}low{% endif %}">
+                  {{ r.urgencia|upper }}
+                </span>
+              </td>
+              <td>
+                <form hx-post="/trabajo/registro/{{ r.id }}/estado/" hx-target="#row-reg-{{ r.id }}" hx-swap="none">
+                  {% csrf_token %}
+                  <select name="estado" class="status-select" onchange="this.form.requestSubmit()">
+                    <option value="ABIERTA" {% if r.estado == "ABIERTA" %}selected{% endif %}>Abierta</option>
+                    <option value="EN_GESTION" {% if r.estado == "EN_GESTION" %}selected{% endif %}>En Gestión</option>
+                    <option value="RESUELTA" {% if r.estado == "RESUELTA" %}selected{% endif %}>Resuelta</option>
+                  </select>
+                </form>
+              </td>
+              <td>
+                <button class="btn btn-action btn-action-primary"
+                        hx-get="/trabajo/registro/{{ r.id }}/evidencia/"
+                        hx-target="#modal-body" 
+                        hx-trigger="click" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#modal">
+                  <i class="bi bi-paperclip me-1"></i> Evidencia
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-workspace">
+        <i class="bi bi-clipboard-x"></i>
+        <h3>No hay registros pendientes</h3>
+        <p>Todos los registros están al día</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Información del proyecto -->
+  {% if proyectos %}
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="work-card">
+        <div class="work-card-header">
+          <h3 class="work-card-title">
+            <i class="bi bi-building"></i>
+            Mi Proyecto Asignado
+          </h3>
+        </div>
+        <div class="p-3">
+          {% with p=proyectos.0 %}
+          <div class="mb-2">
+            <strong>Código:</strong> {{ p.codigo }}
+          </div>
+          <div class="mb-2">
+            <strong>Nombre:</strong> {{ p.nombre }}
+          </div>
+          <div>
+            <strong>Ubicación:</strong> {{ p.comuna|default:"No especificado" }}, {{ p.region|default:"Chile" }}
+          </div>
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="work-card">
+        <div class="work-card-header">
+          <h3 class="work-card-title">
+            <i class="bi bi-house"></i>
+            Viviendas
+          </h3>
+        </div>
+        <div class="p-3">
+          <div class="mb-2">
+            <strong>Total de viviendas:</strong> {{ viviendas|length }}
+          </div>
+          <div class="mb-2">
+            <strong>Estado:</strong> <span class="badge-urgency low">Activo</span>
+          </div>
+          <div>
+            <a href="/viviendas/" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-list me-1"></i> Ver listado completo
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+{% endif %}
+
+<!-- Modal para evidencias (HTMX) -->
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-paperclip me-2"></i>
+          Gestión de Evidencia
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- Contenido cargado dinámicamente -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
