@@ -14,3 +14,8 @@ reportlab>=4.0.4,<4.1
 xhtml2pdf==0.2.15
 sqlparse==0.5.3
 tzdata==2025.2
+
+# Dependencias para Producción (Render/Railway)
+gunicorn==23.0.0
+whitenoise==6.8.2
+dj-database-url==2.3.0
