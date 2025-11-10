@@ -8,13 +8,18 @@ from core.views import (
     admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
     subir_evidencia, cambiar_estado_registro
 )
-from accounts.views import login_view, logout_view, dashboard, perfil, ayuda, tutorial, crear_usuario
+from accounts.views import (
+    login_view, logout_view, dashboard, perfil, ayuda, tutorial, crear_usuario,
+    recuperar_password_solicitar, recuperar_password_verificar
+)
 
 urlpatterns = [
     path("", home, name="home"),
     path("admin/", admin.site.urls),
     path("login/", login_view, name="login"),
     path("logout/", logout_view, name="logout"),
+    path("recuperar-password/", recuperar_password_solicitar, name="recuperar_password_solicitar"),
+    path("recuperar-password/verificar/", recuperar_password_verificar, name="recuperar_password_verificar"),
     path("dashboard/", dashboard, name="dashboard"),
     path("viviendas/", viviendas_list, name="viviendas_list"),
     path("proyectos/", proyectos_list, name="proyectos_list"),

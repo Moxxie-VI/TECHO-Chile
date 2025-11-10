@@ -2,12 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.auth.models import User
 from core.models import Privilegio
 from core.models import PerfilUsuario, Proyecto, Vivienda, RegistroPostventa, Evidencia
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import login_required
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, send_mail
 from core.forms import PerfilForm, AyudaForm
+from .models import TokenRecuperacion
+from django.conf import settings
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -202,3 +203,147 @@ def crear_usuario(request):
     }
     
     return render(request, "accounts/crear_usuario.html", ctx)
+
+
+# ============================================================================
+# RECUPERACIÓN DE CONTRASEÑA
+# ============================================================================
+
+def recuperar_password_solicitar(request):
+    """
+    Vista para solicitar recuperación de contraseña
+    El usuario ingresa su correo y se le envía un código
+    """
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    
+    if request.method == "POST":
+        correo = request.POST.get("correo", "").strip()
+        
+        # Validar que el correo no esté vacío
+        if not correo:
+            messages.error(request, "Por favor ingresa tu correo electrónico")
+            return render(request, "accounts/recuperar_password_solicitar.html")
+        
+        # Buscar usuario por correo (username = correo en este sistema)
+        try:
+            user = User.objects.get(username=correo)
+        except User.DoesNotExist:
+            # Por seguridad, no revelamos si el correo existe o no
+            messages.success(request, 
+                f"Si el correo {correo} está registrado, recibirás un código de recuperación en los próximos minutos.")
+            return redirect("login")
+        
+        # Generar token único
+        codigo = TokenRecuperacion.generar_codigo()
+        
+        # Guardar en base de datos
+        TokenRecuperacion.objects.create(
+            user=user,
+            token=codigo
+        )
+        
+        # Enviar correo con el código
+        asunto = "Código de Recuperación de Contraseña - TECHO Chile"
+        
+        mensaje = f"""
+Hola {user.first_name or user.username},
+
+Has solicitado recuperar tu contraseña en la Plataforma de Gestión de Viviendas de TECHO Chile.
+
+Tu código de recuperación es:
+
+    {codigo}
+
+Este código es válido por 15 minutos.
+
+Para restablecer tu contraseña:
+1. Ingresa a la página de recuperación
+2. Introduce este código
+3. Establece tu nueva contraseña
+
+Si no solicitaste este cambio, ignora este correo.
+
+---
+TECHO Chile
+Plataforma de Recepción y Postventa Habitacional
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Este es un correo automático, por favor no respondas.
+        """
+        
+        try:
+            send_mail(
+                subject=asunto,
+                message=mensaje,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[correo],
+                fail_silently=False,
+            )
+            messages.success(request, 
+                f"Se ha enviado un código de recuperación a {correo}. Revisa tu bandeja de entrada.")
+            return redirect("recuperar_password_verificar")
+        
+        except Exception as e:
+            messages.error(request, 
+                f"Error al enviar el correo. Por favor intenta más tarde. (Error: {str(e)})")
+            return render(request, "accounts/recuperar_password_solicitar.html")
+    
+    return render(request, "accounts/recuperar_password_solicitar.html")
+
+
+def recuperar_password_verificar(request):
+    """
+    Vista para verificar el código y cambiar la contraseña
+    """
+    if request.user.is_authenticated:
+        return redirect("dashboard")
+    
+    if request.method == "POST":
+        codigo = request.POST.get("codigo", "").strip().upper()
+        nueva_password = request.POST.get("nueva_password", "")
+        confirmar_password = request.POST.get("confirmar_password", "")
+        
+        # Validaciones
+        if not codigo:
+            messages.error(request, "Por favor ingresa el código de recuperación")
+            return render(request, "accounts/recuperar_password_verificar.html")
+        
+        if not nueva_password or not confirmar_password:
+            messages.error(request, "Por favor completa ambos campos de contraseña")
+            return render(request, "accounts/recuperar_password_verificar.html")
+        
+        if nueva_password != confirmar_password:
+            messages.error(request, "Las contraseñas no coinciden")
+            return render(request, "accounts/recuperar_password_verificar.html")
+        
+        if len(nueva_password) < 6:
+            messages.error(request, "La contraseña debe tener al menos 6 caracteres")
+            return render(request, "accounts/recuperar_password_verificar.html")
+        
+        # Buscar token
+        try:
+            token = TokenRecuperacion.objects.get(token=codigo, usado=False)
+        except TokenRecuperacion.DoesNotExist:
+            messages.error(request, "Código inválido o ya utilizado")
+            return render(request, "accounts/recuperar_password_verificar.html")
+        
+        # Verificar que el token sea válido (no expirado)
+        if not token.es_valido():
+            messages.error(request, "El código ha expirado. Solicita uno nuevo.")
+            return redirect("recuperar_password_solicitar")
+        
+        # Cambiar contraseña
+        user = token.user
+        user.set_password(nueva_password)
+        user.save()
+        
+        # Marcar token como usado
+        token.usado = True
+        token.save()
+        
+        messages.success(request, 
+            "✅ Tu contraseña ha sido actualizada exitosamente. Ya puedes iniciar sesión.")
+        return redirect("login")
+    
+    return render(request, "accounts/recuperar_password_verificar.html")

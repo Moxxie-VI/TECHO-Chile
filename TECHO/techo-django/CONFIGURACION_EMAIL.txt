@@ -1,0 +1,230 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     CONFIGURACIÓN DE EMAIL PARA RECUPERACIÓN DE CONTRASEÑA   ║
+║                    TECHO CHILE                                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Para que el sistema de recuperación de contraseña funcione y envíe
+correos REALES, necesitas configurar el backend de email.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 OPCIÓN 1: USAR GMAIL (Recomendado para desarrollo y producción)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1: Crear una "Contraseña de aplicación" en Gmail
+
+1. Ve a tu cuenta de Google: https://myaccount.google.com/
+2. Ve a "Seguridad"
+3. Activa "Verificación en dos pasos" (si no la tienes activa)
+4. Busca "Contraseñas de aplicaciones"
+5. Selecciona "Otra (nombre personalizado)" → escribe "TECHO Django"
+6. Google te dará una contraseña de 16 caracteres (ej: abcd efgh ijkl mnop)
+7. ⚠️ GUARDA ESTA CONTRASEÑA, solo se muestra una vez
+
+
+PASO 2: Agregar las siguientes variables al archivo .env
+
+Abre o crea el archivo: techo-django/.env
+
+Y agrega estas líneas:
+
+# Configuración de Email (Gmail)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu.correo@gmail.com
+EMAIL_HOST_PASSWORD=abcd efgh ijkl mnop
+DEFAULT_FROM_EMAIL=tu.correo@gmail.com
+
+
+IMPORTANTE:
+- EMAIL_HOST_USER: Tu correo de Gmail completo
+- EMAIL_HOST_PASSWORD: La contraseña de aplicación de 16 caracteres
+- DEFAULT_FROM_EMAIL: El correo desde el que se enviarán los emails
+
+
+PASO 3: Agregar configuración en settings.py
+
+Abre: techo-django/config/settings.py
+
+Busca la sección de EMAIL y reemplázala con:
+
+# ============================================================================
+# CONFIGURACIÓN DE EMAIL
+# ============================================================================
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 
+    'django.core.mail.backends.console.EmailBackend'  # Por defecto imprime en consola
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@techo.cl')
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 OPCIÓN 2: USAR OTRO PROVEEDOR DE EMAIL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si prefieres usar otro proveedor (Outlook, Yahoo, SendGrid, etc.),
+ajusta las variables en .env:
+
+OUTLOOK/HOTMAIL:
+EMAIL_HOST=smtp-mail.outlook.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu.correo@outlook.com
+EMAIL_HOST_PASSWORD=tu_contraseña
+
+YAHOO:
+EMAIL_HOST=smtp.mail.yahoo.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=tu.correo@yahoo.com
+EMAIL_HOST_PASSWORD=tu_contraseña_de_aplicacion
+
+SENDGRID (Profesional):
+EMAIL_HOST=smtp.sendgrid.net
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=apikey
+EMAIL_HOST_PASSWORD=tu_api_key_de_sendgrid
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 OPCIÓN 3: MODO DE PRUEBA (Sin envío real)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si solo quieres probar el sistema SIN enviar correos reales,
+NO configures nada en .env.
+
+El sistema usará el backend de consola por defecto.
+Los "emails" se imprimirán en la terminal donde corre el servidor:
+
+python manage.py runserver
+
+Verás algo como:
+
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Subject: Código de Recuperación de Contraseña - TECHO Chile
+From: no-reply@techo.cl
+To: usuario@ejemplo.com
+
+Hola Usuario,
+
+Tu código de recuperación es:
+
+    A3K9M2
+
+...
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ VERIFICAR QUE FUNCIONA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Inicia el servidor:
+   cd techo-django
+   python manage.py runserver
+
+2. Ve a: http://localhost:8000/login/
+
+3. Click en "¿Olvidaste tu contraseña?"
+
+4. Ingresa un correo de prueba
+
+5. Si configuraste Gmail correctamente:
+   ✅ Deberías recibir un email con el código
+
+   Si NO configuraste email:
+   ✅ Verás el email impreso en la terminal
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚨 SOLUCIÓN DE PROBLEMAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ERROR: "Authentication failed"
+Causa: Contraseña incorrecta o no es contraseña de aplicación
+Solución: Verifica que uses la contraseña de aplicación de 16 caracteres,
+          NO tu contraseña normal de Gmail
+
+ERROR: "SMTPConnectError"
+Causa: No hay conexión al servidor SMTP
+Solución: Verifica tu conexión a internet y que EMAIL_HOST sea correcto
+
+ERROR: "SMTPAuthenticationError"
+Causa: Credenciales incorrectas
+Solución: Verifica EMAIL_HOST_USER y EMAIL_HOST_PASSWORD en .env
+
+ERROR: El email no llega
+Causa: Puede estar en spam o la configuración es incorrecta
+Solución: 
+  1. Revisa la carpeta de spam
+  2. Verifica que DEFAULT_FROM_EMAIL sea el mismo que EMAIL_HOST_USER
+  3. Revisa los logs del servidor Django
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 SEGURIDAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ NUNCA subas el archivo .env a GitHub o repositorios públicos
+⚠️ Usa contraseñas de aplicación, NO tu contraseña personal
+⚠️ En producción, usa variables de entorno del servidor (Render/Railway)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 EJEMPLO DE ARCHIVO .env COMPLETO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Base de Datos
+DB_NAME=techo_gestion_viviendas
+DB_USER=techo_app
+DB_PASSWORD=tu_password_postgres
+DB_HOST=localhost
+DB_PORT=5432
+
+# Django
+SECRET_KEY=tu-clave-secreta-django
+DEBUG=True
+
+# Email (Gmail)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER=ricardo.techo@gmail.com
+EMAIL_HOST_PASSWORD=abcd efgh ijkl mnop
+DEFAULT_FROM_EMAIL=ricardo.techo@gmail.com
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌐 CONFIGURACIÓN EN PRODUCCIÓN (Render/Railway)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+En Render o Railway, agrega estas variables de entorno:
+
+EMAIL_BACKEND = django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST = smtp.gmail.com
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = tu.correo@gmail.com
+EMAIL_HOST_PASSWORD = abcd efgh ijkl mnop
+DEFAULT_FROM_EMAIL = tu.correo@gmail.com
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║                   ✅ ¡LISTO PARA USAR!                       ║
+║                                                               ║
+║  Ahora el sistema enviará correos REALES para recuperar      ║
+║  contraseñas. Los usuarios recibirán un código de 6          ║
+║  caracteres válido por 15 minutos.                           ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Documento generado: Noviembre 2025
+Sistema: TECHO Chile - Gestión de Viviendas
+

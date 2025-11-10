@@ -342,6 +342,19 @@
       color: var(--techo-blue-dark);
     }
     
+    .forgot-password-link {
+      color: var(--techo-blue);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    
+    .forgot-password-link:hover {
+      color: var(--techo-blue-dark);
+      text-decoration: underline;
+    }
+    
     .security-note {
       display: flex;
       align-items: center;
@@ -475,6 +488,11 @@
                 required 
                 aria-required="true"
               >
+            </div>
+            <div class="text-end mt-2">
+              <a href="{% url 'recuperar_password_solicitar' %}" class="forgot-password-link">
+                ¿Olvidaste tu contraseña?
+              </a>
             </div>
           </div>
           

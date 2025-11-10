@@ -120,8 +120,23 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@techo.cl")
-EMAIL_BACKEND = os.getenv("EMAIL_BACKEND")
+
+# ============================================================================
+# CONFIGURACIÓN DE EMAIL
+# ============================================================================
+# Para envío real de correos, configura estas variables en tu archivo .env
+# Ver archivo: CONFIGURACION_EMAIL.txt para instrucciones detalladas
+
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND', 
+    'django.core.mail.backends.console.EmailBackend'  # Por defecto imprime en consola
+)
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@techo.cl')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
