@@ -1,0 +1,181 @@
+╔═══════════════════════════════════════════════════════════════╗
+║     ✅ CREAR USUARIOS SIN SHELL (100% GRATIS)               ║
+║                    TECHO CHILE                                ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Solución para crear usuarios en Render sin necesidad de acceso Shell.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 PASO 1: SUBIR CAMBIOS A GITHUB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Abre tu terminal y ejecuta:
+
+cd C:\Users\Ricar\Documents\GitHub\TECHO-Chile\TECHO\techo-django
+
+git add .
+git commit -m "Agregado comando para crear usuarios automáticamente"
+git push
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚙️ PASO 2: ACTUALIZAR BUILD COMMAND EN RENDER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Ve a tu Web Service en Render
+2. Click en "Settings"
+3. Busca "Build Command"
+4. Reemplázalo con este comando COMPLETO:
+
+pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate && python manage.py create_initial_users
+
+5. Scroll hasta el final
+6. Click "Save Changes"
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 PASO 3: ESPERAR EL REDEPLOY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Render redesplegará automáticamente
+2. Ve a la pestaña "Logs"
+3. Busca estos mensajes:
+
+   🔍 Verificando usuarios iniciales...
+   📝 Creando usuario Admin...
+   ✅ Usuario Admin creado: admin@techo.cl / Admin#2025
+   📝 Creando usuario Trabajador de prueba...
+   ✅ Usuario Trabajador creado: trabajador@techo.cl / Trabajador#2025
+   📝 Creando usuario Familia de prueba...
+   ✅ Usuario Familia creado: familia@techo.cl / Familia#2025
+   
+   🎉 3 usuario(s) creado(s) exitosamente!
+
+4. Espera que termine el deploy (5-10 minutos)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 PASO 4: HACER LOGIN CON LAS CREDENCIALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Ve a tu aplicación y haz login con:
+
+┌─────────────────────────────────────────────────────────────┐
+│ 👤 ADMINISTRADOR (Jefe)                                     │
+│ Usuario:    admin@techo.cl                                  │
+│ Contraseña: Admin#2025                                      │
+│                                                             │
+│ Permisos: Acceso total al sistema                          │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 👷 TRABAJADOR (CT) - Usuario de prueba                      │
+│ Usuario:    trabajador@techo.cl                             │
+│ Contraseña: Trabajador#2025                                 │
+│                                                             │
+│ Permisos: Acceso limitado a proyecto asignado              │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ 🏠 FAMILIA (Cliente) - Usuario de prueba                    │
+│ Usuario:    familia@techo.cl                                │
+│ Contraseña: Familia#2025                                    │
+│                                                             │
+│ Permisos: Solo su vivienda                                 │
+└─────────────────────────────────────────────────────────────┘
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ ¿CÓMO FUNCIONA ESTO?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Se creó un comando Django personalizado:
+   accounts/management/commands/create_initial_users.py
+
+2. Este comando:
+   ✅ Verifica si los usuarios ya existen
+   ✅ Si NO existen, los crea automáticamente
+   ✅ Si YA existen, no hace nada (seguro)
+   ✅ Se ejecuta durante el build de Render
+
+3. Es 100% GRATIS:
+   ✅ No necesita Shell de pago
+   ✅ No necesita acceso manual
+   ✅ Se ejecuta automáticamente en cada deploy
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔧 CREAR MÁS USUARIOS DESPUÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Una vez que tengas acceso con el Admin, puedes:
+
+1. Ir a: https://tu-proyecto.onrender.com/usuarios/crear/
+2. Login como admin@techo.cl
+3. Crear todos los usuarios que necesites desde la interfaz web
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 EJECUTAR EL COMANDO MANUALMENTE (Opcional)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Si en el futuro tienes acceso a Shell o quieres probarlo en local:
+
+python manage.py create_initial_users
+
+Esto creará los usuarios si no existen.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ IMPORTANTE: CAMBIAR CONTRASEÑAS EN PRODUCCIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Las contraseñas por defecto son para PRUEBAS.
+
+Para producción real:
+1. Haz login como admin
+2. Ve a tu perfil o usa la función "Recuperar contraseña"
+3. Cambia a contraseñas seguras
+4. Elimina los usuarios de prueba (trabajador y familia)
+5. Crea usuarios reales desde la interfaz
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚨 SOLUCIÓN DE PROBLEMAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ERROR: "No module named 'accounts.management'"
+Solución: Verifica que hayas subido todos los archivos a GitHub,
+          especialmente los __init__.py
+
+ERROR: Los usuarios no se crean
+Solución: Verifica los logs de Render. Si no ves mensajes sobre
+          usuarios, el comando no se ejecutó. Verifica el Build Command.
+
+ERROR: "User already exists"
+Solución: Los usuarios ya existen, esto es NORMAL. Solo se crean
+          una vez.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ RESUMEN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. ✅ Subir cambios a GitHub (git push)
+2. ✅ Actualizar Build Command en Render
+3. ✅ Esperar redeploy (5-10 min)
+4. ✅ Hacer login con admin@techo.cl / Admin#2025
+5. ✅ Crear usuarios reales desde la interfaz web
+
+
+╔═══════════════════════════════════════════════════════════════╗
+║              🎉 ¡SOLUCIÓN 100% GRATUITA!                     ║
+║                                                               ║
+║  No necesitas Shell de pago.                                 ║
+║  Los usuarios se crean automáticamente.                      ║
+║  Todo funciona en el tier gratuito de Render.               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+Sistema: TECHO Chile - Gestión de Viviendas
+Solución: Noviembre 2025
+
