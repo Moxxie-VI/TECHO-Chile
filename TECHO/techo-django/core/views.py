@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from accounts.decorators import require_role
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.core.mail import EmailMessage
+from django.db.models import Count
 from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS
+from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
     return render(request, "core/home.html")
@@ -18,10 +23,6 @@ def viviendas_list(request):
 def proyectos_list(request):
     qs = Proyecto.objects.all()[:100]
     return render(request, "core/proyectos_list.html", {"proyectos": qs})
-
-@login_required
-def reportes_home(request):
-    return render(request, "core/reportes_home.html")
 
 @login_required
 def reportes_home(request):
@@ -39,18 +40,54 @@ def reporte_proyecto_pdf(request):
     except Proyecto.DoesNotExist:
         return HttpResponseBadRequest("Proyecto no existe")
 
-    registros = (RegistroPostventa.objects
+    # Obtener registros de postventa (primero el queryset completo, sin slice)
+    registros_qs = (RegistroPostventa.objects
+                    .filter(proyecto=proyecto)
+                    .select_related('proyecto')
+                    .order_by("-creado_en"))
+    
+    # Calcular estadísticas generales (ANTES del slice)
+    total_registros = registros_qs.count()
+    urgentes = registros_qs.filter(urgencia="ALTA").count()
+    
+    # Calcular distribución por urgencia (ANTES del slice)
+    por_urgencia = []
+    if total_registros > 0:
+        urgencia_counts = registros_qs.values('urgencia').annotate(total=Count('id'))
+        for item in urgencia_counts:
+            urgencia = item['urgencia'] or 'BAJA'
+            total = item['total']
+            porcentaje = (total / total_registros) * 100
+            por_urgencia.append({
+                'urgencia': urgencia,
+                'total': total,
+                'porcentaje': porcentaje
+            })
+    
+    # AHORA SÍ aplicar el slice para limitar los registros en el PDF
+    registros = list(registros_qs[:200])
+    
+    # Obtener viviendas con información adicional
+    viviendas = (Vivienda.objects
                  .filter(proyecto=proyecto)
-                 .order_by("-creado_en")[:200])
+                 .prefetch_related('perfilusuario_set')
+                 .annotate(num_registros=Count('fichainmueble__registropostventa')))
+    
+    # Contar evidencias
+    evidencias_count = Evidencia.objects.filter(registro__proyecto=proyecto).count()
+    
     stats = {
-        "viviendas": Vivienda.objects.filter(proyecto=proyecto).count(),
-        "registros": registros.count(),
-        "urgentes": registros.filter(urgencia="ALTA").count(),
+        "viviendas": viviendas.count(),
+        "registros": total_registros,
+        "urgentes": urgentes,
+        "evidencias": evidencias_count,
+        "por_urgencia": por_urgencia,
     }
 
     ctx = {
         "proyecto": proyecto,
         "registros": registros,
+        "viviendas": list(viviendas[:50]),  # Limitar a 50 viviendas para el PDF
         "stats": stats,
         "generado_en": timezone.localtime(),
     }
@@ -59,7 +96,7 @@ def reporte_proyecto_pdf(request):
     if not pdf_bytes:
         return HttpResponseBadRequest("No se pudo generar PDF")
 
-    filename = f"reporte_{proyecto.codigo}.pdf"
+    filename = f"reporte_{proyecto.codigo}_{timezone.now().strftime('%Y%m%d')}.pdf"
     return pdf_http_response(filename, pdf_bytes, as_attachment=True)
 
 @login_required
@@ -74,18 +111,54 @@ def reporte_proyecto_enviar(request):
     except Proyecto.DoesNotExist:
         return HttpResponseBadRequest("Proyecto no existe")
 
-    registros = (RegistroPostventa.objects
+    # Obtener registros de postventa (primero el queryset completo, sin slice)
+    registros_qs = (RegistroPostventa.objects
+                    .filter(proyecto=proyecto)
+                    .select_related('proyecto')
+                    .order_by("-creado_en"))
+    
+    # Calcular estadísticas generales (ANTES del slice)
+    total_registros = registros_qs.count()
+    urgentes = registros_qs.filter(urgencia="ALTA").count()
+    
+    # Calcular distribución por urgencia (ANTES del slice)
+    por_urgencia = []
+    if total_registros > 0:
+        urgencia_counts = registros_qs.values('urgencia').annotate(total=Count('id'))
+        for item in urgencia_counts:
+            urgencia = item['urgencia'] or 'BAJA'
+            total = item['total']
+            porcentaje = (total / total_registros) * 100
+            por_urgencia.append({
+                'urgencia': urgencia,
+                'total': total,
+                'porcentaje': porcentaje
+            })
+    
+    # AHORA SÍ aplicar el slice para limitar los registros en el PDF
+    registros = list(registros_qs[:200])
+    
+    # Obtener viviendas con información adicional
+    viviendas = (Vivienda.objects
                  .filter(proyecto=proyecto)
-                 .order_by("-creado_en")[:200])
+                 .prefetch_related('perfilusuario_set')
+                 .annotate(num_registros=Count('fichainmueble__registropostventa')))
+    
+    # Contar evidencias
+    evidencias_count = Evidencia.objects.filter(registro__proyecto=proyecto).count()
+    
     stats = {
-        "viviendas": Vivienda.objects.filter(proyecto=proyecto).count(),
-        "registros": registros.count(),
-        "urgentes": registros.filter(urgencia="ALTA").count(),
+        "viviendas": viviendas.count(),
+        "registros": total_registros,
+        "urgentes": urgentes,
+        "evidencias": evidencias_count,
+        "por_urgencia": por_urgencia,
     }
 
     ctx = {
         "proyecto": proyecto,
         "registros": registros,
+        "viviendas": list(viviendas[:50]),  # Limitar a 50 viviendas para el PDF
         "stats": stats,
         "generado_en": timezone.localtime(),
     }
@@ -94,13 +167,44 @@ def reporte_proyecto_enviar(request):
     if not pdf_bytes:
         return HttpResponseBadRequest("No se pudo generar PDF")
 
-    # Enviar email (por ahora usa console backend si así está en settings)
-    subject = f"Reporte Proyecto {proyecto.codigo} — {proyecto.nombre}"
-    body = "Adjunto reporte PDF generado desde la plataforma TECHO."
-    email = EmailMessage(subject=subject, body=body, to=[to_addr])
-    email.attach(filename=f"reporte_{proyecto.codigo}.pdf", content=pdf_bytes, mimetype="application/pdf")
-    email.send(fail_silently=False)
+    # Preparar email con información detallada
+    fecha_generacion = timezone.localtime().strftime("%d de %B de %Y a las %H:%M")
+    filename = f"reporte_{proyecto.codigo}_{timezone.now().strftime('%Y%m%d')}.pdf"
+    
+    body = f"""Estimado/a,
 
+Adjunto encontrará el Informe de Recepción y Postventa del Proyecto:
+
+• Código: {proyecto.codigo}
+• Nombre: {proyecto.nombre}
+• Ubicación: {proyecto.ubicacion or 'No especificada'}
+
+RESUMEN:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Total de Viviendas: {stats['viviendas']}
+• Registros de Postventa: {stats['registros']}
+• Observaciones Urgentes: {stats['urgentes']}
+• Evidencias Adjuntas: {stats['evidencias']}
+
+Este reporte fue generado automáticamente el {fecha_generacion}.
+
+Para cualquier consulta, no dude en contactarnos.
+
+Saludos cordiales,
+TECHO Chile
+Plataforma de Recepción y Postventa Habitacional
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Este correo y sus adjuntos contienen información confidencial.
+"""
+    
+    # Enviar email
+    subject = f"Reporte Proyecto {proyecto.codigo} - {proyecto.nombre}"
+    email = EmailMessage(subject=subject, body=body, to=[to_addr])
+    email.attach(filename=filename, content=pdf_bytes, mimetype="application/pdf")
+    email.send(fail_silently=False)
+    
+    messages.success(request, f"✓ Reporte enviado exitosamente a {to_addr}")
     return redirect("reportes_home")
 
 # --- Admin: Proyectos (HTMX modales) ---
@@ -108,6 +212,9 @@ def reporte_proyecto_enviar(request):
 @require_role("Admin")
 def admin_proyectos(request):
     qs = Proyecto.objects.all().order_by("codigo")
+    # Si es una petición HTMX para solo el tbody, devolver solo eso
+    if request.headers.get('HX-Request') and request.headers.get('HX-Target') == 'tb-proy':
+        return render(request, "partials/proyectos_table.html", {"proyectos": qs})
     return render(request, "adminx/proyectos.html", {"proyectos": qs})
 
 @login_required
@@ -117,8 +224,15 @@ def admin_proyecto_form(request, pk=None):
     if request.method == "POST":
         form = ProyectoForm(request.POST, instance=obj)
         if form.is_valid():
-            form.save()
-            return render(request, "partials/ok.html", {"msg":"Proyecto guardado"})
+            proyecto = form.save()
+            # Si es una petición HTMX, devolver script para cerrar modal y actualizar tabla
+            if request.headers.get('HX-Request'):
+                proyectos = Proyecto.objects.all().order_by("codigo")
+                return render(request, "partials/proyecto_saved.html", {
+                    "proyectos": proyectos,
+                    "proyecto": proyecto
+                })
+            return redirect("admin_proyectos")
         return render(request, "partials/form_proyecto.html", {"form": form}, status=400)
     form = ProyectoForm(instance=obj)
     return render(request, "partials/form_proyecto.html", {"form": form})
@@ -127,8 +241,12 @@ def admin_proyecto_form(request, pk=None):
 @require_role("Admin")
 @require_POST
 def admin_proyecto_delete(request, pk):
-    get_object_or_404(Proyecto, pk=pk).delete()
-    return render(request, "partials/ok.html", {"msg":"Proyecto eliminado"})
+    proyecto = get_object_or_404(Proyecto, pk=pk)
+    proyecto.delete()
+    # Si es una petición HTMX, devolver un string vacío para eliminar la fila
+    if request.headers.get('HX-Request'):
+        return HttpResponse("")
+    return redirect("admin_proyectos")
 
 # --- Trabajador: subir evidencia a un registro ---
 @login_required

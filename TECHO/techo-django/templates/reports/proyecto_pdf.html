@@ -4,77 +4,490 @@
 <head>
   <meta charset="utf-8">
   <style>
-    @page { size: A4; margin: 20mm; }
-    body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color:#0f172a; }
-    .header { display:flex; align-items:center; margin-bottom: 16px; }
-    .logo { width: 120px; }
-    h1 { font-size: 20px; margin: 0; color:#0ea5e9; }
-    h2 { font-size: 14px; margin: 4px 0 0 0; color:#334155; }
-    .muted { color: #64748b; }
-    .badge { display:inline-block; padding: 3px 8px; border:1px solid #0ea5e9; color:#0ea5e9; border-radius: 12px; font-size: 10px; }
-    .grid { width:100%; border-collapse: collapse; margin-top: 10px; }
-    .grid th, .grid td { border:1px solid #e2e8f0; padding:6px; }
-    .grid th { background:#e0f2fe; text-align:left; }
-    .section { margin-top: 16px; }
-    .right { text-align:right; }
-    .small { font-size: 10px; }
+    @page { 
+      size: A4; 
+      margin: 18mm;
+    }
+    
+    body { 
+      font-family: 'DejaVu Sans', Arial, sans-serif; 
+      font-size: 11px; 
+      color: #0f172a;
+      line-height: 1.5;
+    }
+    
+    /* HEADER */
+    .header { 
+      border-bottom: 3px solid #0ea5e9;
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .header-top {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .header-top::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    
+    .header-top .logo {
+      float: left;
+    }
+    
+    .header-top .header-right {
+      float: right;
+    }
+    
+    .logo { 
+      width: 100px; 
+      height: auto;
+    }
+    
+    .header-right {
+      text-align: right;
+    }
+    
+    h1 { 
+      font-size: 22px; 
+      margin: 0 0 8px 0; 
+      color: #0ea5e9;
+      font-weight: bold;
+    }
+    
+    h2 { 
+      font-size: 16px; 
+      margin: 0 0 5px 0; 
+      color: #334155;
+      font-weight: 600;
+    }
+    
+    h3 {
+      font-size: 14px;
+      margin: 20px 0 10px 0;
+      color: #0c4a6e;
+      font-weight: bold;
+      border-bottom: 2px solid #e0f2fe;
+      padding-bottom: 5px;
+    }
+    
+    .badge { 
+      display: inline-block; 
+      padding: 4px 10px; 
+      border: 1px solid #0ea5e9; 
+      color: #0ea5e9; 
+      border-radius: 12px; 
+      font-size: 9px;
+      font-weight: 600;
+      background: #f0f9ff;
+    }
+    
+    .badge-danger {
+      border-color: #dc2626;
+      color: #dc2626;
+      background: #fef2f2;
+    }
+    
+    .badge-warning {
+      border-color: #f59e0b;
+      color: #f59e0b;
+      background: #fffbeb;
+    }
+    
+    .badge-success {
+      border-color: #16a34a;
+      color: #16a34a;
+      background: #f0fdf4;
+    }
+    
+    .muted { 
+      color: #64748b;
+      font-size: 10px;
+    }
+    
+    /* INFO BOX */
+    .info-box {
+      background: #f1f5f9;
+      border-left: 4px solid #0ea5e9;
+      padding: 12px 15px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+    
+    .info-box strong {
+      color: #0c4a6e;
+      font-size: 12px;
+    }
+    
+    /* ESTADÍSTICAS */
+    .stats-grid {
+      width: 100%;
+      margin: 15px 0;
+    }
+    
+    .stats-grid::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    
+    .stat-card {
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      float: left;
+      width: 23%;
+      margin-right: 2%;
+      margin-bottom: 10px;
+    }
+    
+    .stat-card:nth-child(4n) {
+      margin-right: 0;
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #0ea5e9;
+      margin: 5px 0;
+    }
+    
+    .stat-label {
+      font-size: 9px;
+      color: #0c4a6e;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    
+    /* TABLAS */
+    .table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin: 10px 0;
+      font-size: 10px;
+    }
+    
+    .table th, .table td { 
+      border: 1px solid #e2e8f0; 
+      padding: 8px 10px;
+      text-align: left;
+    }
+    
+    .table th { 
+      background: #dbeafe;
+      color: #0c4a6e;
+      font-weight: bold;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    
+    .table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    
+    .table tbody tr:hover {
+      background: #f1f5f9;
+    }
+    
+    /* SECCIONES */
+    .section { 
+      margin-top: 20px;
+      page-break-inside: avoid;
+    }
+    
+    .section-simple {
+      margin: 15px 0;
+    }
+    
+    /* RESUMEN DE PROYECTO */
+    .project-info {
+      width: 100%;
+      margin: 15px 0;
+    }
+    
+    .project-info::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    
+    .info-item {
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 6px;
+      border-left: 3px solid #0ea5e9;
+      float: left;
+      width: 48%;
+      margin-right: 2%;
+      margin-bottom: 10px;
+    }
+    
+    .info-item:nth-child(2n) {
+      margin-right: 0;
+    }
+    
+    .info-label {
+      font-size: 9px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    
+    .info-value {
+      font-size: 11px;
+      color: #0f172a;
+      font-weight: 600;
+    }
+    
+    /* URGENCIA */
+    .urgencia-alta {
+      color: #dc2626;
+      font-weight: bold;
+    }
+    
+    .urgencia-media {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    
+    .urgencia-baja {
+      color: #16a34a;
+    }
+    
+    /* FOOTER */
+    .footer {
+      margin-top: 30px;
+      padding-top: 15px;
+      border-top: 2px solid #e2e8f0;
+      font-size: 9px;
+      color: #64748b;
+      text-align: center;
+    }
+    
+    /* UTILIDADES */
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .bold { font-weight: bold; }
+    .small { font-size: 9px; }
+    
+    /* PAGE BREAK */
+    .page-break {
+      page-break-before: always;
+    }
   </style>
 </head>
 <body>
+  <!-- HEADER -->
   <div class="header">
-    <img class="logo" src="{% static 'img/techo_logo.png' %}">
-    <div style="margin-left:12px">
-      <h1>Informe de Proyecto</h1>
-      <h2>{{ proyecto.codigo }} — {{ proyecto.nombre }}</h2>
-      <div class="muted small">Ubicación: {{ proyecto.ubicacion|default:"s/i" }} · Constructora: {{ proyecto.constructora.nombre|default:"s/i" }}</div>
-      <div class="muted small">Generado: {{ generado_en }}</div>
+    <div class="header-top">
+      <img class="logo" src="{% static 'img/techo_logo.png' %}" alt="TECHO Chile">
+      <div class="header-right">
+        <span class="badge">REPORTE OFICIAL</span><br>
+        <span class="muted">Fecha: {{ generado_en|date:"d/m/Y H:i" }}</span>
+      </div>
     </div>
-    <div class="right" style="margin-left:auto">
-      <span class="badge">TECHO Chile</span>
+    <h1>Informe de Recepción y Postventa</h1>
+    <h2>{{ proyecto.codigo }} — {{ proyecto.nombre }}</h2>
+  </div>
+
+  <!-- INFORMACIÓN DEL PROYECTO -->
+  <div class="info-box">
+    <strong>INFORMACIÓN DEL PROYECTO</strong>
+  </div>
+  
+  <div class="project-info">
+    <div class="info-item">
+      <div class="info-label">Código Proyecto</div>
+      <div class="info-value">{{ proyecto.codigo }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Nombre del Proyecto</div>
+      <div class="info-value">{{ proyecto.nombre }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Ubicación</div>
+      <div class="info-value">{{ proyecto.ubicacion|default:"Sin especificar" }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Constructora</div>
+      <div class="info-value">{{ proyecto.constructora.nombre|default:"Sin especificar" }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Fecha de Inicio</div>
+      <div class="info-value">{{ proyecto.fecha_inicio|date:"d/m/Y"|default:"Sin especificar" }}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Fecha Estimada Término</div>
+      <div class="info-value">{{ proyecto.fecha_estimada_termino|date:"d/m/Y"|default:"Sin especificar" }}</div>
     </div>
   </div>
 
-  <div class="section">
-    <table>
-      <tr>
-        <td><b>Viviendas registradas:</b> {{ stats.viviendas }}</td>
-        <td><b>Registros postventa:</b> {{ stats.registros }}</td>
-        <td><b>Observ. urgentes:</b> {{ stats.urgentes }}</td>
-      </tr>
-    </table>
+  <!-- ESTADÍSTICAS GENERALES -->
+  <h3>ESTADÍSTICAS GENERALES</h3>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Viviendas</div>
+      <div class="stat-number">{{ stats.viviendas }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Registros Postventa</div>
+      <div class="stat-number">{{ stats.registros }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Observ. Urgentes</div>
+      <div class="stat-number">{{ stats.urgentes }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Evidencias</div>
+      <div class="stat-number">{{ stats.evidencias|default:0 }}</div>
+    </div>
   </div>
 
-  <div class="section">
-    <h3>Observaciones de Postventa</h3>
-    <table class="grid">
+  <!-- DISTRIBUCIÓN POR URGENCIA -->
+  {% if stats.por_urgencia %}
+  <div class="section-simple">
+    <strong>Distribución por Urgencia:</strong>
+    <table class="table">
       <thead>
         <tr>
-          <th>#</th>
-          <th>Recinto</th>
-          <th>Descripción</th>
-          <th>Urgencia</th>
-          <th>Creado</th>
+          <th>Nivel de Urgencia</th>
+          <th class="center">Cantidad</th>
+          <th class="center">Porcentaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in stats.por_urgencia %}
+        <tr>
+          <td>
+            {% if item.urgencia == "ALTA" %}
+              <span class="badge badge-danger">ALTA</span>
+            {% elif item.urgencia == "MEDIA" %}
+              <span class="badge badge-warning">MEDIA</span>
+            {% else %}
+              <span class="badge badge-success">BAJA</span>
+            {% endif %}
+          </td>
+          <td class="center">{{ item.total }}</td>
+          <td class="center">{{ item.porcentaje|floatformat:1 }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- LISTA DE VIVIENDAS -->
+  {% if viviendas %}
+  <div class="section">
+    <h3>VIVIENDAS DEL PROYECTO</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Dirección</th>
+          <th>Familia Asignada</th>
+          <th class="center">N° Registros</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in viviendas %}
+        <tr>
+          <td>{{ v.tipo|default:"Vivienda" }}</td>
+          <td>{{ v.direccion|default:"Sin dirección" }}</td>
+          <td>
+            {% if v.perfilusuario_set.first %}
+              {{ v.perfilusuario_set.first.nombre }} {{ v.perfilusuario_set.first.apellido }}
+            {% else %}
+              <span class="muted">Sin asignar</span>
+            {% endif %}
+          </td>
+          <td class="center">{{ v.num_registros|default:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- OBSERVACIONES DE POSTVENTA -->
+  <div class="section page-break">
+    <h3>OBSERVACIONES DE POSTVENTA (Últimos 120 días DS 49)</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width: 5%;">#</th>
+          <th style="width: 15%;">Fecha</th>
+          <th style="width: 15%;">Recinto</th>
+          <th style="width: 40%;">Descripción</th>
+          <th style="width: 10%;">Urgencia</th>
+          <th style="width: 15%;">Estado</th>
         </tr>
       </thead>
       <tbody>
         {% for r in registros %}
         <tr>
           <td>{{ forloop.counter }}</td>
-          <td>{{ r.recinto|default:"s/i" }}</td>
-          <td>{{ r.observacion|default:"" }}</td>
-          <td>{{ r.urgencia }}</td>
-          <td>{{ r.creado_en|date:"d/m/Y H:i" }}</td>
+          <td>{{ r.creado_en|date:"d/m/Y" }}</td>
+          <td>{{ r.recinto|default:"General" }}</td>
+          <td>{{ r.observacion|truncatewords:15|default:"Sin descripción" }}</td>
+          <td class="center">
+            {% if r.urgencia == "ALTA" %}
+              <span class="urgencia-alta">ALTA</span>
+            {% elif r.urgencia == "MEDIA" %}
+              <span class="urgencia-media">MEDIA</span>
+            {% else %}
+              <span class="urgencia-baja">BAJA</span>
+            {% endif %}
+          </td>
+          <td>{{ r.estado|default:"PENDIENTE" }}</td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="small muted">No hay registros</td></tr>
+        <tr>
+          <td colspan="6" class="center muted">No hay registros de observaciones para este proyecto</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 
-  <div class="section small muted">
-    <p>Este informe fue generado automáticamente por la Plataforma de Recepción y Postventa de TECHO Chile.</p>
-    <p>Privacidad: este documento puede contener información sensible. Su difusión está restringida a usuarios autorizados.</p>
+  <!-- RESUMEN Y CONCLUSIONES -->
+  <div class="section">
+    <h3>RESUMEN Y CONCLUSIONES</h3>
+    <div class="info-box">
+      <p><strong>Estado General del Proyecto:</strong></p>
+      <p>
+        El proyecto {{ proyecto.codigo }} cuenta con {{ stats.viviendas }} vivienda{{ stats.viviendas|pluralize:",s" }} 
+        {% if stats.registros > 0 %}
+          y se han registrado {{ stats.registros }} observación{{ stats.registros|pluralize:"es" }} de postventa.
+          {% if stats.urgentes > 0 %}
+            <span class="urgencia-alta">ATENCIÓN: {{ stats.urgentes }} observación{{ stats.urgentes|pluralize:"es" }} urgente{{ stats.urgentes|pluralize:",s" }} requiere{{ stats.urgentes|pluralize:"n," }} atención inmediata.</span>
+          {% else %}
+            <span class="urgencia-baja">No hay observaciones urgentes pendientes.</span>
+          {% endif %}
+        {% else %}
+          y no se han registrado observaciones de postventa hasta la fecha.
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p><strong>TECHO Chile - Plataforma de Recepción y Postventa Habitacional</strong></p>
+    <p>Este informe fue generado automáticamente el {{ generado_en|date:"d \d\e F \d\e Y \a \l\a\s H:i" }}.</p>
+    <p style="margin-top: 10px;">
+      <strong>Confidencialidad:</strong> Este documento contiene información sensible y su difusión está restringida exclusivamente 
+      a usuarios autorizados de TECHO Chile, familias beneficiarias y entidades pertinentes involucradas en el proyecto.
+    </p>
+    <p style="margin-top: 10px;">
+      Para consultas o aclaraciones sobre este informe, contactar a: <strong>contacto@techo.cl</strong>
+    </p>
   </div>
 </body>
 </html>

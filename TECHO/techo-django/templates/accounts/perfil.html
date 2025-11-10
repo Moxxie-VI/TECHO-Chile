@@ -1,58 +1,426 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% block title %}Mi perfil · TECHO{% endblock %}
+{% block title %}Mi Perfil · TECHO{% endblock %}
+
 {% block page_intro %}
-<div class="container-fluid pt-3">
-  <div class="intro p-3 d-flex align-items-center gap-3">
-    <img src="{% static 'img/user_card.png' %}" height="64" alt="">
-    <div>
-      <h5 class="mb-1">Mi perfil</h5>
-      <div class="text-muted">Datos personales, correo y foto de perfil.</div>
+<div class="container-fluid pt-4">
+  <div class="dashboard-header perfil-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon perfil-icon">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Mi Perfil</h1>
+          <p class="mb-0" style="opacity: 0.9;">Gestiona tu información personal y configuración de cuenta</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="row g-3">
+<style>
+  .perfil-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+  }
+  
+  .perfil-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+  }
+  
+  .profile-card {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+  }
+  
+  .profile-avatar-section {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .profile-avatar-section {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+  }
+  
+  .avatar-container {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+  }
+  
+  .avatar-image {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--accent);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .avatar-placeholder {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: white;
+    border: 5px solid var(--accent);
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+  }
+  
+  .avatar-edit-overlay {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    border: 4px solid var(--card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .avatar-edit-overlay:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+  
+  .avatar-edit-overlay i {
+    font-size: 1.25rem;
+  }
+  
+  .user-display-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-info-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+  
+  .user-email-display {
+    color: var(--muted);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .profile-form-card {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+  }
+  
+  .profile-form-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(99, 102, 241, 0.12) 100%);
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .profile-form-header {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%);
+  }
+  
+  .profile-form-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .profile-form-header p {
+    margin: 0.5rem 0 0 0;
+    color: var(--muted);
+  }
+  
+  .profile-form-body {
+    padding: 2.5rem 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.75rem;
+  }
+  
+  .form-label {
+    font-weight: 700;
+    color: var(--fg);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .form-label i {
+    color: #6366f1;
+    font-size: 1.25rem;
+  }
+  
+  .form-control {
+    padding: 0.875rem 1.125rem;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    outline: none;
+  }
+  
+  .file-upload-wrapper {
+    position: relative;
+    display: block;
+  }
+  
+  .file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border: 3px dashed var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  
+  .file-upload-label:hover {
+    border-color: #6366f1;
+    background: rgba(99, 102, 241, 0.05);
+    color: #6366f1;
+  }
+  
+  .file-upload-label i {
+    font-size: 1.5rem;
+  }
+  
+  input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .btn-save-profile {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border: none;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .btn-save-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+  
+  .btn-save-profile i {
+    font-size: 1.25rem;
+  }
+  
+  @media (max-width: 768px) {
+    .profile-form-body {
+      padding: 1.5rem 1rem;
+    }
+    
+    .avatar-image, .avatar-placeholder {
+      width: 140px;
+      height: 140px;
+    }
+  }
+</style>
+
+<div class="row g-4">
   <div class="col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-body text-center">
-        {% if request.user.perfil.avatar %}
-          <img src="{{ request.user.perfil.avatar.url }}" class="rounded-circle" width="140" height="140" style="object-fit:cover">
-        {% else %}
-          <i class="bi bi-person-circle" style="font-size:140px"></i>
-        {% endif %}
-        <div class="mt-2"><b>{{ request.user.username }}</b></div>
-        <div class="text-muted small">Rol: {{ rol }}</div>
-        <div class="text-muted small">Correo institucional: {{ request.user.email|default:request.user.username }}</div>
+    <div class="profile-card">
+      <div class="profile-avatar-section">
+        <div class="avatar-container">
+          {% if request.user.perfil.avatar %}
+            <img src="{{ request.user.perfil.avatar.url }}" alt="Avatar" class="avatar-image" id="avatarPreview">
+          {% else %}
+            <div class="avatar-placeholder" id="avatarPlaceholder">
+              <i class="bi bi-person-fill"></i>
+            </div>
+          {% endif %}
+          <label for="id_avatar" class="avatar-edit-overlay">
+            <i class="bi bi-camera-fill"></i>
+          </label>
+        </div>
+        
+        <h2 class="user-display-name">
+          {{ request.user.perfil.nombre|default:request.user.username }} 
+          {{ request.user.perfil.apellido|default:"" }}
+        </h2>
+        
+        <div class="user-info-badge">
+          <i class="bi bi-shield-check"></i>
+          {{ rol }}
+        </div>
+        
+        <div class="user-email-display">
+          <i class="bi bi-envelope-fill"></i>
+          {{ request.user.email|default:request.user.username }}
+        </div>
       </div>
     </div>
   </div>
+  
   <div class="col-lg-8">
-    <div class="card shadow-sm">
-      <div class="card-header">Editar datos</div>
-      <div class="card-body">
+    <div class="profile-form-card">
+      <div class="profile-form-header">
+        <h3>
+          <i class="bi bi-pencil-square"></i>
+          Editar Información Personal
+        </h3>
+        <p>Actualiza tus datos de contacto y foto de perfil</p>
+      </div>
+      
+      <div class="profile-form-body">
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="row g-3">
+          
+          <div class="row g-4">
             <div class="col-md-6">
-              <label class="form-label">Correo personal</label>
-              {{ form.correo_personal }}
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-envelope-at-fill"></i>
+                  Correo Personal
+                </label>
+                {{ form.correo_personal }}
+              </div>
             </div>
+            
             <div class="col-md-6">
-              <label class="form-label">Teléfono</label>
-              {{ form.telefono }}
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-telephone-fill"></i>
+                  Teléfono
+                </label>
+                {{ form.telefono }}
+              </div>
             </div>
-            <div class="col-md-12">
-              <label class="form-label">Foto de perfil</label>
-              {{ form.avatar }}
+            
+            <div class="col-12">
+              <div class="form-group">
+                <label class="form-label">
+                  <i class="bi bi-image-fill"></i>
+                  Foto de Perfil
+                </label>
+                <div class="file-upload-wrapper">
+                  {{ form.avatar }}
+                  <label for="id_avatar" class="file-upload-label">
+                    <i class="bi bi-cloud-upload-fill"></i>
+                    <span id="fileName">Haz clic para seleccionar una imagen</span>
+                  </label>
+                </div>
+                <small class="text-muted">Formatos: JPG, PNG. Tamaño máximo: 5MB</small>
+              </div>
             </div>
           </div>
-          <button class="btn btn-primary mt-3">Guardar cambios</button>
+          
+          <div class="text-end mt-4 pt-3" style="border-top: 2px solid var(--border);">
+            <button type="submit" class="btn-save-profile">
+              <i class="bi bi-check-circle-fill"></i>
+              Guardar Cambios
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+// Preview de avatar al seleccionar archivo
+document.getElementById('id_avatar').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  const fileName = document.getElementById('fileName');
+  const avatarPreview = document.getElementById('avatarPreview');
+  const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+  
+  if (file) {
+    fileName.textContent = file.name;
+    
+    // Mostrar preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      if (avatarPreview) {
+        avatarPreview.src = e.target.result;
+      } else if (avatarPlaceholder) {
+        // Crear imagen si solo había placeholder
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'avatar-image';
+        img.id = 'avatarPreview';
+        avatarPlaceholder.parentNode.replaceChild(img, avatarPlaceholder);
+      }
+    };
+    reader.readAsDataURL(file);
+  } else {
+    fileName.textContent = 'Haz clic para seleccionar una imagen';
+  }
+});
+</script>
 {% endblock %}

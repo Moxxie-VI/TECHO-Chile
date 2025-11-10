@@ -7,82 +7,938 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
   :root{
-    --bg:#ffffff; --fg:#0f172a; --muted:#64748b;
-    --sidebar:#0ea5e9; --sidebar-fg:#fff; --card:#fff; --border:#e2e8f0;
-    --head-h:56px; --foot-h:56px;
+    /* Colores principales */
+    --bg: #f8fafc;
+    --fg: #0f172a;
+    --muted: #64748b;
+    --accent: #0ea5e9;
+    --accent-dark: #0284c7;
+    
+    /* Sidebar */
+    --sidebar-bg: linear-gradient(180deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+    --sidebar-fg: #ffffff;
+    --sidebar-hover: rgba(255, 255, 255, 0.15);
+    --sidebar-active: rgba(255, 255, 255, 0.25);
+    
+    /* Componentes */
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --header-bg: rgba(255, 255, 255, 0.95);
+    --footer-bg: linear-gradient(90deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+    
+    /* Sombras */
+    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+    
+    /* Dimensiones */
+    --head-h: 70px;
+    --foot-h: 60px;
+    --sidebar-w: 260px;
+    --sidebar-collapsed-w: 70px;
+    
+    /* Radios */
+    --radius-sm: 10px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 24px;
   }
+  
   [data-theme="dark"]{
-    --bg:#0b1220; --fg:#e5e7eb; --muted:#9aa5b1;
-    --sidebar:#0b84c6; --sidebar-fg:#fff; --card:#121a2b; --border:#1f2937;
+    --bg: #0f172a;
+    --fg: #f1f5f9;
+    --muted: #cbd5e1;
+    --accent: #38bdf8;
+    --accent-dark: #0ea5e9;
+    
+    --sidebar-bg: linear-gradient(180deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
+    --sidebar-hover: rgba(255, 255, 255, 0.12);
+    --sidebar-active: rgba(255, 255, 255, 0.2);
+    
+    --card: #1e293b;
+    --border: #475569;
+    --header-bg: rgba(15, 23, 42, 0.98);
+    --footer-bg: linear-gradient(90deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
+    
+    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.7);
   }
-  [data-font="base"]{ --fs:16px } [data-font="lg"]{ --fs:18px } [data-font="xl"]{ --fs:20px }
+  
+  [data-font="base"]{ --fs:16px }
+  [data-font="lg"]{ --fs:18px }
+  [data-font="xl"]{ --fs:20px }
 
-  html,body{height:100%}
-  body{display:flex;font-size:var(--fs);background:var(--bg);color:var(--fg);}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    display: flex;
+    font-size: var(--fs);
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
 
-  .sidebar{width:270px;background:var(--sidebar);color:var(--sidebar-fg);transition:width .2s ease;overflow:hidden}
-  .sidebar a{color:var(--sidebar-fg);text-decoration:none}
-  .sidebar .active{background:rgba(255,255,255,.15);border-radius:10px}
-  .sb-collapsed .sidebar{width:72px}
-  .sb-collapsed .sidebar .text{display:none}
+  /* ============ SIDEBAR MODERNO ============ */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-fg);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s ease;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+  }
+  
+  /* Efectos de fondo animados en sidebar */
+  .sidebar::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: sidebarFloat 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+  
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    bottom: -40%;
+    left: -20%;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: sidebarFloat 15s ease-in-out infinite reverse;
+    pointer-events: none;
+  }
+  
+  @keyframes sidebarFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(20px, 20px) scale(1.1); }
+  }
+  
+  /* ============ PERFIL DE USUARIO ============ */
+  .user-profile-section {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 1rem;
+  }
+  
+  .user-profile-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+  }
+  
+  .user-avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .user-avatar, .user-avatar-placeholder {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .user-avatar {
+    object-fit: cover;
+  }
+  
+  .user-avatar-placeholder {
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: white;
+  }
+  
+  .avatar-status {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 14px;
+    height: 14px;
+    background: #10b981;
+    border: 2px solid var(--sidebar-bg);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .user-info {
+    flex: 1;
+    min-width: 0;
+    transition: all 0.3s ease;
+  }
+  
+  .user-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .user-role-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.25);
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+  
+  .user-id {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Courier New', monospace;
+  }
+  
+  .user-settings-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .user-settings-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg) scale(1.1);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .user-settings-btn i {
+    font-size: 1.1rem;
+  }
+  
+  /* Estado colapsado del perfil */
+  .sb-collapsed .user-info {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+  }
+  
+  .sb-collapsed .user-settings-btn {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+    border: none;
+  }
+  
+  .sb-collapsed .user-profile-container {
+    justify-content: center;
+  }
+  
+  /* Navegación */
+  .sidebar nav {
+    padding: 0 0.875rem;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .sidebar nav::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .sidebar nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  
+  .sidebar a {
+    color: var(--sidebar-fg);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .sidebar a i {
+    font-size: 1.15rem;
+    min-width: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .sidebar a:hover {
+    background: var(--sidebar-hover);
+    transform: translateX(6px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .sidebar a.active {
+    background: var(--sidebar-active);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+  }
+  
+  .sidebar a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 0 4px 4px 0;
+  }
+  
+  /* Asegurar que el texto siempre esté visible cuando NO está colapsado */
+  .sidebar .text {
+    display: inline !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Estado colapsado */
+  .sb-collapsed .sidebar {
+    width: var(--sidebar-collapsed-w);
+  }
+  
+  .sb-collapsed .sidebar .text {
+    opacity: 0 !important;
+    display: none !important;
+  }
+  
+  .sb-collapsed .user-profile-section {
+    padding: 1rem 0.5rem;
+  }
+  
+  .sb-collapsed .user-avatar-wrapper {
+    margin: 0 auto;
+  }
+  
+  .sb-collapsed .user-avatar,
+  .sb-collapsed .user-avatar-placeholder {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .sb-collapsed .sidebar a {
+    justify-content: center;
+    padding: 0.875rem;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .sb-collapsed .sidebar a:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Transiciones suaves para el sidebar y contenido */
+  .sidebar {
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .content {
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Efecto en el icono del botón toggle */
+  #btnCollapseTop i {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-  .content{flex:1;display:flex;flex-direction:column;min-height:100vh}
-  header{height:var(--head-h);background:var(--card);border-bottom:1px solid var(--border)}
-  main{flex:1}               /* 👈 asegura el footer al fondo */
-  footer{height:var(--foot-h);background:var(--sidebar);color:#eaf6ff}
+  /* ============ CONTENT AREA ============ */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* ============ HEADER MODERNO ============ */
+  header {
+    height: var(--head-h);
+    background: var(--header-bg);
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+  }
+  
+  header .container-fluid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 2rem;
+  }
+  
+  /* Botones del header */
+  header .btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    padding: 0.625rem 1rem;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+  }
+  
+  header .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--accent);
+    background: var(--accent);
+    color: white !important;
+  }
+  
+  header .btn i {
+    color: inherit !important;
+  }
+  
+  header .btn:active {
+    transform: translateY(0);
+  }
+  
+  /* Botón de toggle sidebar mejorado */
+  #btnCollapseTop {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  #btnCollapseTop::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(14, 165, 233, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+  }
+  
+  #btnCollapseTop:active::before {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .sb-collapsed #btnCollapseTop i {
+    transform: rotate(180deg);
+  }
+  
+  header .btn i {
+    font-size: 1.1rem;
+  }
+  
+  /* Badge de rol */
+  header .badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    border: none;
+    color: white !important;
+  }
+  
+  /* Grupo de controles */
+  header .d-flex.gap-2 {
+    gap: 0.75rem !important;
+  }
+  
+  /* Usuario info */
+  header .text-muted {
+    font-weight: 500;
+    color: var(--muted) !important;
+    padding: 0.5rem 1rem;
+    background: var(--card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+  
+  /* ============ MAIN CONTENT ============ */
+  main {
+    flex: 1;
+    animation: fadeIn 0.5s ease-out;
+    padding: 0 !important;
+  }
+  
+  /* ============ FOOTER MODERNO ============ */
+  footer {
+    min-height: var(--foot-h);
+    background: var(--footer-bg);
+    color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(255, 255, 255, 0.5) 50%, 
+      transparent 100%
+    );
+  }
+  
+  footer .container-fluid {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem 2rem;
+  }
+  
+  footer a {
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  footer a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: width 0.3s ease;
+  }
+  
+  footer a:hover {
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  footer a:hover::after {
+    width: 100%;
+  }
 
-  .intro{background:linear-gradient(135deg,#e0f2fe 0,#fff 100%);border:1px solid var(--border);border-radius:12px}
-  [data-theme="dark"] .intro{background:linear-gradient(135deg,#0b84c633 0,#0b1220 100%)}
-  .fade-in{animation:fade .4s ease-in-out}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* ============ COMPONENTES GENERALES ============ */
+  
+  /* Intro banner */
+  .intro {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+  }
+  
+  [data-theme="dark"] .intro {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, var(--card) 100%);
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .intro * {
+    color: var(--fg) !important;
+  }
+  
+  /* Cards mejoradas */
+  .card {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--card);
+    color: var(--fg);
+  }
+  
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-4px);
+    border-color: var(--accent);
+  }
+  
+  [data-theme="dark"] .card {
+    background: var(--card);
+    color: var(--fg);
+  }
+  
+  [data-theme="dark"] .card * {
+    color: var(--fg);
+  }
+  
+  [data-theme="dark"] .card .text-muted {
+    color: var(--muted) !important;
+  }
+  
+  /* Botones mejorados */
+  .btn {
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+  }
+  
+  .btn-outline-primary {
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    background: transparent;
+  }
+  
+  .btn-outline-primary:hover {
+    background: var(--accent);
+    color: white;
+  }
+  
+  /* Badges mejorados */
+  .badge {
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.875rem;
+    font-weight: 600;
+  }
+  
+  /* Tablas en tema oscuro */
+  [data-theme="dark"] .table {
+    color: var(--fg);
+    background: var(--card);
+  }
+  
+  [data-theme="dark"] .table thead {
+    background: rgba(14, 165, 233, 0.1);
+    color: var(--fg);
+  }
+  
+  [data-theme="dark"] .table td,
+  [data-theme="dark"] .table th {
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .table-light {
+    background: rgba(14, 165, 233, 0.08);
+  }
+  
+  [data-theme="dark"] .table tbody tr:hover {
+    background: rgba(14, 165, 233, 0.05);
+  }
+  
+  /* Forms en tema oscuro */
+  [data-theme="dark"] .form-control,
+  [data-theme="dark"] .form-select {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .form-control:focus,
+  [data-theme="dark"] .form-select:focus {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+  }
+  
+  [data-theme="dark"] .form-label {
+    color: var(--fg);
+  }
+  
+  /* Modales en tema oscuro */
+  [data-theme="dark"] .modal-content {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .modal-header,
+  [data-theme="dark"] .modal-footer {
+    border-color: var(--border);
+  }
+  
+  [data-theme="dark"] .btn-close {
+    filter: invert(1);
+  }
+  
+  /* ============ ANIMACIONES ============ */
+  .fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* ============ SCROLLBAR PERSONALIZADO ============ */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-radius: 6px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border-radius: 6px;
+    border: 2px solid var(--bg);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
+  }
+  
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    header .container-fluid {
+      padding: 0 1.5rem;
+    }
+    
+    header .text-muted.small {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    :root {
+      --head-h: 64px;
+    }
+    
+    /* En móvil, el sidebar se colapsa automáticamente */
+    body:not(.sb-collapsed) .sidebar {
+      width: var(--sidebar-w);
+    }
+    
+    .sidebar .text {
+      opacity: 1;
+    }
+    
+    header .container-fluid {
+      padding: 0 1rem;
+    }
+    
+    header .btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+    
+    footer .container-fluid {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+    
+    /* Cuando está colapsado en móvil */
+    .sb-collapsed .sidebar {
+      width: var(--sidebar-collapsed-w);
+    }
+  }
+  
+  @media (max-width: 480px) {
+    header .badge {
+      font-size: 0.75rem;
+      padding: 0.5rem 0.875rem;
+    }
+    
+    header #fBase, header #fLg, header #fXl {
+      display: none;
+    }
+  }
 </style>
 </head>
 <body>
-  <aside id="sb" class="sidebar p-3">
-    <div class="d-flex align-items-center mb-3">
-      <img src="{% static 'img/techo_logo_white.png' %}" height="34" class="me-2" alt="TECHO">
-      <strong class="text">Gestión Habitacional</strong>
-      <button id="btnCollapseAside" class="btn btn-sm btn-outline-light ms-auto" title="Contraer/expandir">
-       <i class="bi bi-layout-sidebar-inset"></i>
-      </button>
+  <aside id="sb" class="sidebar">
+    <!-- Perfil del Usuario -->
+    <div class="user-profile-section">
+      <div class="user-profile-container">
+        <div class="user-avatar-wrapper">
+          {% if request.user.perfil.avatar %}
+            <img src="{{ request.user.perfil.avatar.url }}" alt="Avatar" class="user-avatar">
+          {% else %}
+            <div class="user-avatar-placeholder">
+              <i class="bi bi-person-fill"></i>
+            </div>
+          {% endif %}
+          <div class="avatar-status"></div>
+        </div>
+        
+        <div class="user-info">
+          <div class="user-name">{{ request.user.perfil.nombre|default:request.user.username }} {{ request.user.perfil.apellido|truncatewords:1 }}</div>
+          <div class="user-role-badge">{{ rol }}</div>
+          <div class="user-id">ID: {{ request.user.id }}</div>
+        </div>
+        
+        <a href="/perfil/" class="user-settings-btn" title="Ver perfil">
+          <i class="bi bi-gear-fill"></i>
+        </a>
+      </div>
     </div>
-    <nav class="d-grid gap-2">
-      <a href="/dashboard/" class="btn btn-sm btn-link text-start {% if request.path == '/dashboard/' %}active{% endif %}">
-        <i class="bi bi-speedometer2 me-2"></i><span class="text">Dashboard</span>
+    <nav class="d-grid gap-1">
+      {% if rol != 'Familia' %}
+      <a href="/dashboard/" class="{% if request.path == '/dashboard/' %}active{% endif %}">
+        <i class="bi bi-speedometer2"></i><span class="text">Dashboard</span>
       </a>
-      <a href="/tutorial/" class="btn btn-sm btn-link text-start {% if request.path == '/tutorial/' %}active{% endif %}">
-        <i class="bi bi-mortarboard me-2"></i><span class="text">Tutorial</span>
-      </a>
-      <a href="/ayuda/" class="btn btn-sm btn-link text-start {% if request.path == '/ayuda/' %}active{% endif %}">
-        <i class="bi bi-life-preserver me-2"></i><span class="text">Ayuda</span>
-      </a>
-      <a href="/perfil/" class="btn btn-sm btn-link text-start {% if request.path == '/perfil/' %}active{% endif %}">
-        <i class="bi bi-person-circle me-2"></i><span class="text">Perfil</span>
-      </a>
-      {% if rol == 'Admin' %}
-        <a href="/panel/admin/proyectos/" class="btn btn-sm btn-link text-start"><i class="bi bi-diagram-3 me-2"></i><span class="text">Proyectos</span></a>
-        <a href="/reportes/" class="btn btn-sm btn-link text-start"><i class="bi bi-file-earmark-pdf me-2"></i><span class="text">Reportes</span></a>
-        <a href="/admin/" class="btn btn-sm btn-link text-start"><i class="bi bi-gear me-2"></i><span class="text">Admin Django</span></a>
-      {% elif rol == 'Trabajador' %}
-        <a href="/proyectos/" class="btn btn-sm btn-link text-start"><i class="bi bi-diagram-3 me-2"></i><span class="text">Mi proyecto</span></a>
-        <a href="/viviendas/" class="btn btn-sm btn-link text-start"><i class="bi bi-houses me-2"></i><span class="text">Viviendas</span></a>
-      {% elif rol == 'Familia' %}
-        <a href="/dashboard/" class="btn btn-sm btn-link text-start"><i class="bi bi-house-heart me-2"></i><span class="text">Mi vivienda</span></a>
       {% endif %}
-      <a href="/logout/" class="btn btn-sm btn-outline-light text-start mt-3"><i class="bi bi-box-arrow-right me-2"></i><span class="text">Salir</span></a>
+      
+      {% if rol == 'Admin' %}
+        <div style="margin-top: 0.5rem; margin-bottom: 0.25rem; padding: 0.5rem 0.875rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; font-weight: 700;">
+          <span class="text">Administración</span>
+        </div>
+        <a href="/panel/admin/proyectos/" class="{% if '/panel/admin/proyectos' in request.path %}active{% endif %}">
+          <i class="bi bi-diagram-3"></i><span class="text">Proyectos</span>
+        </a>
+        <a href="/usuarios/crear/" class="{% if '/usuarios/crear' in request.path %}active{% endif %}">
+          <i class="bi bi-person-plus-fill"></i><span class="text">Crear Usuarios</span>
+        </a>
+        <a href="/reportes/" class="{% if '/reportes' in request.path %}active{% endif %}">
+          <i class="bi bi-file-earmark-pdf"></i><span class="text">Reportes</span>
+        </a>
+        <a href="/admin/" target="_blank">
+          <i class="bi bi-gear"></i><span class="text">Admin Django</span>
+        </a>
+      {% elif rol == 'Trabajador' %}
+        <div style="margin-top: 0.5rem; margin-bottom: 0.25rem; padding: 0.5rem 0.875rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; font-weight: 700;">
+          <span class="text">Mi Trabajo</span>
+        </div>
+        <a href="/proyectos/" class="{% if '/proyectos' in request.path %}active{% endif %}">
+          <i class="bi bi-diagram-3"></i><span class="text">Mi proyecto</span>
+        </a>
+        <a href="/viviendas/" class="{% if '/viviendas' in request.path %}active{% endif %}">
+          <i class="bi bi-houses"></i><span class="text">Viviendas</span>
+        </a>
+      {% elif rol == 'Familia' %}
+        <a href="/dashboard/" class="{% if request.path == '/dashboard/' %}active{% endif %}">
+          <i class="bi bi-house-heart-fill"></i><span class="text">Mi Vivienda</span>
+        </a>
+      {% endif %}
+      
+      <div style="margin-top: 0.5rem; margin-bottom: 0.25rem; padding: 0.5rem 0.875rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; font-weight: 700;">
+        <span class="text">Recursos</span>
+      </div>
+      <a href="/tutorial/" class="{% if '/tutorial' in request.path %}active{% endif %}">
+        <i class="bi bi-mortarboard"></i><span class="text">Tutorial</span>
+      </a>
+      <a href="/ayuda/" class="{% if '/ayuda' in request.path %}active{% endif %}">
+        <i class="bi bi-life-preserver"></i><span class="text">Ayuda</span>
+      </a>
+      <a href="/perfil/" class="{% if '/perfil' in request.path %}active{% endif %}">
+        <i class="bi bi-person-circle"></i><span class="text">Perfil</span>
+      </a>
+      
+      <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+        <a href="/logout/" style="background: rgba(239, 68, 68, 0.15); color: #fca5a5;">
+          <i class="bi bi-box-arrow-right"></i><span class="text">Cerrar Sesión</span>
+        </a>
+      </div>
     </nav>
   </aside>
 
   <div class="content">
     <header>
-      <button id="btnCollapseTop" class="btn btn-sm btn-outline-secondary" title="Contraer/expandir menú">
-         <i class="bi bi-layout-sidebar-inset-reverse"></i>
-      </button>
       <div class="container-fluid py-2 d-flex justify-content-between align-items-center">
-        <div class="d-flex align-items-center gap-2">
+        <button id="btnCollapseTop" class="btn btn-sm btn-outline-secondary" title="Contraer/expandir sidebar (Ctrl+B)">
+          <i class="bi bi-layout-sidebar"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2 ms-3">
           <span class="badge bg-info text-dark">Rol: {{ rol }}</span>
         </div>
         <div class="d-flex align-items-center gap-2">
@@ -91,8 +947,8 @@
           <button id="fLg" class="btn btn-sm btn-outline-secondary" title="Letra grande">A+</button>
           <button id="fXl" class="btn btn-sm btn-outline-secondary" title="Letra muy grande">A++</button>
           <!-- Tema -->
-          <button id="btnTheme" class="btn btn-sm btn-outline-secondary" title="Cambiar tema">
-            <i class="bi bi-moon"></i>
+          <button id="btnTheme" class="btn btn-sm btn-outline-secondary" title="Cambiar tema (Ctrl+D)">
+            <i class="bi bi-moon-fill"></i>
           </button>
           <span class="text-muted small">Usuario: {{ request.user.username }}</span>
         </div>
@@ -119,7 +975,7 @@
   </div>
 
   <script>
-  // CSRF para HTMX (necesario para POST/DELETE)
+  // ============ CONFIGURACIÓN HTMX ============
   document.body.addEventListener('htmx:configRequest', (evt) => {
     const getCookie = (name) => {
       const v = document.cookie.split('; ').find(row => row.startsWith(name+'='));
@@ -128,30 +984,209 @@
     evt.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
   });
 
-  // Preferencias tema y fuente
+  // ============ SISTEMA DE TEMAS Y PREFERENCIAS ============
   const root = document.documentElement;
-  const loadPref = () => {
-    root.setAttribute('data-theme', localStorage.getItem('theme') || 'light');
-    root.setAttribute('data-font', localStorage.getItem('font') || 'base');
-    if (localStorage.getItem('sb-collapsed') === '1') document.body.classList.add('sb-collapsed');
+  const themeBtn = document.getElementById('btnTheme');
+  const themeIcon = themeBtn?.querySelector('i');
+  
+  // Cargar preferencias guardadas
+  const loadPreferences = () => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedFont = localStorage.getItem('font') || 'base';
+    const sidebarCollapsed = localStorage.getItem('sb-collapsed') === '1';
+    
+    root.setAttribute('data-theme', savedTheme);
+    root.setAttribute('data-font', savedFont);
+    
+    if (sidebarCollapsed) {
+      document.body.classList.add('sb-collapsed');
+    }
+    
+    // Actualizar icono del tema
+    updateThemeIcon(savedTheme);
   };
-  loadPref();
-  document.getElementById('btnTheme').onclick = () => {
-    const next = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
-    root.setAttribute('data-theme', next); localStorage.setItem('theme', next);
+  
+  // Actualizar icono del botón de tema
+  const updateThemeIcon = (theme) => {
+    if (themeIcon) {
+      themeIcon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+    }
   };
-  const setFont = f => { root.setAttribute('data-font', f); localStorage.setItem('font', f); };
-  document.getElementById('fBase').onclick = () => setFont('base');
-  document.getElementById('fLg').onclick  = () => setFont('lg');
-  document.getElementById('fXl').onclick  = () => setFont('xl');
-
-  // Toggle sidebar (funciona colapsado y desde header)
-  const toggleSB = () => {
+  
+  // Toggle tema con animación
+  const toggleTheme = () => {
+    const currentTheme = root.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    // Añadir clase para animación suave
+    document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+    
+    root.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+    
+    // Mostrar notificación visual
+    showNotification(`Tema ${newTheme === 'light' ? 'claro' : 'oscuro'} activado`);
+    
+    // Remover transición después
+    setTimeout(() => {
+      document.body.style.transition = '';
+    }, 300);
+  };
+  
+  // Cambiar tamaño de fuente
+  const setFont = (size) => {
+    root.setAttribute('data-font', size);
+    localStorage.setItem('font', size);
+    
+    const sizeLabels = {
+      'base': 'Normal',
+      'lg': 'Grande',
+      'xl': 'Muy Grande'
+    };
+    
+    showNotification(`Tamaño de texto: ${sizeLabels[size]}`);
+  };
+  
+  // Toggle sidebar mejorado
+  const toggleSidebar = () => {
     document.body.classList.toggle('sb-collapsed');
-    localStorage.setItem('sb-collapsed', document.body.classList.contains('sb-collapsed') ? '1' : '0');
+    const isCollapsed = document.body.classList.contains('sb-collapsed');
+    localStorage.setItem('sb-collapsed', isCollapsed ? '1' : '0');
+    
+    // Mostrar notificación
+    showNotification(isCollapsed ? 'Sidebar contraído' : 'Sidebar expandido');
   };
-  document.getElementById('btnCollapseAside').onclick = toggleSB;
-  document.getElementById('btnCollapseTop').onclick   = toggleSB;
+  
+  // Sistema de notificaciones visuales mejorado
+  const showNotification = (message) => {
+    // Remover notificación existente
+    const existing = document.querySelector('.theme-notification');
+    if (existing) {
+      existing.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = 'theme-notification';
+    notification.innerHTML = `
+      <i class="bi bi-check-circle-fill" style="font-size: 1.25rem;"></i>
+      <span>${message}</span>
+    `;
+    notification.style.cssText = `
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg), 0 0 30px rgba(14, 165, 233, 0.3);
+      font-weight: 600;
+      z-index: 10000;
+      animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.animation = 'slideOutDown 0.3s ease-out';
+      setTimeout(() => notification.remove(), 300);
+    }, 2500);
+  };
+  
+  // Añadir estilos de animación mejorados
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+      }
+      70% {
+        transform: translateY(-5px) scale(1.02);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    
+    @keyframes slideOutDown {
+      from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(100px) scale(0.9);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // ============ EVENT LISTENERS ============
+  // Cargar preferencias al iniciar
+  loadPreferences();
+  
+  // Botón de tema
+  if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+  }
+  
+  // Botones de tamaño de fuente
+  const btnFontBase = document.getElementById('fBase');
+  const btnFontLg = document.getElementById('fLg');
+  const btnFontXl = document.getElementById('fXl');
+  
+  if (btnFontBase) btnFontBase.addEventListener('click', () => setFont('base'));
+  if (btnFontLg) btnFontLg.addEventListener('click', () => setFont('lg'));
+  if (btnFontXl) btnFontXl.addEventListener('click', () => setFont('xl'));
+  
+  // Botón del sidebar
+  const btnCollapseTop = document.getElementById('btnCollapseTop');
+  if (btnCollapseTop) btnCollapseTop.addEventListener('click', toggleSidebar);
+  
+  // ============ ATAJOS DE TECLADO ============
+  document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + D = Toggle tema
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+      e.preventDefault();
+      toggleTheme();
+    }
+    
+    // Ctrl/Cmd + B = Toggle sidebar
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  });
+  
+  // ============ DETECCIÓN DE PREFERENCIA DEL SISTEMA ============
+  // Detectar tema del sistema operativo
+  if (window.matchMedia) {
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Solo aplicar si no hay preferencia guardada
+    if (!localStorage.getItem('theme')) {
+      root.setAttribute('data-theme', darkModeQuery.matches ? 'dark' : 'light');
+      updateThemeIcon(darkModeQuery.matches ? 'dark' : 'light');
+    }
+    
+    // Escuchar cambios en la preferencia del sistema
+    darkModeQuery.addEventListener('change', (e) => {
+      if (!localStorage.getItem('theme')) {
+        const newTheme = e.matches ? 'dark' : 'light';
+        root.setAttribute('data-theme', newTheme);
+        updateThemeIcon(newTheme);
+      }
+    });
+  }
+  
+  console.log('✨ TECHO - Sistema de temas y preferencias cargado correctamente');
 </script>
 
 </body>

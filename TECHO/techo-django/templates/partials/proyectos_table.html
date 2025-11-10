@@ -1,0 +1,27 @@
+<tbody id="tb-proy">
+{% for p in proyectos %}
+<tr id="proy-{{ p.id }}">
+  <td><b>{{ p.codigo }}</b></td>
+  <td>{{ p.nombre }}</td>
+  <td>{{ p.ubicacion|default:"s/i" }}</td>
+  <td>{{ p.constructora.nombre|default:"s/i" }}</td>
+  <td class="text-end">
+    <button class="btn btn-sm btn-outline-secondary"
+            hx-get="{% url 'admin_proyecto_edit' p.id %}"
+            hx-target="#modal-body"
+            hx-swap="innerHTML">
+      Editar
+    </button>
+    <button class="btn btn-sm btn-outline-danger"
+            hx-post="{% url 'admin_proyecto_delete' p.id %}"
+            hx-confirm="¿Eliminar proyecto?"
+            hx-target="#proy-{{ p.id }}" hx-swap="outerHTML">
+      Eliminar
+    </button>
+  </td>
+</tr>
+{% empty %}
+<tr><td colspan="5" class="text-muted">Sin proyectos</td></tr>
+{% endfor %}
+</tbody>
+

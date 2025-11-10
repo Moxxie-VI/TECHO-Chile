@@ -1,10 +1,14 @@
 from django.contrib import admin
 from django.urls import path
-from core.views import home, viviendas_list, proyectos_list, reportes_home, reporte_proyecto_pdf, reporte_proyecto_enviar
-from accounts.views import login_view, logout_view, dashboard,perfil, ayuda, tutorial
 from django.conf import settings
 from django.conf.urls.static import static
-from core.views import admin_proyectos, admin_proyecto_form, admin_proyecto_delete, subir_evidencia, cambiar_estado_registro
+from core.views import (
+    home, viviendas_list, proyectos_list, reportes_home, 
+    reporte_proyecto_pdf, reporte_proyecto_enviar,
+    admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
+    subir_evidencia, cambiar_estado_registro
+)
+from accounts.views import login_view, logout_view, dashboard, perfil, ayuda, tutorial, crear_usuario
 
 urlpatterns = [
     path("", home, name="home"),
@@ -24,6 +28,7 @@ urlpatterns = [
     path("perfil/", perfil, name="perfil"),
     path("ayuda/", ayuda, name="ayuda"),
     path("tutorial/", tutorial, name="tutorial"),
+    path("usuarios/crear/", crear_usuario, name="crear_usuario"),
     path("trabajo/registro/<int:reg_id>/evidencia/", subir_evidencia, name="subir_evidencia"),
     path("trabajo/registro/<int:reg_id>/estado/", cambiar_estado_registro, name="cambiar_estado_registro"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

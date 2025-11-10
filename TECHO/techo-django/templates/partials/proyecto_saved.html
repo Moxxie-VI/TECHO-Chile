@@ -1,0 +1,20 @@
+<div class="alert alert-success mb-0">
+  <i class="bi bi-check-circle"></i> Proyecto guardado exitosamente.
+</div>
+<script>
+  // Cerrar modal
+  setTimeout(() => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modal'));
+    if (modal) modal.hide();
+  }, 500);
+  
+  // Recargar la tabla después de cerrar el modal
+  setTimeout(() => {
+    htmx.ajax('GET', '{% url "admin_proyectos" %}', {
+      target: '#tb-proy',
+      swap: 'outerHTML',
+      headers: {'HX-Target': 'tb-proy'}
+    });
+  }, 600);
+</script>
+

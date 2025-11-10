@@ -1,0 +1,461 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Mi Vivienda · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-4">
+  <div class="dashboard-header familia-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon familia-icon">
+          <i class="bi bi-house-heart"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Mi Vivienda</h1>
+          <p class="text-muted mb-0">Información y seguimiento de tu nuevo hogar</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  .familia-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+  }
+  
+  .familia-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+  }
+  
+  .welcome-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .welcome-card i {
+    font-size: 3rem;
+    color: #d97706;
+    margin-bottom: 1rem;
+  }
+  
+  .welcome-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #78350f;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-card p {
+    color: #92400e;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  
+  .info-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .info-card-header {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.12) 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .info-card-header {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  }
+  
+  .info-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .info-card-title i {
+    font-size: 1.75rem;
+    color: #8b5cf6;
+  }
+  
+  .info-card-body {
+    padding: 2rem;
+  }
+  
+  .info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 2px solid var(--border);
+    align-items: start;
+  }
+  
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .info-label {
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  
+  .info-value {
+    font-size: 1.1rem;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  
+  .observations-list {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .observation-item {
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid var(--border);
+    transition: background 0.2s;
+  }
+  
+  .observation-item:hover {
+    background: rgba(139, 92, 246, 0.05);
+  }
+  
+  .observation-item:last-child {
+    border-bottom: none;
+  }
+  
+  .observation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .observation-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .observation-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    background: #dbeafe;
+    color: #0284c7;
+  }
+  
+  .observation-date {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .observation-content {
+    color: var(--fg);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .observation-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .meta-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .meta-badge.urgency-high {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .meta-badge.urgency-medium {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  
+  .meta-badge.urgency-low {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .meta-badge.status {
+    background: #dcfce7;
+    color: #166534;
+  }
+  
+  .empty-state-familia {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--muted);
+  }
+  
+  .empty-state-familia i {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+    color: #8b5cf6;
+  }
+  
+  .empty-state-familia h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--fg);
+  }
+  
+  .empty-state-familia p {
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+  
+  .help-banner {
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border: 2px solid #8b5cf6;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  [data-theme="dark"] .help-banner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  }
+  
+  .help-banner-icon {
+    font-size: 3rem;
+    color: #7c3aed;
+    flex-shrink: 0;
+  }
+  
+  [data-theme="dark"] .help-banner-icon {
+    color: #a78bfa;
+  }
+  
+  .help-banner-content h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #5b21b6;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  [data-theme="dark"] .help-banner-content h4 {
+    color: #c4b5fd;
+  }
+  
+  .help-banner-content p {
+    margin: 0 0 1rem 0;
+    color: #6d28d9;
+    font-size: 1rem;
+  }
+  
+  [data-theme="dark"] .help-banner-content p {
+    color: #c4b5fd;
+  }
+  
+  .help-banner-content a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #8b5cf6;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  
+  .help-banner-content a:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+  
+  @media (max-width: 768px) {
+    .info-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    
+    .observation-header {
+      flex-direction: column;
+    }
+    
+    .help-banner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
+
+{% if mensaje %}
+  <div class="welcome-card">
+    <i class="bi bi-exclamation-circle"></i>
+    <h2>Información Importante</h2>
+    <p>{{ mensaje }}</p>
+  </div>
+{% else %}
+  <!-- Información de la vivienda -->
+  {% if viviendas %}
+    {% with v=viviendas.0 %}
+    <div class="info-card">
+      <div class="info-card-header">
+        <h2 class="info-card-title">
+          <i class="bi bi-house-door"></i>
+          Información de Tu Vivienda
+        </h2>
+      </div>
+      <div class="info-card-body">
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-building me-2"></i>Tipo de Vivienda:
+          </div>
+          <div class="info-value">{{ v.tipo|default:"No especificado" }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-grid me-2"></i>Modelo:
+          </div>
+          <div class="info-value">{{ v.modelo|default:"No especificado" }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-diagram-3 me-2"></i>Proyecto:
+          </div>
+          <div class="info-value">{{ v.proyecto.nombre }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-tag me-2"></i>Código Proyecto:
+          </div>
+          <div class="info-value">{{ v.proyecto.codigo }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-geo-alt me-2"></i>Ubicación:
+          </div>
+          <div class="info-value">{{ v.proyecto.comuna|default:"No especificado" }}</div>
+        </div>
+      </div>
+    </div>
+    {% endwith %}
+  {% endif %}
+
+  <!-- Observaciones -->
+  <div class="observations-list">
+    <div class="info-card-header">
+      <h2 class="info-card-title">
+        <i class="bi bi-clipboard-check"></i>
+        Mis Observaciones
+      </h2>
+    </div>
+    
+    {% if registros %}
+      {% for r in registros %}
+      <div class="observation-item">
+        <div class="observation-header">
+          <div class="observation-title">
+            <div class="observation-icon">
+              <i class="bi bi-info-circle"></i>
+            </div>
+            <span>{{ r.recinto|default:"Observación General" }}</span>
+          </div>
+          <div class="observation-date">
+            <i class="bi bi-calendar3 me-1"></i>
+            {{ r.creado_en|date:"d/m/Y H:i" }}
+          </div>
+        </div>
+        
+        <div class="observation-content">
+          {{ r.observacion|default:"Sin descripción disponible" }}
+        </div>
+        
+        <div class="observation-meta">
+          <span class="meta-badge urgency-{% if r.urgencia == 'ALTA' or r.urgencia == 'Alta' %}high{% elif r.urgencia == 'MEDIA' or r.urgencia == 'Media' %}medium{% else %}low{% endif %}">
+            <i class="bi bi-exclamation-triangle"></i>
+            Urgencia: {{ r.urgencia|upper }}
+          </span>
+          <span class="meta-badge status">
+            <i class="bi bi-check-circle"></i>
+            Estado: {{ r.estado|default:"En proceso" }}
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state-familia">
+        <i class="bi bi-emoji-smile"></i>
+        <h3>¡Todo en orden!</h3>
+        <p>No tienes observaciones registradas en este momento</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Banner de ayuda -->
+  <div class="help-banner">
+    <i class="bi bi-question-circle-fill help-banner-icon"></i>
+    <div class="help-banner-content">
+      <h4>¿Necesitas ayuda?</h4>
+      <p>Tenemos tutoriales y guías para ayudarte a usar la plataforma de manera sencilla</p>
+      <a href="/tutorial/">
+        <i class="bi bi-book"></i>
+        Ver Tutorial
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}
+

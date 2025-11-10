@@ -18,6 +18,13 @@ admin.site.register(Reporte)
 
 @receiver(post_save, sender=User)
 def crear_perfil_usuario(sender, instance, created, **kwargs):
+    """
+    Signal que crea automáticamente un perfil cuando se crea un usuario.
+    Usa get_or_create para evitar duplicados.
+    """
     if created:
         rol = "Admin" if instance.is_superuser else "Trabajador"
-        PerfilUsuario.objects.create(user=instance, rol=rol)
+        PerfilUsuario.objects.get_or_create(
+            user=instance,
+            defaults={'rol': rol}
+        )
