@@ -47,15 +47,15 @@ urlpatterns = [
     path("ds49/monitoreo/", monitoreo_ds49, name="monitoreo_ds49"),
     path("ds49/actualizar-fecha/<int:ficha_id>/", actualizar_fecha_entrega, name="actualizar_fecha_entrega"),
     # Gestión de Viviendas
-    path("admin/viviendas/", admin_viviendas, name="admin_viviendas"),
-    path("admin/viviendas/crear/", crear_vivienda, name="crear_vivienda"),
-    path("admin/viviendas/editar/<int:vivienda_id>/", editar_vivienda, name="editar_vivienda"),
-    path("admin/viviendas/eliminar/<int:vivienda_id>/", eliminar_vivienda, name="eliminar_vivienda"),
+    path("panel/admin/viviendas/", admin_viviendas, name="admin_viviendas"),
+    path("panel/admin/viviendas/crear/", crear_vivienda, name="crear_vivienda"),
+    path("panel/admin/viviendas/editar/<int:vivienda_id>/", editar_vivienda, name="editar_vivienda"),
+    path("panel/admin/viviendas/eliminar/<int:vivienda_id>/", eliminar_vivienda, name="eliminar_vivienda"),
     # Gestión de Constructoras
-    path("admin/constructoras/", admin_constructoras, name="admin_constructoras"),
-    path("admin/constructoras/crear/", crear_constructora, name="crear_constructora"),
-    path("admin/constructoras/editar/<int:constructora_id>/", editar_constructora, name="editar_constructora"),
-    path("admin/constructoras/eliminar/<int:constructora_id>/", eliminar_constructora, name="eliminar_constructora"),
+    path("panel/admin/constructoras/", admin_constructoras, name="admin_constructoras"),
+    path("panel/admin/constructoras/crear/", crear_constructora, name="crear_constructora"),
+    path("panel/admin/constructoras/editar/<int:constructora_id>/", editar_constructora, name="editar_constructora"),
+    path("panel/admin/constructoras/eliminar/<int:constructora_id>/", eliminar_constructora, name="eliminar_constructora"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
