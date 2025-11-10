@@ -48,7 +48,7 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <i class="bi bi-shield-check fs-2 text-success mb-2"></i>
-                            <h3 class="mb-0">{{ usuarios|dictsort:"perfil.rol"|first.perfil.rol|length }}</h3>
+                            <h3 class="mb-0">{{ total_admin }}</h3>
                             <p class="text-muted small mb-0">Administradores</p>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <i class="bi bi-person-badge fs-2 text-info mb-2"></i>
-                            <h3 class="mb-0">{{ usuarios|length }}</h3>
+                            <h3 class="mb-0">{{ total_trabajadores }}</h3>
                             <p class="text-muted small mb-0">Trabajadores</p>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                     <div class="card text-center">
                         <div class="card-body">
                             <i class="bi bi-house-heart fs-2 text-warning mb-2"></i>
-                            <h3 class="mb-0">{{ usuarios|length }}</h3>
+                            <h3 class="mb-0">{{ total_familias }}</h3>
                             <p class="text-muted small mb-0">Familias</p>
                         </div>
                     </div>

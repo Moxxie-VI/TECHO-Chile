@@ -90,7 +90,7 @@ def ayuda(request):
     perfil = request.user.perfil
     sent = False
     if request.method == "POST":
-        form = AyudaForm(request.POST)
+        form = AyudaForm(request.POST, request.FILES)
         if form.is_valid():
             asunto_usuario = form.cleaned_data["asunto"]
             mensaje_usuario = form.cleaned_data["mensaje"]
@@ -191,6 +191,11 @@ def ayuda(request):
                 reply_to=[correo]
             )
             email.attach_alternative(html_message, "text/html")
+            
+            # Adjuntar evidencia si existe
+            evidencia = form.cleaned_data.get("evidencia")
+            if evidencia:
+                email.attach(evidencia.name, evidencia.read(), evidencia.content_type)
             
             try:
                 email.send(fail_silently=False)
@@ -320,9 +325,17 @@ def listar_usuarios(request):
     # Obtener todos los usuarios con sus perfiles
     usuarios = User.objects.select_related('perfil').all().order_by('-date_joined')
     
+    # Calcular contadores por rol
+    total_admin = usuarios.filter(perfil__rol='Admin').count()
+    total_trabajadores = usuarios.filter(perfil__rol='Trabajador').count()
+    total_familias = usuarios.filter(perfil__rol='Familia').count()
+    
     ctx = {
         "rol": perfil.rol,
-        "usuarios": usuarios
+        "usuarios": usuarios,
+        "total_admin": total_admin,
+        "total_trabajadores": total_trabajadores,
+        "total_familias": total_familias,
     }
     
     return render(request, "accounts/listar_usuarios.html", ctx)

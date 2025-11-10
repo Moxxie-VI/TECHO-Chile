@@ -1,0 +1,133 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Constructoras - TECHO Chile{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-building text-primary me-2"></i>
+                        Gestión de Constructoras
+                    </h2>
+                    <p class="text-muted mb-0">Administra todas las empresas constructoras del sistema</p>
+                </div>
+                <a href="{% url 'crear_constructora' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Crear Nueva Constructora
+                </a>
+            </div>
+
+            <!-- Mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}-fill me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Estadística Rápida -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="bi bi-building fs-2 text-primary mb-2"></i>
+                            <h3 class="mb-0">{{ constructoras.count }}</h3>
+                            <p class="text-muted small mb-0">Total Constructoras</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Constructoras -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        Listado de Constructoras
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if constructoras %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 15%;">RUT</th>
+                                    <th style="width: 30%;">Nombre</th>
+                                    <th style="width: 25%;">Dirección</th>
+                                    <th style="width: 20%;">Correo</th>
+                                    <th class="text-center" style="width: 10%;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for constructora in constructoras %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ constructora.rut }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ constructora.nombre }}</strong>
+                                    </td>
+                                    <td>
+                                        {{ constructora.direccion|default:"Sin dirección" }}
+                                    </td>
+                                    <td>
+                                        {% if constructora.correo %}
+                                        <a href="mailto:{{ constructora.correo }}" class="text-decoration-none">
+                                            <i class="bi bi-envelope me-1"></i>{{ constructora.correo }}
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">Sin correo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{% url 'editar_constructora' constructora.id %}" 
+                                               class="btn btn-outline-primary" 
+                                               title="Editar">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'eliminar_constructora' constructora.id %}" 
+                                               class="btn btn-outline-danger" 
+                                               title="Eliminar">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                        <p class="text-muted mt-3 mb-0">No hay constructoras registradas.</p>
+                        <a href="{% url 'crear_constructora' %}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle me-2"></i>Crear Primera Constructora
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}
+

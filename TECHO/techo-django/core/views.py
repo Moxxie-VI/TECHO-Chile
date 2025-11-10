@@ -331,6 +331,7 @@ def monitoreo_ds49(request):
     contadores['SIN_FECHA'] = fichas_sin_fecha
     
     context = {
+        'rol': request.user.perfil.rol,
         'fichas_data': fichas_data,
         'contadores': contadores,
         'total_fichas': fichas.count() + fichas_sin_fecha,
@@ -366,7 +367,10 @@ def actualizar_fecha_entrega(request, ficha_id):
         
         return redirect("monitoreo_ds49")
     
-    return render(request, "core/actualizar_fecha_entrega.html", {"ficha": ficha})
+    return render(request, "core/actualizar_fecha_entrega.html", {
+        "rol": request.user.perfil.rol,
+        "ficha": ficha
+    })
 
 
 # =============================================================================
@@ -393,6 +397,7 @@ def admin_viviendas(request):
         viviendas = viviendas.filter(tipo=tipo)
     
     context = {
+        'rol': request.user.perfil.rol,
         'viviendas': viviendas,
         'proyectos': proyectos,
         'proyecto_filtro': proyecto_id,
@@ -429,6 +434,7 @@ def crear_vivienda(request):
     proyectos = Proyecto.objects.all().order_by('codigo')
     
     return render(request, "core/crear_vivienda.html", {
+        "rol": request.user.perfil.rol,
         "form": form,
         "proyectos": proyectos
     })
@@ -463,6 +469,7 @@ def editar_vivienda(request, vivienda_id):
     proyectos = Proyecto.objects.all().order_by('codigo')
     
     return render(request, "core/editar_vivienda.html", {
+        "rol": request.user.perfil.rol,
         "form": form,
         "vivienda": vivienda,
         "proyectos": proyectos
@@ -510,7 +517,110 @@ def eliminar_vivienda(request, vivienda_id):
     familias_count = PerfilUsuario.objects.filter(vivienda_asignada=vivienda).count()
     
     return render(request, "core/eliminar_vivienda.html", {
+        "rol": request.user.perfil.rol,
         "vivienda": vivienda,
         "registros_count": registros_count,
         "familias_count": familias_count,
+    })
+
+
+# =============================================================================
+# GESTIÓN DE CONSTRUCTORAS (CRUD COMPLETO PARA ADMIN)
+# =============================================================================
+
+@login_required
+@require_role("Admin")
+def admin_constructoras(request):
+    """Vista para listar todas las constructoras"""
+    from .models import Constructora
+    
+    constructoras = Constructora.objects.all().order_by('nombre')
+    
+    context = {
+        'rol': request.user.perfil.rol,
+        'constructoras': constructoras,
+    }
+    
+    return render(request, "core/admin_constructoras.html", context)
+
+
+@login_required
+@require_role("Admin")
+def crear_constructora(request):
+    """Vista para crear una nueva constructora"""
+    from .forms import ConstructoraForm
+    
+    if request.method == "POST":
+        form = ConstructoraForm(request.POST)
+        if form.is_valid():
+            constructora = form.save()
+            messages.success(request, 
+                f"✅ Constructora '{constructora.nombre}' creada exitosamente")
+            return redirect("admin_constructoras")
+    else:
+        form = ConstructoraForm()
+    
+    return render(request, "core/crear_constructora.html", {
+        "rol": request.user.perfil.rol,
+        "form": form
+    })
+
+
+@login_required
+@require_role("Admin")
+def editar_constructora(request, constructora_id):
+    """Vista para editar una constructora existente"""
+    from .models import Constructora
+    from .forms import ConstructoraForm
+    
+    constructora = get_object_or_404(Constructora, pk=constructora_id)
+    
+    if request.method == "POST":
+        form = ConstructoraForm(request.POST, instance=constructora)
+        if form.is_valid():
+            constructora = form.save()
+            messages.success(request, 
+                f"✅ Constructora '{constructora.nombre}' actualizada exitosamente")
+            return redirect("admin_constructoras")
+    else:
+        form = ConstructoraForm(instance=constructora)
+    
+    return render(request, "core/editar_constructora.html", {
+        "rol": request.user.perfil.rol,
+        "form": form,
+        "constructora": constructora
+    })
+
+
+@login_required
+@require_role("Admin")
+def eliminar_constructora(request, constructora_id):
+    """Vista para eliminar una constructora"""
+    from .models import Constructora
+    
+    constructora = get_object_or_404(Constructora, pk=constructora_id)
+    
+    if request.method == "POST":
+        # Verificar si tiene proyectos asociados
+        proyectos_count = Proyecto.objects.filter(constructora=constructora).count()
+        
+        if proyectos_count > 0:
+            messages.error(request, 
+                f"❌ No se puede eliminar la constructora porque tiene {proyectos_count} proyecto(s) asociado(s)")
+            return redirect("admin_constructoras")
+        
+        nombre = constructora.nombre
+        constructora.delete()
+        
+        messages.success(request, 
+            f"✅ Constructora '{nombre}' eliminada exitosamente")
+        return redirect("admin_constructoras")
+    
+    # Obtener información para mostrar en la confirmación
+    proyectos_count = Proyecto.objects.filter(constructora=constructora).count()
+    
+    return render(request, "core/eliminar_constructora.html", {
+        "rol": request.user.perfil.rol,
+        "constructora": constructora,
+        "proyectos_count": proyectos_count,
     })

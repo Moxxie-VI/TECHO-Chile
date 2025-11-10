@@ -20,17 +20,34 @@
         {% if enviado %}
           <div class="alert alert-success">Tu mensaje fue enviado. Te contactaremos.</div>
         {% endif %}
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="mb-2">
-            <label class="form-label">Asunto</label>
+          <div class="mb-3">
+            <label class="form-label fw-bold">
+              <i class="bi bi-tag me-2"></i>Asunto *
+            </label>
             {{ form.asunto }}
+            <small class="form-text text-muted">Describe brevemente tu consulta</small>
           </div>
-          <div class="mb-2">
-            <label class="form-label">Mensaje</label>
+          <div class="mb-3">
+            <label class="form-label fw-bold">
+              <i class="bi bi-chat-text me-2"></i>Mensaje *
+            </label>
             {{ form.mensaje }}
+            <small class="form-text text-muted">Explica detalladamente tu problema o consulta</small>
           </div>
-          <button class="btn btn-primary">Enviar</button>
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              <i class="bi bi-paperclip me-2"></i>Evidencia (Opcional)
+            </label>
+            {{ form.evidencia }}
+            <small class="form-text text-muted">{{ form.evidencia.help_text }}</small>
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-send me-2"></i>Enviar Solicitud de Ayuda
+            </button>
+          </div>
         </form>
       </div>
     </div>

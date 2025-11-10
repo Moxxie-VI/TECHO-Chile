@@ -8,7 +8,8 @@ from core.views import (
     admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
     subir_evidencia, cambiar_estado_registro,
     monitoreo_ds49, actualizar_fecha_entrega,
-    admin_viviendas, crear_vivienda, editar_vivienda, eliminar_vivienda
+    admin_viviendas, crear_vivienda, editar_vivienda, eliminar_vivienda,
+    admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora
 )
 from accounts.views import (
     login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
@@ -50,6 +51,11 @@ urlpatterns = [
     path("admin/viviendas/crear/", crear_vivienda, name="crear_vivienda"),
     path("admin/viviendas/editar/<int:vivienda_id>/", editar_vivienda, name="editar_vivienda"),
     path("admin/viviendas/eliminar/<int:vivienda_id>/", eliminar_vivienda, name="eliminar_vivienda"),
+    # Gestión de Constructoras
+    path("admin/constructoras/", admin_constructoras, name="admin_constructoras"),
+    path("admin/constructoras/crear/", crear_constructora, name="crear_constructora"),
+    path("admin/constructoras/editar/<int:constructora_id>/", editar_constructora, name="editar_constructora"),
+    path("admin/constructoras/eliminar/<int:constructora_id>/", eliminar_constructora, name="eliminar_constructora"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
