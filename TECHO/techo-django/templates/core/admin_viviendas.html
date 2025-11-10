@@ -1,0 +1,256 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Gestión de Viviendas - TECHO Chile{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(14, 165, 233, 0.25);
+    }
+    
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .filters-card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        margin-bottom: 1.5rem;
+    }
+    
+    .table-card {
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        overflow: hidden;
+    }
+    
+    .table-card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(14, 165, 233, 0.05);
+    }
+    
+    .table-card-header h3 {
+        margin: 0;
+        font-weight: 700;
+        color: var(--fg);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .table-responsive {
+        padding: 1.5rem;
+    }
+    
+    .table-modern {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .table-modern thead {
+        background: rgba(14, 165, 233, 0.1);
+    }
+    
+    .table-modern th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: var(--fg);
+        border-bottom: 2px solid var(--border);
+    }
+    
+    .table-modern td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .table-modern tbody tr:hover {
+        background: rgba(14, 165, 233, 0.05);
+    }
+    
+    .badge-tipo {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .badge-casa {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .badge-departamento {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .btn-action {
+        padding: 0.4rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
+    
+    .empty-state {
+        padding: 3rem;
+        text-align: center;
+        color: var(--muted);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-houses me-2"></i>Gestión de Viviendas</h1>
+                <p class="mb-0 opacity-90">Administración completa de viviendas por proyecto</p>
+            </div>
+            <div>
+                <a href="{% url 'crear_vivienda' %}" class="btn btn-light">
+                    <i class="bi bi-plus-circle me-2"></i>Nueva Vivienda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-card">
+        <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+        <form method="GET" class="row g-3">
+            <div class="col-md-5">
+                <label for="proyecto" class="form-label">Proyecto</label>
+                <select name="proyecto" id="proyecto" class="form-select">
+                    <option value="">Todos los proyectos</option>
+                    {% for p in proyectos %}
+                    <option value="{{ p.id }}" {% if proyecto_filtro == p.id|stringformat:"s" %}selected{% endif %}>
+                        {{ p.codigo }} - {{ p.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select name="tipo" id="tipo" class="form-select">
+                    <option value="">Todos los tipos</option>
+                    <option value="CASA" {% if tipo_filtro == "CASA" %}selected{% endif %}>Casa</option>
+                    <option value="DEPARTAMENTO" {% if tipo_filtro == "DEPARTAMENTO" %}selected{% endif %}>Departamento</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search me-2"></i>Filtrar
+                </button>
+                <a href="{% url 'admin_viviendas' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-x-circle me-2"></i>Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de viviendas -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3><i class="bi bi-list-ul me-2"></i>Viviendas Registradas ({{ viviendas.count }})</h3>
+        </div>
+        
+        {% if viviendas %}
+        <div class="table-responsive">
+            <table class="table-modern">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Proyecto</th>
+                        <th>Tipo</th>
+                        <th>Modelo</th>
+                        <th>Cuartos</th>
+                        <th>Baños</th>
+                        <th>Piso</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in viviendas %}
+                    <tr>
+                        <td><strong>#{{ v.id }}</strong></td>
+                        <td>
+                            <div>
+                                <strong>{{ v.proyecto.codigo }}</strong>
+                                <div class="text-muted small">{{ v.proyecto.nombre }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if v.tipo == "CASA" %}
+                            <span class="badge-tipo badge-casa">
+                                <i class="bi bi-house-door me-1"></i>Casa
+                            </span>
+                            {% else %}
+                            <span class="badge-tipo badge-departamento">
+                                <i class="bi bi-building me-1"></i>Departamento
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ v.modelo|default:"—" }}</td>
+                        <td>{{ v.cant_cuartos|default:"—" }}</td>
+                        <td>{{ v.cant_banos|default:"—" }}</td>
+                        <td>{{ v.piso|default:"—" }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'editar_vivienda' v.id %}" 
+                                   class="btn btn-sm btn-outline-primary btn-action"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{% url 'eliminar_vivienda' v.id %}" 
+                                   class="btn btn-sm btn-outline-danger btn-action"
+                                   title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h4>No hay viviendas registradas</h4>
+            <p>Crea la primera vivienda para comenzar</p>
+            <a href="{% url 'crear_vivienda' %}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle me-2"></i>Crear Vivienda
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

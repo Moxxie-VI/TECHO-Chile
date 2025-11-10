@@ -1,0 +1,127 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Usuario - TECHO Chile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Card de confirmación -->
+            <div class="card shadow border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Confirmar Eliminación
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-warning border-warning">
+                        <i class="bi bi-exclamation-circle-fill me-2"></i>
+                        <strong>¡Atención!</strong> Esta acción no se puede deshacer.
+                    </div>
+
+                    <p class="mb-4">¿Estás seguro de que deseas eliminar al siguiente usuario?</p>
+
+                    <!-- Información del usuario a eliminar -->
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if usuario_eliminar.perfil.avatar %}
+                                    <img src="{{ usuario_eliminar.perfil.avatar.url }}" class="rounded-circle me-3" width="60" height="60">
+                                {% else %}
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px; font-size: 24px;">
+                                        {{ usuario_eliminar.first_name|first|upper }}{{ usuario_eliminar.last_name|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <h5 class="mb-0">{{ usuario_eliminar.first_name }} {{ usuario_eliminar.last_name }}</h5>
+                                    <p class="text-muted mb-0">{{ usuario_eliminar.email }}</p>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Rol</small>
+                                    {% if usuario_eliminar.perfil.rol == "Admin" %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-shield-fill me-1"></i>Admin
+                                        </span>
+                                    {% elif usuario_eliminar.perfil.rol == "Trabajador" %}
+                                        <span class="badge bg-info">
+                                            <i class="bi bi-person-badge me-1"></i>Trabajador
+                                        </span>
+                                    {% elif usuario_eliminar.perfil.rol == "Familia" %}
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-house-heart me-1"></i>Familia
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted d-block">Fecha de Registro</small>
+                                    <strong>{{ usuario_eliminar.date_joined|date:"d/m/Y" }}</strong>
+                                </div>
+                            </div>
+
+                            {% if usuario_eliminar.perfil.proyecto_asignado %}
+                            <div class="mt-3">
+                                <small class="text-muted d-block">Proyecto Asignado</small>
+                                <strong>{{ usuario_eliminar.perfil.proyecto_asignado.nombre }}</strong>
+                            </div>
+                            {% endif %}
+
+                            {% if usuario_eliminar.perfil.vivienda_asignada %}
+                            <div class="mt-3">
+                                <small class="text-muted d-block">Vivienda Asignada</small>
+                                <strong>Vivienda #{{ usuario_eliminar.perfil.vivienda_asignada.id }}</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-danger mt-4 mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <strong>Se eliminarán:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>El usuario y toda su información personal</li>
+                            <li>Su perfil y asignaciones</li>
+                            <li>Sus datos de acceso al sistema</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white">
+                    <form method="post" class="d-flex justify-content-between">
+                        {% csrf_token %}
+                        <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash-fill me-1"></i>
+                            Sí, Eliminar Usuario
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Esta acción requiere confirmación y no se puede revertir
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+    }
+</style>
+{% endblock %}
+

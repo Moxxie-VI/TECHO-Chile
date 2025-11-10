@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -9,6 +9,7 @@ from django.core.mail import EmailMessage, send_mail
 from core.forms import PerfilForm, AyudaForm
 from .models import TokenRecuperacion
 from django.conf import settings
+from django.utils import timezone
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -91,14 +92,115 @@ def ayuda(request):
     if request.method == "POST":
         form = AyudaForm(request.POST)
         if form.is_valid():
-            msg = form.cleaned_data["mensaje"]
-            asunto = f"[TECHO] {form.cleaned_data['asunto']}"
-            body = f"De: {request.user.username}\nRol: {perfil.rol}\n\n{msg}"
-            email = EmailMessage(subject=asunto, body=body, to=["soporte@techo.cl"])
-            email.send(fail_silently=False)
-            sent = True
+            asunto_usuario = form.cleaned_data["asunto"]
+            mensaje_usuario = form.cleaned_data["mensaje"]
+            
+            # Información del usuario
+            nombre_completo = f"{request.user.first_name} {request.user.last_name}"
+            correo = request.user.email
+            rol = perfil.rol
+            telefono = perfil.telefono or "No proporcionado"
+            
+            # Construir mensaje HTML profesional
+            html_message = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .header {{ background: linear-gradient(135deg, #0073e6 0%, #005bb5 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }}
+                    .content {{ background: #f8f9fa; padding: 30px; border: 1px solid #e0e0e0; }}
+                    .info-box {{ background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0073e6; }}
+                    .info-row {{ display: flex; margin-bottom: 10px; }}
+                    .info-label {{ font-weight: bold; min-width: 120px; color: #666; }}
+                    .info-value {{ color: #333; }}
+                    .message-box {{ background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-top: 20px; }}
+                    .footer {{ background: #f1f1f1; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 8px 8px; }}
+                    .badge {{ display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }}
+                    .badge-admin {{ background: #dc3545; color: white; }}
+                    .badge-trabajador {{ background: #17a2b8; color: white; }}
+                    .badge-familia {{ background: #ffc107; color: black; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1 style="margin: 0; font-size: 24px;">📧 Solicitud de Ayuda</h1>
+                        <p style="margin: 10px 0 0 0; opacity: 0.9;">Plataforma de Gestión de Viviendas</p>
+                    </div>
+                    
+                    <div class="content">
+                        <div class="info-box">
+                            <h2 style="margin-top: 0; color: #0073e6; font-size: 18px;">👤 Información del Usuario</h2>
+                            <div class="info-row">
+                                <span class="info-label">Nombre:</span>
+                                <span class="info-value">{nombre_completo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Correo:</span>
+                                <span class="info-value">{correo}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Teléfono:</span>
+                                <span class="info-value">{telefono}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Rol:</span>
+                                <span class="info-value">
+                                    <span class="badge badge-{rol.lower()}">{rol}</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box">
+                            <h2 style="margin-top: 0; color: #0073e6; font-size: 18px;">📋 Asunto</h2>
+                            <p style="margin: 0; font-size: 16px; font-weight: bold;">{asunto_usuario}</p>
+                        </div>
+                        
+                        <div class="message-box">
+                            <h3 style="margin-top: 0; color: #666; font-size: 14px;">💬 Mensaje:</h3>
+                            <p style="white-space: pre-wrap; margin: 0;">{mensaje_usuario}</p>
+                        </div>
+                        
+                        <p style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 4px; font-size: 13px;">
+                            <strong>⏰ Fecha de solicitud:</strong> {timezone.localtime().strftime('%d/%m/%Y %H:%M:%S')}
+                        </p>
+                    </div>
+                    
+                    <div class="footer">
+                        <p style="margin: 0;">TECHO Chile - Plataforma de Recepción y Postventa Habitacional</p>
+                        <p style="margin: 5px 0 0 0;">Este es un correo automático generado por el sistema</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """
+            
+            # Enviar email con HTML
+            from django.core.mail import EmailMultiAlternatives
+            from django.utils import timezone
+            
+            asunto_email = f"[TECHO] Solicitud de Ayuda: {asunto_usuario}"
+            
+            email = EmailMultiAlternatives(
+                subject=asunto_email,
+                body=f"De: {nombre_completo} ({correo})\nRol: {rol}\n\nAsunto: {asunto_usuario}\n\n{mensaje_usuario}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=["proyecto.techochile@gmail.com"],
+                reply_to=[correo]
+            )
+            email.attach_alternative(html_message, "text/html")
+            
+            try:
+                email.send(fail_silently=False)
+                sent = True
+                messages.success(request, f"✅ Tu mensaje ha sido enviado exitosamente. Te contactaremos pronto a {correo}")
+            except Exception as e:
+                messages.error(request, f"❌ Error al enviar el mensaje: {str(e)}")
     else:
         form = AyudaForm()
+    
     return render(request, "accounts/ayuda.html", {"form": form, "enviado": sent, "rol": perfil.rol})
 
 @login_required
@@ -205,6 +307,159 @@ def crear_usuario(request):
     return render(request, "accounts/crear_usuario.html", ctx)
 
 
+@login_required
+def listar_usuarios(request):
+    """Vista para listar todos los usuarios del sistema"""
+    perfil = request.user.perfil
+    
+    # Solo Admin puede acceder
+    if perfil.rol != "Admin":
+        messages.error(request, "No tienes permisos para acceder a esta página")
+        return redirect("dashboard")
+    
+    # Obtener todos los usuarios con sus perfiles
+    usuarios = User.objects.select_related('perfil').all().order_by('-date_joined')
+    
+    ctx = {
+        "rol": perfil.rol,
+        "usuarios": usuarios
+    }
+    
+    return render(request, "accounts/listar_usuarios.html", ctx)
+
+
+@login_required
+def editar_usuario(request, user_id):
+    """Vista para editar un usuario existente"""
+    perfil = request.user.perfil
+    
+    # Solo Admin puede acceder
+    if perfil.rol != "Admin":
+        messages.error(request, "No tienes permisos para acceder a esta página")
+        return redirect("dashboard")
+    
+    usuario = get_object_or_404(User, id=user_id)
+    perfil_usuario = usuario.perfil
+    
+    if request.method == "POST":
+        nombre = request.POST.get("nombre", "").strip()
+        apellido = request.POST.get("apellido", "").strip()
+        correo = request.POST.get("correo", "").strip()
+        rol = request.POST.get("rol", "")
+        proyecto_id = request.POST.get("proyecto_id")
+        vivienda_id = request.POST.get("vivienda_id")
+        telefono = request.POST.get("telefono", "").strip()
+        nueva_password = request.POST.get("nueva_password", "").strip()
+        
+        # Validaciones
+        if not all([nombre, apellido, correo, rol]):
+            messages.error(request, "Los campos nombre, apellido, correo y rol son obligatorios")
+        elif rol not in ["Trabajador", "Familia", "Admin"]:
+            messages.error(request, "Rol inválido")
+        else:
+            try:
+                # Actualizar User
+                usuario.first_name = nombre
+                usuario.last_name = apellido
+                usuario.email = correo
+                
+                # Cambiar contraseña si se proporcionó una nueva
+                if nueva_password:
+                    usuario.set_password(nueva_password)
+                    messages.success(request, "Contraseña actualizada exitosamente")
+                
+                # Actualizar is_superuser basado en el rol
+                if rol == "Admin":
+                    usuario.is_superuser = True
+                    usuario.is_staff = True
+                else:
+                    usuario.is_superuser = False
+                    usuario.is_staff = False
+                
+                usuario.save()
+                
+                # Actualizar PerfilUsuario
+                perfil_usuario.nombre = nombre
+                perfil_usuario.apellido = apellido
+                perfil_usuario.correo_personal = correo
+                perfil_usuario.rol = rol
+                perfil_usuario.telefono = telefono
+                
+                # Asignar proyecto si es Trabajador
+                if rol == "Trabajador" and proyecto_id:
+                    try:
+                        proyecto = Proyecto.objects.get(id=proyecto_id)
+                        perfil_usuario.proyecto_asignado = proyecto
+                    except Proyecto.DoesNotExist:
+                        perfil_usuario.proyecto_asignado = None
+                else:
+                    perfil_usuario.proyecto_asignado = None
+                
+                # Asignar vivienda si es Familia
+                if rol == "Familia" and vivienda_id:
+                    try:
+                        vivienda = Vivienda.objects.get(id=vivienda_id)
+                        perfil_usuario.vivienda_asignada = vivienda
+                    except Vivienda.DoesNotExist:
+                        perfil_usuario.vivienda_asignada = None
+                else:
+                    perfil_usuario.vivienda_asignada = None
+                
+                perfil_usuario.save()
+                
+                messages.success(request, f"Usuario {correo} actualizado exitosamente")
+                return redirect("listar_usuarios")
+                
+            except Exception as e:
+                messages.error(request, f"Error al actualizar usuario: {str(e)}")
+    
+    # Obtener proyectos y viviendas para los selectores
+    proyectos = Proyecto.objects.all().order_by("codigo")
+    viviendas = Vivienda.objects.select_related("proyecto").all().order_by("proyecto__codigo")
+    
+    ctx = {
+        "rol": perfil.rol,
+        "usuario_editar": usuario,
+        "perfil_editar": perfil_usuario,
+        "proyectos": proyectos,
+        "viviendas": viviendas
+    }
+    
+    return render(request, "accounts/editar_usuario.html", ctx)
+
+
+@login_required
+def eliminar_usuario(request, user_id):
+    """Vista para eliminar un usuario"""
+    perfil = request.user.perfil
+    
+    # Solo Admin puede acceder
+    if perfil.rol != "Admin":
+        messages.error(request, "No tienes permisos para acceder a esta página")
+        return redirect("dashboard")
+    
+    usuario = get_object_or_404(User, id=user_id)
+    
+    # No permitir que se elimine a sí mismo
+    if usuario == request.user:
+        messages.error(request, "No puedes eliminar tu propio usuario")
+        return redirect("listar_usuarios")
+    
+    if request.method == "POST":
+        nombre_completo = f"{usuario.first_name} {usuario.last_name}"
+        correo = usuario.username
+        usuario.delete()
+        messages.success(request, f"Usuario {nombre_completo} ({correo}) eliminado exitosamente")
+        return redirect("listar_usuarios")
+    
+    ctx = {
+        "rol": perfil.rol,
+        "usuario_eliminar": usuario
+    }
+    
+    return render(request, "accounts/eliminar_usuario.html", ctx)
+
+
 # ============================================================================
 # RECUPERACIÓN DE CONTRASEÑA
 # ============================================================================
@@ -272,22 +527,51 @@ Plataforma de Recepción y Postventa Habitacional
 Este es un correo automático, por favor no respondas.
         """
         
-        try:
-            send_mail(
-                subject=asunto,
-                message=mensaje,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[correo],
-                fail_silently=False,
-            )
-            messages.success(request, 
-                f"Se ha enviado un código de recuperación a {correo}. Revisa tu bandeja de entrada.")
-            return redirect("recuperar_password_verificar")
+        # Verificar si el email está configurado en producción
+        email_configurado = settings.EMAIL_BACKEND != 'django.core.mail.backends.console.EmailBackend'
         
-        except Exception as e:
-            messages.error(request, 
-                f"Error al enviar el correo. Por favor intenta más tarde. (Error: {str(e)})")
-            return render(request, "accounts/recuperar_password_solicitar.html")
+        if email_configurado:
+            try:
+                # Intentar enviar email con timeout corto para evitar WORKER TIMEOUT
+                from django.core.mail import get_connection
+                
+                connection = get_connection(
+                    backend=settings.EMAIL_BACKEND,
+                    host=settings.EMAIL_HOST,
+                    port=settings.EMAIL_PORT,
+                    username=settings.EMAIL_HOST_USER,
+                    password=settings.EMAIL_HOST_PASSWORD,
+                    use_tls=settings.EMAIL_USE_TLS,
+                    timeout=10  # Timeout de 10 segundos
+                )
+                
+                send_mail(
+                    subject=asunto,
+                    message=mensaje,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[correo],
+                    fail_silently=False,
+                    connection=connection,
+                )
+                messages.success(request, 
+                    f"✅ Se ha enviado un código de recuperación a {correo}. Revisa tu bandeja de entrada.")
+                return redirect("recuperar_password_verificar")
+            
+            except Exception as e:
+                # Si falla el envío, mostrar el código en consola (solo desarrollo)
+                if settings.DEBUG:
+                    print(f"⚠️ Error enviando email: {e}")
+                    print(f"🔑 Código de recuperación para {correo}: {codigo}")
+                
+                # En producción, mostrar el código al usuario como fallback
+                messages.warning(request, 
+                    f"⚠️ Hubo un problema al enviar el correo. Tu código de recuperación es: {codigo}")
+                return redirect("recuperar_password_verificar")
+        else:
+            # Modo desarrollo: mostrar código en pantalla
+            messages.info(request, 
+                f"ℹ️ Email no configurado (modo desarrollo). Tu código de recuperación es: {codigo}")
+            return redirect("recuperar_password_verificar")
     
     return render(request, "accounts/recuperar_password_solicitar.html")
 

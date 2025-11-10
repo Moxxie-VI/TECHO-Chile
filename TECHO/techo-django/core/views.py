@@ -280,3 +280,237 @@ def cambiar_estado_registro(request, reg_id):
     reg.estado = nuevo
     reg.save()
     return HttpResponse("OK")
+
+
+# =============================================================================
+# SISTEMA DE MONITOREO DS 49 (120 DÍAS POST-ENTREGA)
+# =============================================================================
+
+@login_required
+@require_role("Admin", "Trabajador")
+def monitoreo_ds49(request):
+    """
+    Vista para monitorear el cumplimiento del DS 49 (120 días post-entrega)
+    Muestra todas las fichas con fecha de entrega y su estado
+    """
+    from .models import FichaInmueble
+    
+    # Obtener todas las fichas con fecha de entrega
+    fichas = (FichaInmueble.objects
+              .select_related('proyecto', 'vivienda')
+              .filter(fecha_entrega__isnull=False)
+              .order_by('fecha_entrega'))
+    
+    # Clasificar por estado
+    fichas_data = []
+    contadores = {
+        'NORMAL': 0,
+        'ADVERTENCIA': 0,
+        'CRITICO': 0,
+        'VENCIDO': 0,
+        'SIN_FECHA': 0,
+    }
+    
+    for ficha in fichas:
+        estado = ficha.estado_ds49()
+        dias_restantes = ficha.dias_restantes_ds49()
+        porcentaje = ficha.porcentaje_ds49()
+        
+        fichas_data.append({
+            'ficha': ficha,
+            'estado': estado,
+            'dias_restantes': dias_restantes,
+            'dias_transcurridos': ficha.dias_desde_entrega(),
+            'porcentaje': porcentaje,
+        })
+        
+        contadores[estado] += 1
+    
+    # Fichas sin fecha de entrega
+    fichas_sin_fecha = FichaInmueble.objects.filter(fecha_entrega__isnull=True).count()
+    contadores['SIN_FECHA'] = fichas_sin_fecha
+    
+    context = {
+        'fichas_data': fichas_data,
+        'contadores': contadores,
+        'total_fichas': fichas.count() + fichas_sin_fecha,
+    }
+    
+    return render(request, "core/monitoreo_ds49.html", context)
+
+
+@login_required
+@require_role("Admin")
+def actualizar_fecha_entrega(request, ficha_id):
+    """
+    Vista para que el Admin actualice la fecha de entrega de una ficha
+    """
+    from .models import FichaInmueble
+    
+    ficha = get_object_or_404(FichaInmueble, pk=ficha_id)
+    
+    if request.method == "POST":
+        fecha_str = request.POST.get("fecha_entrega")
+        if fecha_str:
+            from datetime import datetime
+            try:
+                fecha = datetime.strptime(fecha_str, "%Y-%m-%d").date()
+                ficha.fecha_entrega = fecha
+                ficha.save()
+                messages.success(request, 
+                    f"✅ Fecha de entrega actualizada para {ficha.proyecto.codigo} - {ficha.vivienda}")
+            except ValueError:
+                messages.error(request, "❌ Formato de fecha inválido")
+        else:
+            messages.error(request, "❌ Debes ingresar una fecha")
+        
+        return redirect("monitoreo_ds49")
+    
+    return render(request, "core/actualizar_fecha_entrega.html", {"ficha": ficha})
+
+
+# =============================================================================
+# GESTIÓN DE VIVIENDAS (CRUD COMPLETO PARA ADMIN)
+# =============================================================================
+
+@login_required
+@require_role("Admin")
+def admin_viviendas(request):
+    """
+    Vista para listar todas las viviendas (con filtros)
+    """
+    viviendas = Vivienda.objects.select_related('proyecto').all().order_by('proyecto__codigo', 'id')
+    proyectos = Proyecto.objects.all().order_by('codigo')
+    
+    # Filtro por proyecto
+    proyecto_id = request.GET.get('proyecto')
+    if proyecto_id:
+        viviendas = viviendas.filter(proyecto_id=proyecto_id)
+    
+    # Filtro por tipo
+    tipo = request.GET.get('tipo')
+    if tipo:
+        viviendas = viviendas.filter(tipo=tipo)
+    
+    context = {
+        'viviendas': viviendas,
+        'proyectos': proyectos,
+        'proyecto_filtro': proyecto_id,
+        'tipo_filtro': tipo,
+    }
+    
+    return render(request, "core/admin_viviendas.html", context)
+
+
+@login_required
+@require_role("Admin")
+def crear_vivienda(request):
+    """
+    Vista para crear una nueva vivienda
+    """
+    if request.method == "POST":
+        form = ViviendaForm(request.POST)
+        if form.is_valid():
+            vivienda = form.save()
+            
+            # Crear automáticamente la ficha de inmueble
+            from .models import FichaInmueble
+            FichaInmueble.objects.get_or_create(
+                proyecto=vivienda.proyecto,
+                vivienda=vivienda
+            )
+            
+            messages.success(request, 
+                f"✅ Vivienda creada exitosamente en el proyecto {vivienda.proyecto.codigo}")
+            return redirect("admin_viviendas")
+    else:
+        form = ViviendaForm()
+    
+    proyectos = Proyecto.objects.all().order_by('codigo')
+    
+    return render(request, "core/crear_vivienda.html", {
+        "form": form,
+        "proyectos": proyectos
+    })
+
+
+@login_required
+@require_role("Admin")
+def editar_vivienda(request, vivienda_id):
+    """
+    Vista para editar una vivienda existente
+    """
+    vivienda = get_object_or_404(Vivienda, pk=vivienda_id)
+    
+    if request.method == "POST":
+        form = ViviendaForm(request.POST, instance=vivienda)
+        if form.is_valid():
+            vivienda = form.save()
+            
+            # Actualizar la ficha de inmueble si cambió el proyecto
+            from .models import FichaInmueble
+            ficha, created = FichaInmueble.objects.get_or_create(
+                proyecto=vivienda.proyecto,
+                vivienda=vivienda
+            )
+            
+            messages.success(request, 
+                f"✅ Vivienda actualizada exitosamente")
+            return redirect("admin_viviendas")
+    else:
+        form = ViviendaForm(instance=vivienda)
+    
+    proyectos = Proyecto.objects.all().order_by('codigo')
+    
+    return render(request, "core/editar_vivienda.html", {
+        "form": form,
+        "vivienda": vivienda,
+        "proyectos": proyectos
+    })
+
+
+@login_required
+@require_role("Admin")
+def eliminar_vivienda(request, vivienda_id):
+    """
+    Vista para eliminar una vivienda
+    """
+    vivienda = get_object_or_404(Vivienda, pk=vivienda_id)
+    
+    if request.method == "POST":
+        # Verificar si tiene registros de postventa asociados
+        registros_count = RegistroPostventa.objects.filter(
+            ficha__vivienda=vivienda
+        ).count()
+        
+        if registros_count > 0:
+            messages.error(request, 
+                f"❌ No se puede eliminar la vivienda porque tiene {registros_count} registros de postventa asociados")
+            return redirect("admin_viviendas")
+        
+        # Verificar si tiene familias asignadas
+        from .models import PerfilUsuario
+        familias_count = PerfilUsuario.objects.filter(vivienda_asignada=vivienda).count()
+        
+        if familias_count > 0:
+            messages.error(request, 
+                f"❌ No se puede eliminar la vivienda porque tiene {familias_count} familia(s) asignada(s)")
+            return redirect("admin_viviendas")
+        
+        proyecto_codigo = vivienda.proyecto.codigo
+        vivienda.delete()
+        
+        messages.success(request, 
+            f"✅ Vivienda eliminada exitosamente del proyecto {proyecto_codigo}")
+        return redirect("admin_viviendas")
+    
+    # Obtener información para mostrar en la confirmación
+    from .models import PerfilUsuario
+    registros_count = RegistroPostventa.objects.filter(ficha__vivienda=vivienda).count()
+    familias_count = PerfilUsuario.objects.filter(vivienda_asignada=vivienda).count()
+    
+    return render(request, "core/eliminar_vivienda.html", {
+        "vivienda": vivienda,
+        "registros_count": registros_count,
+        "familias_count": familias_count,
+    })

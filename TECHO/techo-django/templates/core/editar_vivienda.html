@@ -1,0 +1,198 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Editar Vivienda #{{ vivienda.id }} - TECHO Chile{% endblock %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+        text-align: center;
+    }
+    
+    .form-card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section-title {
+        font-weight: 700;
+        color: var(--fg);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f59e0b;
+    }
+    
+    .info-box {
+        background: rgba(245, 158, 11, 0.1);
+        border-left: 4px solid #f59e0b;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: var(--fg);
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control,
+    .form-select {
+        border-radius: 8px;
+        border: 2px solid var(--border);
+        padding: 0.75rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 0.2rem rgba(245, 158, 11, 0.25);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+        color: white;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="form-container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1><i class="bi bi-pencil me-2"></i>Editar Vivienda #{{ vivienda.id }}</h1>
+            <p class="mb-0 opacity-90">Actualiza la información de la vivienda</p>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <strong><i class="bi bi-info-circle me-2"></i>Vivienda Actual:</strong>
+            {{ vivienda.proyecto.codigo }} - {{ vivienda.tipo }} ({{ vivienda.modelo|default:"Sin modelo" }})
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST">
+                {% csrf_token %}
+                
+                <!-- Información del Proyecto -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="bi bi-diagram-3 me-2"></i>Proyecto
+                    </h5>
+                    <div class="mb-3">
+                        <label for="{{ form.proyecto.id_for_label }}" class="form-label">
+                            Proyecto * <small class="text-muted">(Requerido)</small>
+                        </label>
+                        {{ form.proyecto }}
+                        {% if form.proyecto.errors %}
+                        <div class="text-danger small mt-1">{{ form.proyecto.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Información de la Vivienda -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="bi bi-house-door me-2"></i>Información de la Vivienda
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                Tipo * <small class="text-muted">(Requerido)</small>
+                            </label>
+                            {{ form.tipo }}
+                            {% if form.tipo.errors %}
+                            <div class="text-danger small mt-1">{{ form.tipo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.modelo.id_for_label }}" class="form-label">
+                                Modelo <small class="text-muted">(Opcional)</small>
+                            </label>
+                            {{ form.modelo }}
+                            {% if form.modelo.errors %}
+                            <div class="text-danger small mt-1">{{ form.modelo.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.cant_cuartos.id_for_label }}" class="form-label">
+                                Cuartos
+                            </label>
+                            {{ form.cant_cuartos }}
+                            {% if form.cant_cuartos.errors %}
+                            <div class="text-danger small mt-1">{{ form.cant_cuartos.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.cant_banos.id_for_label }}" class="form-label">
+                                Baños
+                            </label>
+                            {{ form.cant_banos }}
+                            {% if form.cant_banos.errors %}
+                            <div class="text-danger small mt-1">{{ form.cant_banos.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.piso.id_for_label }}" class="form-label">
+                                Piso
+                            </label>
+                            {{ form.piso }}
+                            {% if form.piso.errors %}
+                            <div class="text-danger small mt-1">{{ form.piso.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-3 justify-content-end">
+                    <a href="{% url 'admin_viviendas' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

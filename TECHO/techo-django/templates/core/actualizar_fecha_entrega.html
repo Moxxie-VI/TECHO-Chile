@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualizar Fecha de Entrega - TECHO Chile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --techo-blue: #0073e6;
+            --techo-blue-dark: #005bb5;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: var(--techo-blue);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid var(--techo-blue);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box p {
+            margin: 5px 0;
+        }
+        
+        .info-box strong {
+            color: var(--techo-blue);
+        }
+        
+        .btn-techo {
+            background: linear-gradient(135deg, var(--techo-blue) 0%, var(--techo-blue-dark) 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        .btn-techo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 115, 230, 0.4);
+            color: white;
+        }
+        
+        .btn-secondary-custom {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--techo-blue);
+            box-shadow: 0 0 0 0.2rem rgba(0, 115, 230, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <div class="form-header">
+            <h2>
+                <i class="bi bi-calendar-event me-2"></i>
+                Actualizar Fecha de Entrega
+            </h2>
+            <p class="text-muted">Establecer fecha de entrega de vivienda para monitoreo DS 49</p>
+        </div>
+
+        <!-- Información de la Ficha -->
+        <div class="info-box">
+            <h5 class="mb-3"><i class="bi bi-info-circle me-2"></i>Información de la Ficha</h5>
+            <p><strong>Proyecto:</strong> {{ ficha.proyecto.codigo }} - {{ ficha.proyecto.nombre }}</p>
+            <p><strong>Vivienda:</strong> {{ ficha.vivienda }}</p>
+            <p><strong>Tipo:</strong> {{ ficha.vivienda.tipo }}</p>
+            {% if ficha.fecha_entrega %}
+            <p><strong>Fecha Actual:</strong> {{ ficha.fecha_entrega|date:"d/m/Y" }}</p>
+            {% else %}
+            <p><strong>Estado:</strong> <span class="badge bg-warning text-dark">Sin fecha registrada</span></p>
+            {% endif %}
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+                <label for="fecha_entrega" class="form-label">
+                    <i class="bi bi-calendar-check me-2"></i>Fecha de Entrega de Vivienda
+                </label>
+                <input type="date" 
+                       class="form-control" 
+                       id="fecha_entrega" 
+                       name="fecha_entrega" 
+                       value="{{ ficha.fecha_entrega|date:'Y-m-d' }}"
+                       required>
+                <small class="form-text text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Esta fecha se usará para calcular el período de 120 días del DS 49
+                </small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-2">
+                    <button type="submit" class="btn btn-techo">
+                        <i class="bi bi-check-circle me-2"></i>Guardar Fecha
+                    </button>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <a href="{% url 'monitoreo_ds49' %}" class="btn btn-secondary-custom">
+                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+
+        <!-- Información Adicional -->
+        <div class="mt-4 p-3 bg-light rounded">
+            <h6 class="mb-2"><i class="bi bi-lightbulb me-2"></i>Información sobre DS 49</h6>
+            <small class="text-muted">
+                El Decreto Supremo N° 49 establece un período de garantía de 120 días 
+                posteriores a la entrega de la vivienda, durante el cual TECHO Chile 
+                debe atender las observaciones y reparaciones necesarias.
+            </small>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

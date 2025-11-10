@@ -1,0 +1,206 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block title %}Editar Usuario - TECHO Chile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <div>
+                    <h2 class="mb-1">
+                        <i class="bi bi-pencil-square text-primary me-2"></i>
+                        Editar Usuario
+                    </h2>
+                    <p class="text-muted mb-0">Modifica la información del usuario</p>
+                </div>
+            </div>
+
+            <!-- Mensajes -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}-fill me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Formulario -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Nombre -->
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Nombre *
+                                </label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" 
+                                       value="{{ usuario_editar.first_name }}" required>
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="col-md-6 mb-3">
+                                <label for="apellido" class="form-label">
+                                    <i class="bi bi-person me-1"></i>Apellido *
+                                </label>
+                                <input type="text" class="form-control" id="apellido" name="apellido" 
+                                       value="{{ usuario_editar.last_name }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Correo -->
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">
+                                <i class="bi bi-envelope me-1"></i>Correo Electrónico *
+                            </label>
+                            <input type="email" class="form-control" id="correo" name="correo" 
+                                   value="{{ usuario_editar.email }}" required>
+                            <div class="form-text">Este correo se usa para iniciar sesión</div>
+                        </div>
+
+                        <!-- Rol -->
+                        <div class="mb-3">
+                            <label for="rol" class="form-label">
+                                <i class="bi bi-shield me-1"></i>Rol *
+                            </label>
+                            <select class="form-select" id="rol" name="rol" required onchange="toggleAssignments()">
+                                <option value="">Selecciona un rol...</option>
+                                <option value="Admin" {% if perfil_editar.rol == "Admin" %}selected{% endif %}>👑 Administrador</option>
+                                <option value="Trabajador" {% if perfil_editar.rol == "Trabajador" %}selected{% endif %}>👷 Trabajador</option>
+                                <option value="Familia" {% if perfil_editar.rol == "Familia" %}selected{% endif %}>🏠 Familia</option>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <!-- Proyecto (solo para Trabajadores) -->
+                            <div class="col-md-6 mb-3" id="div-proyecto" style="display: {% if perfil_editar.rol == 'Trabajador' %}block{% else %}none{% endif %};">
+                                <label for="proyecto_id" class="form-label">
+                                    <i class="bi bi-briefcase me-1"></i>Proyecto Asignado
+                                </label>
+                                <select class="form-select" id="proyecto_id" name="proyecto_id">
+                                    <option value="">Sin asignar</option>
+                                    {% for proyecto in proyectos %}
+                                        <option value="{{ proyecto.id }}" 
+                                                {% if perfil_editar.proyecto_asignado.id == proyecto.id %}selected{% endif %}>
+                                            {{ proyecto.codigo }} - {{ proyecto.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Vivienda (solo para Familias) -->
+                            <div class="col-md-6 mb-3" id="div-vivienda" style="display: {% if perfil_editar.rol == 'Familia' %}block{% else %}none{% endif %};">
+                                <label for="vivienda_id" class="form-label">
+                                    <i class="bi bi-house me-1"></i>Vivienda Asignada
+                                </label>
+                                <select class="form-select" id="vivienda_id" name="vivienda_id">
+                                    <option value="">Sin asignar</option>
+                                    {% for vivienda in viviendas %}
+                                        <option value="{{ vivienda.id }}"
+                                                {% if perfil_editar.vivienda_asignada.id == vivienda.id %}selected{% endif %}>
+                                            {{ vivienda.proyecto.codigo }} - {{ vivienda.tipo }} #{{ vivienda.id }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">
+                                <i class="bi bi-telephone me-1"></i>Teléfono
+                            </label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" 
+                                   value="{{ perfil_editar.telefono }}" placeholder="+56 9 XXXX XXXX">
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Cambiar Contraseña -->
+                        <div class="mb-3">
+                            <label for="nueva_password" class="form-label">
+                                <i class="bi bi-key me-1"></i>Nueva Contraseña
+                            </label>
+                            <input type="password" class="form-control" id="nueva_password" name="nueva_password">
+                            <div class="form-text">
+                                Deja en blanco si no deseas cambiar la contraseña
+                            </div>
+                        </div>
+
+                        <!-- Botones -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'listar_usuarios' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info adicional -->
+            <div class="card mt-3 bg-light border-0">
+                <div class="card-body">
+                    <h6 class="mb-2">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        Información del Usuario
+                    </h6>
+                    <ul class="small mb-0">
+                        <li><strong>Fecha de registro:</strong> {{ usuario_editar.date_joined|date:"d/m/Y H:i" }}</li>
+                        <li><strong>Último login:</strong> {{ usuario_editar.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</li>
+                        <li><strong>Estado:</strong> {% if usuario_editar.is_active %}Activo{% else %}Inactivo{% endif %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAssignments() {
+    const rol = document.getElementById('rol').value;
+    const divProyecto = document.getElementById('div-proyecto');
+    const divVivienda = document.getElementById('div-vivienda');
+    
+    // Ocultar ambos por defecto
+    divProyecto.style.display = 'none';
+    divVivienda.style.display = 'none';
+    
+    // Mostrar según el rol
+    if (rol === 'Trabajador') {
+        divProyecto.style.display = 'block';
+    } else if (rol === 'Familia') {
+        divVivienda.style.display = 'block';
+    }
+}
+
+// Ejecutar al cargar para que muestre correctamente
+document.addEventListener('DOMContentLoaded', toggleAssignments);
+</script>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #0073e6;
+        box-shadow: 0 0 0 0.2rem rgba(0, 115, 230, 0.25);
+    }
+</style>
+{% endblock %}
+

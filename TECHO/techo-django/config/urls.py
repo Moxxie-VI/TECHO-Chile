@@ -6,10 +6,13 @@ from core.views import (
     home, viviendas_list, proyectos_list, reportes_home, 
     reporte_proyecto_pdf, reporte_proyecto_enviar,
     admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
-    subir_evidencia, cambiar_estado_registro
+    subir_evidencia, cambiar_estado_registro,
+    monitoreo_ds49, actualizar_fecha_entrega,
+    admin_viviendas, crear_vivienda, editar_vivienda, eliminar_vivienda
 )
 from accounts.views import (
-    login_view, logout_view, dashboard, perfil, ayuda, tutorial, crear_usuario,
+    login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
+    crear_usuario, listar_usuarios, editar_usuario, eliminar_usuario,
     recuperar_password_solicitar, recuperar_password_verificar
 )
 
@@ -33,9 +36,20 @@ urlpatterns = [
     path("perfil/", perfil, name="perfil"),
     path("ayuda/", ayuda, name="ayuda"),
     path("tutorial/", tutorial, name="tutorial"),
+    path("usuarios/", listar_usuarios, name="listar_usuarios"),
     path("usuarios/crear/", crear_usuario, name="crear_usuario"),
+    path("usuarios/editar/<int:user_id>/", editar_usuario, name="editar_usuario"),
+    path("usuarios/eliminar/<int:user_id>/", eliminar_usuario, name="eliminar_usuario"),
     path("trabajo/registro/<int:reg_id>/evidencia/", subir_evidencia, name="subir_evidencia"),
     path("trabajo/registro/<int:reg_id>/estado/", cambiar_estado_registro, name="cambiar_estado_registro"),
+    # Sistema DS 49
+    path("ds49/monitoreo/", monitoreo_ds49, name="monitoreo_ds49"),
+    path("ds49/actualizar-fecha/<int:ficha_id>/", actualizar_fecha_entrega, name="actualizar_fecha_entrega"),
+    # Gestión de Viviendas
+    path("admin/viviendas/", admin_viviendas, name="admin_viviendas"),
+    path("admin/viviendas/crear/", crear_vivienda, name="crear_vivienda"),
+    path("admin/viviendas/editar/<int:vivienda_id>/", editar_vivienda, name="editar_vivienda"),
+    path("admin/viviendas/eliminar/<int:vivienda_id>/", eliminar_vivienda, name="eliminar_vivienda"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

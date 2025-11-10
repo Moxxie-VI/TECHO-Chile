@@ -1,49 +1,770 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% block title %}Tutorial · TECHO{% endblock %}
-{% block page_intro %}
-<div class="container-fluid pt-3">
-  <div class="intro p-3 d-flex align-items-center gap-3">
-    <img src="{% static 'img/tutorial.png' %}" height="64" alt="">
-    <div>
-      <h5 class="mb-1">Tutorial de uso</h5>
-      <div class="text-muted">Aprende en minutos a usar la plataforma.</div>
-    </div>
-  </div>
-</div>
-{% endblock %}
+{% block title %}Tutorial de Uso - TECHO{% endblock %}
+
 {% block content %}
-<div class="row g-3">
-  <div class="col-lg-8">
-    <div class="accordion" id="tut">
-      <div class="accordion-item">
-        <h2 class="accordion-header"><button class="accordion-button" data-bs-toggle="collapse" data-bs-target="#t1">1. Iniciar sesión</button></h2>
-        <div id="t1" class="accordion-collapse collapse show" data-bs-parent="#tut">
-          <div class="accordion-body">Usa tu correo institucional para entrar. Si olvidaste la clave, solicita un restablecimiento al admin.</div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t2">2. Navegar por el panel</button></h2>
-        <div id="t2" class="accordion-collapse collapse" data-bs-parent="#tut">
-          <div class="accordion-body">Usa el menú lateral para acceder a Dashboard, Reportes, Proyectos y Perfil. Puedes colapsar el menú y cambiar el tema.</div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header"><button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t3">3. Subir evidencias (Trabajador)</button></h2>
-        <div id="t3" class="accordion-collapse collapse" data-bs-parent="#tut">
-          <div class="accordion-body">Desde el listado de registros, presiona “Evidencia”, adjunta tu archivo y un comentario. Quedará asociado al caso.</div>
-        </div>
-      </div>
+<style>
+    .tutorial-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+        text-align: center;
+    }
+    
+    .tutorial-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+    }
+    
+    .tutorial-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+    
+    .role-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .role-btn {
+        flex: 1;
+        min-width: 200px;
+        padding: 1.5rem;
+        background: white;
+        border: 3px solid #e2e8f0;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .role-btn:hover {
+        border-color: #8b5cf6;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+    }
+    
+    .role-btn.active {
+        border-color: #8b5cf6;
+        background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+        box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+    }
+    
+    .role-btn-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .role-btn-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+    
+    .role-btn-desc {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .tutorial-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e2e8f0;
+    }
+    
+    .tutorial-section.hidden {
+        display: none;
+    }
+    
+    .section-title {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .section-title i {
+        color: #8b5cf6;
+    }
+    
+    .tutorial-step {
+        margin-bottom: 2rem;
+        padding-left: 3rem;
+        position: relative;
+    }
+    
+    .tutorial-step::before {
+        content: attr(data-step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    }
+    
+    .tutorial-step h4 {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.75rem;
+    }
+    
+    .tutorial-step p {
+        color: #6b7280;
+        line-height: 1.7;
+        margin-bottom: 1rem;
+    }
+    
+    .tutorial-tip {
+        background: linear-gradient(135deg, #fef3c7 0%, #fef08a 100%);
+        border-left: 4px solid #f59e0b;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .tutorial-tip strong {
+        color: #92400e;
+    }
+    
+    .tutorial-tip p {
+        margin: 0;
+        color: #78350f;
+    }
+    
+    .tutorial-warning {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        border-left: 4px solid #dc2626;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .tutorial-warning strong {
+        color: #7f1d1d;
+    }
+    
+    .tutorial-warning p {
+        margin: 0;
+        color: #991b1b;
+    }
+    
+    .tutorial-success {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        border-left: 4px solid #10b981;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+    
+    .tutorial-success strong {
+        color: #065f46;
+    }
+    
+    .tutorial-success p {
+        margin: 0;
+        color: #047857;
+    }
+    
+    .tutorial-image {
+        max-width: 100%;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        margin-top: 1rem;
+    }
+    
+    .keyboard-shortcut {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: #f3f4f6;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        border: 1px solid #d1d5db;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .feature-card {
+        background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        border-color: #8b5cf6;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+    }
+    
+    .feature-card-icon {
+        font-size: 2rem;
+        color: #8b5cf6;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card-title {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-card-desc {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin: 0;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="tutorial-header">
+        <i class="bi bi-mortarboard-fill" style="font-size: 4rem;"></i>
+        <h1>Tutorial de Uso</h1>
+        <p>Aprende a usar la plataforma paso a paso según tu rol</p>
     </div>
-  </div>
-  <div class="col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h6>Video</h6>
-        <div class="ratio ratio-16x9 bg-dark rounded"></div>
-        <div class="text-muted small mt-2">Próximamente añadiremos un video explicativo.</div>
-      </div>
+
+    <!-- Selector de Rol -->
+    <div class="role-selector">
+        <div class="role-btn active" data-role="admin" onclick="showTutorial('admin')">
+            <div class="role-btn-icon">🛠️</div>
+            <div class="role-btn-title">Administrador</div>
+            <div class="role-btn-desc">Gestión completa del sistema</div>
+        </div>
+        <div class="role-btn" data-role="trabajador" onclick="showTutorial('trabajador')">
+            <div class="role-btn-icon">👷</div>
+            <div class="role-btn-title">Trabajador</div>
+            <div class="role-btn-desc">Gestión de proyectos y viviendas</div>
+        </div>
+        <div class="role-btn" data-role="familia" onclick="showTutorial('familia')">
+            <div class="role-btn-icon">🏠</div>
+            <div class="role-btn-title">Familia</div>
+            <div class="role-btn-desc">Seguimiento de tu vivienda</div>
+        </div>
     </div>
-  </div>
+
+    <!-- ============ TUTORIAL ADMIN ============ -->
+    <div id="tutorial-admin" class="tutorial-content">
+        <!-- Introducción -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-stars"></i>
+                Bienvenido, Administrador
+            </h3>
+            <p class="lead">Como administrador, tienes acceso completo a todas las funcionalidades del sistema. Este tutorial te guiará paso a paso.</p>
+            
+            <div class="tutorial-success">
+                <strong>💡 Tus Responsabilidades:</strong>
+                <p>Gestionar proyectos, usuarios, viviendas, monitorear el cumplimiento del DS 49 y generar reportes.</p>
+            </div>
+        </div>
+
+        <!-- Paso 1 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-1-circle-fill"></i>
+                Primeros Pasos
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Acceder al Dashboard</h4>
+                <p>Al iniciar sesión, verás el <strong>Dashboard de Administración</strong> con estadísticas generales, registros recientes y accesos rápidos a las funciones principales.</p>
+                <div class="tutorial-tip">
+                    <strong>💡 Consejo:</strong>
+                    <p>El dashboard se actualiza en tiempo real. Revísalo regularmente para estar al tanto de la actividad.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Conocer el Menú Principal</h4>
+                <p>En la barra superior encontrarás el menú <strong>"Administración"</strong> con todas las herramientas:</p>
+                <ul>
+                    <li><strong>Proyectos:</strong> Crear y gestionar proyectos habitacionales</li>
+                    <li><strong>Viviendas:</strong> Administrar viviendas por proyecto</li>
+                    <li><strong>Usuarios:</strong> Crear, editar y eliminar usuarios</li>
+                    <li><strong>DS 49 (120 días):</strong> Monitorear plazos de garantía</li>
+                    <li><strong>Reportes PDF:</strong> Generar fichas de cierre</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-2-circle-fill"></i>
+                Gestión de Usuarios
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Crear un Nuevo Usuario</h4>
+                <p>1. Ve a <strong>Administración → Usuarios</strong></p>
+                <p>2. Haz clic en <strong>"Crear Nuevo Usuario"</strong></p>
+                <p>3. Completa el formulario:
+                    <ul>
+                        <li>Correo electrónico (será su usuario)</li>
+                        <li>Nombre y apellidos</li>
+                        <li>Rol (Admin, Trabajador o Familia)</li>
+                        <li>Contraseña temporal</li>
+                        <li>Proyecto asignado (para Trabajadores)</li>
+                        <li>Vivienda asignada (para Familias)</li>
+                    </ul>
+                </p>
+                <div class="tutorial-warning">
+                    <strong>⚠️ Importante:</strong>
+                    <p>Los trabajadores deben estar asignados a un proyecto y las familias a una vivienda específica.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Editar o Eliminar Usuarios</h4>
+                <p>En la lista de usuarios puedes:</p>
+                <ul>
+                    <li>✏️ <strong>Editar:</strong> Modificar información del usuario</li>
+                    <li>🗑️ <strong>Eliminar:</strong> Remover usuarios (con confirmación de seguridad)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-3-circle-fill"></i>
+                Gestión de Viviendas
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Crear una Vivienda</h4>
+                <p>1. Ve a <strong>Administración → Viviendas</strong></p>
+                <p>2. Haz clic en <strong>"Nueva Vivienda"</strong></p>
+                <p>3. Selecciona el proyecto y completa:
+                    <ul>
+                        <li>Tipo (Casa o Departamento)</li>
+                        <li>Modelo (opcional)</li>
+                        <li>Cantidad de cuartos y baños</li>
+                        <li>Piso (para departamentos)</li>
+                    </ul>
+                </p>
+                <div class="tutorial-success">
+                    <strong>✅ Automático:</strong>
+                    <p>Al crear la vivienda, se genera automáticamente su ficha de inmueble asociada.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Filtrar y Buscar Viviendas</h4>
+                <p>Usa los filtros por <strong>proyecto</strong> y <strong>tipo</strong> para encontrar rápidamente las viviendas que necesitas.</p>
+            </div>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-4-circle-fill"></i>
+                Sistema DS 49 (Crítico)
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>¿Qué es el DS 49?</h4>
+                <p>El Decreto Supremo N° 49 establece que TECHO Chile debe atender observaciones durante <strong>120 días posteriores a la entrega</strong> de cada vivienda.</p>
+                <div class="tutorial-warning">
+                    <strong>⚠️ Crítico:</strong>
+                    <p>El incumplimiento de este plazo puede generar sanciones legales. Es vital monitorearlo constantemente.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Monitorear el DS 49</h4>
+                <p>1. Ve a <strong>Administración → DS 49 (120 días)</strong></p>
+                <p>2. Verás todas las viviendas clasificadas por urgencia:</p>
+                <ul>
+                    <li>🟢 <strong>Verde (Normal):</strong> Más de 30 días restantes</li>
+                    <li>🟡 <strong>Amarillo (Advertencia):</strong> 15-30 días restantes</li>
+                    <li>🟠 <strong>Naranja (Crítico):</strong> 1-15 días restantes</li>
+                    <li>🔴 <strong>Rojo (Vencido):</strong> Plazo cumplido o excedido</li>
+                </ul>
+                <div class="tutorial-tip">
+                    <strong>💡 Recomendación:</strong>
+                    <p>Prioriza las viviendas en estado crítico (naranja y rojo) para evitar incumplimientos.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="3">
+                <h4>Establecer Fecha de Entrega</h4>
+                <p>Para cada vivienda, debes registrar su fecha de entrega. El sistema calculará automáticamente:</p>
+                <ul>
+                    <li>Días transcurridos</li>
+                    <li>Días restantes del período de 120 días</li>
+                    <li>Porcentaje consumido</li>
+                    <li>Estado de urgencia</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-5-circle-fill"></i>
+                Atajos de Teclado
+            </h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card-icon"><i class="bi bi-keyboard"></i></div>
+                    <div class="feature-card-title"><span class="keyboard-shortcut">Ctrl + D</span></div>
+                    <p class="feature-card-desc">Cambiar tema (claro/oscuro)</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon"><i class="bi bi-search"></i></div>
+                    <div class="feature-card-title">Búsqueda Rápida</div>
+                    <p class="feature-card-desc">Usa los filtros en cada sección</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ TUTORIAL TRABAJADOR ============ -->
+    <div id="tutorial-trabajador" class="tutorial-content hidden">
+        <!-- Introducción -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-stars"></i>
+                Bienvenido, Trabajador
+            </h3>
+            <p class="lead">Como trabajador de construcción técnica, tu rol es fundamental para gestionar las observaciones y el mantenimiento de las viviendas.</p>
+            
+            <div class="tutorial-success">
+                <strong>💡 Tus Responsabilidades:</strong>
+                <p>Gestionar registros de postventa, subir evidencias fotográficas/videos y actualizar el estado de las observaciones.</p>
+            </div>
+        </div>
+
+        <!-- Paso 1 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-1-circle-fill"></i>
+                Tu Área de Trabajo
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Dashboard del Trabajador</h4>
+                <p>Al iniciar sesión verás:</p>
+                <ul>
+                    <li>Registros de postventa asignados</li>
+                    <li>Estadísticas rápidas</li>
+                    <li>Accesos directos a DS 49 y Viviendas</li>
+                </ul>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Menú "Mi Trabajo"</h4>
+                <p>En la barra superior, el menú <strong>"Mi Trabajo"</strong> te da acceso a:</p>
+                <ul>
+                    <li><strong>Mi Proyecto:</strong> Información del proyecto asignado</li>
+                    <li><strong>Viviendas:</strong> Lista de viviendas del proyecto</li>
+                    <li><strong>DS 49 (120 días):</strong> Monitor de plazos de garantía</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-2-circle-fill"></i>
+                Gestionar Observaciones
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Ver Registros Asignados</h4>
+                <p>En tu dashboard verás una tabla con todos los registros de postventa asignados a tu proyecto, incluyendo:</p>
+                <ul>
+                    <li>Proyecto y vivienda</li>
+                    <li>Recinto afectado</li>
+                    <li>Descripción de la observación</li>
+                    <li>Nivel de urgencia</li>
+                    <li>Estado actual</li>
+                </ul>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Subir Evidencia</h4>
+                <p>1. En la tabla de registros, haz clic en <strong>"📎 Evidencia"</strong></p>
+                <p>2. Selecciona el archivo (foto o video)</p>
+                <p>3. Añade un comentario descriptivo</p>
+                <p>4. Haz clic en <strong>"Subir"</strong></p>
+                <div class="tutorial-tip">
+                    <strong>💡 Buenas Prácticas:</strong>
+                    <p>Toma fotos claras del problema. Si es posible, incluye "antes" y "después" de la reparación.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="3">
+                <h4>Cambiar Estado de Registro</h4>
+                <p>Puedes actualizar el estado de cada observación:</p>
+                <ul>
+                    <li>🟡 <strong>Abierta:</strong> Pendiente de atención</li>
+                    <li>🟦 <strong>En Gestión:</strong> Estás trabajando en ello</li>
+                    <li>🟢 <strong>Resuelta:</strong> Problema solucionado</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-3-circle-fill"></i>
+                Monitoreo DS 49
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Consultar Plazos</h4>
+                <p>Ve a <strong>Mi Trabajo → DS 49 (120 días)</strong> para ver:</p>
+                <ul>
+                    <li>Viviendas con plazos próximos a vencer</li>
+                    <li>Días restantes para cada vivienda</li>
+                    <li>Estado de urgencia por colores</li>
+                </ul>
+                <div class="tutorial-warning">
+                    <strong>⚠️ Atención:</strong>
+                    <p>Prioriza las viviendas en estado crítico (naranja) y vencido (rojo).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-4-circle-fill"></i>
+                Consejos para el Terreno
+            </h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card-icon">📸</div>
+                    <div class="feature-card-title">Fotografía Clara</div>
+                    <p class="feature-card-desc">Toma fotos con buena iluminación y enfoque nítido</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">📝</div>
+                    <div class="feature-card-title">Descripciones Detalladas</div>
+                    <p class="feature-card-desc">Explica claramente el problema y la solución aplicada</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">⏰</div>
+                    <div class="feature-card-title">Actualiza el Estado</div>
+                    <p class="feature-card-desc">Mantén los registros actualizados en tiempo real</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ TUTORIAL FAMILIA ============ -->
+    <div id="tutorial-familia" class="tutorial-content hidden">
+        <!-- Introducción -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-stars"></i>
+                Bienvenido a tu Hogar
+            </h3>
+            <p class="lead" style="font-size: 1.2rem;">Como familia beneficiaria, esta plataforma te permite hacer seguimiento de tu vivienda y las reparaciones necesarias.</p>
+            
+            <div class="tutorial-success">
+                <strong>💡 Esta plataforma es para ti:</strong>
+                <p>Puedes ver el estado de tu vivienda, las observaciones reportadas y el progreso de las reparaciones.</p>
+            </div>
+        </div>
+
+        <!-- Paso 1 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-1-circle-fill"></i>
+                Primeros Pasos (Para Adultos Mayores)
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Iniciar Sesión (Entrar al Sistema)</h4>
+                <p style="font-size: 1.1rem;">1. Abre tu navegador (Chrome, Firefox, Edge)</p>
+                <p style="font-size: 1.1rem;">2. Escribe la dirección web que te dieron</p>
+                <p style="font-size: 1.1rem;">3. Ingresa tu correo electrónico</p>
+                <p style="font-size: 1.1rem;">4. Ingresa tu contraseña</p>
+                <p style="font-size: 1.1rem;">5. Haz clic en el botón <strong>"Ingresar"</strong></p>
+                <div class="tutorial-tip">
+                    <strong>💡 ¿Olvidaste tu contraseña?</strong>
+                    <p>Haz clic en "¿Olvidaste tu contraseña?" y sigue las instrucciones. Te llegará un código a tu correo.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Tu Pantalla Principal</h4>
+                <p style="font-size: 1.1rem;">Después de ingresar, verás información sobre:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>Tu vivienda</li>
+                    <li>El proyecto donde está ubicada</li>
+                    <li>Observaciones o reparaciones pendientes</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Paso 2 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-2-circle-fill"></i>
+                Ver el Estado de tu Vivienda
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Información de tu Vivienda</h4>
+                <p style="font-size: 1.1rem;">En la pantalla principal podrás ver:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>📍 <strong>Ubicación:</strong> Dónde está tu casa</li>
+                    <li>🏠 <strong>Tipo:</strong> Casa o departamento</li>
+                    <li>🛏️ <strong>Cuartos:</strong> Cantidad de habitaciones</li>
+                    <li>🚿 <strong>Baños:</strong> Cantidad de baños</li>
+                </ul>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Ver Observaciones (Problemas Reportados)</h4>
+                <p style="font-size: 1.1rem;">Si hay algo que reparar en tu casa, lo verás aquí. Cada observación muestra:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>🔧 <strong>Qué hay que reparar</strong></li>
+                    <li>📅 <strong>Cuándo fue reportado</strong></li>
+                    <li>✅ <strong>Estado:</strong> Si está pendiente, en proceso o resuelto</li>
+                </ul>
+                <div class="tutorial-success">
+                    <strong>✅ Tranquilidad:</strong>
+                    <p>El equipo de TECHO está trabajando para solucionar todos los problemas dentro del plazo legal de 120 días.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 3 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-3-circle-fill"></i>
+                Pedir Ayuda
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>Si necesitas ayuda con la plataforma</h4>
+                <p style="font-size: 1.1rem;">1. Haz clic en <strong>"Recursos"</strong> en la barra superior</p>
+                <p style="font-size: 1.1rem;">2. Selecciona <strong>"Ayuda"</strong></p>
+                <p style="font-size: 1.1rem;">3. Escribe tu consulta o problema</p>
+                <p style="font-size: 1.1rem;">4. Haz clic en <strong>"Enviar"</strong></p>
+                <div class="tutorial-tip">
+                    <strong>💡 Respuesta Rápida:</strong>
+                    <p>El equipo de TECHO responderá tu consulta a tu correo en menos de 24 horas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 4 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-4-circle-fill"></i>
+                Consejos para Usar la Plataforma
+            </h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-card-icon">🖥️</div>
+                    <div class="feature-card-title">Pantalla Grande</div>
+                    <p class="feature-card-desc">Si puedes, usa una computadora o tablet. Verás mejor la información.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">🔒</div>
+                    <div class="feature-card-title">Guarda tu Contraseña</div>
+                    <p class="feature-card-desc">Anota tu contraseña en un lugar seguro. No la compartas con nadie.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">📱</div>
+                    <div class="feature-card-title">También en el Celular</div>
+                    <p class="feature-card-desc">Puedes usar la plataforma desde tu teléfono móvil.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">🆘</div>
+                    <div class="feature-card-title">Pide Ayuda</div>
+                    <p class="feature-card-desc">Si algo no te queda claro, no dudes en preguntar. Estamos para ayudarte.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 5 -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-5-circle-fill"></i>
+                Video Tutorial (Próximamente)
+            </h3>
+            <div style="background: #f3f4f6; padding: 3rem; text-align: center; border-radius: 12px;">
+                <i class="bi bi-play-circle" style="font-size: 4rem; color: #8b5cf6;"></i>
+                <h4 style="margin-top: 1rem;">Video Explicativo</h4>
+                <p class="text-muted">Pronto agregaremos un video paso a paso para que sea aún más fácil.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function showTutorial(role) {
+    // Ocultar todos los tutoriales
+    document.querySelectorAll('.tutorial-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Mostrar el tutorial seleccionado
+    document.getElementById(`tutorial-${role}`).classList.remove('hidden');
+    
+    // Actualizar botones activos
+    document.querySelectorAll('.role-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`[data-role="${role}"]`).classList.add('active');
+    
+    // Scroll suave al contenido
+    setTimeout(() => {
+        window.scrollTo({
+            top: document.querySelector('.role-selector').offsetTop - 100,
+            behavior: 'smooth'
+        });
+    }, 100);
+}
+
+// Detectar rol actual y mostrar tutorial correspondiente
+document.addEventListener('DOMContentLoaded', () => {
+    const userRole = '{{ rol|lower }}'; // Admin, Trabajador, Familia
+    if (userRole && ['admin', 'trabajador', 'familia'].includes(userRole)) {
+        showTutorial(userRole);
+    }
+});
+</script>
+
 {% endblock %}

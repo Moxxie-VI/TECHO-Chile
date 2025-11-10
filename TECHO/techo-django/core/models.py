@@ -39,8 +39,52 @@ class Vivienda(models.Model):
 class FichaInmueble(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
     vivienda = models.ForeignKey(Vivienda, on_delete=models.CASCADE)
+    fecha_entrega = models.DateField(null=True, blank=True, verbose_name="Fecha de Entrega de Vivienda")
+    
     class Meta:
         unique_together = ("proyecto","vivienda")
+        verbose_name = "Ficha de Inmueble"
+        verbose_name_plural = "Fichas de Inmuebles"
+    
+    def dias_desde_entrega(self):
+        """Calcula los días transcurridos desde la entrega"""
+        if not self.fecha_entrega:
+            return None
+        from django.utils import timezone
+        delta = timezone.now().date() - self.fecha_entrega
+        return delta.days
+    
+    def dias_restantes_ds49(self):
+        """Calcula los días restantes del período DS 49 (120 días)"""
+        if not self.fecha_entrega:
+            return None
+        dias = self.dias_desde_entrega()
+        return 120 - dias
+    
+    def estado_ds49(self):
+        """Retorna el estado del DS 49"""
+        dias_restantes = self.dias_restantes_ds49()
+        if dias_restantes is None:
+            return "SIN_FECHA"
+        elif dias_restantes > 30:
+            return "NORMAL"  # Verde
+        elif dias_restantes > 15:
+            return "ADVERTENCIA"  # Amarillo
+        elif dias_restantes > 0:
+            return "CRITICO"  # Rojo
+        else:
+            return "VENCIDO"  # Rojo oscuro
+    
+    def porcentaje_ds49(self):
+        """Retorna el porcentaje del período DS 49 consumido"""
+        if not self.fecha_entrega:
+            return 0
+        dias = self.dias_desde_entrega()
+        if dias < 0:
+            return 0
+        if dias > 120:
+            return 100
+        return int((dias / 120) * 100)
 
 class EstadoInmueble(models.Model):
     ESTADOS = (
