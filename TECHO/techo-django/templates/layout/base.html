@@ -800,16 +800,24 @@
           <!-- Dropdown de usuario -->
           <div class="dropdown">
             <div class="navbar-user" data-bs-toggle="dropdown" aria-expanded="false">
-              {% if request.user.perfil.avatar %}
-                <img src="{{ request.user.perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
+              {% if perfil and perfil.avatar %}
+                <img src="{{ perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
               {% else %}
                 <div class="navbar-user-avatar-placeholder">
                   <i class="bi bi-person-fill"></i>
                 </div>
               {% endif %}
               <div class="navbar-user-info">
-                <span class="navbar-user-name">{{ request.user.perfil.nombre|default:request.user.username }}</span>
-                <span class="navbar-user-role">{{ rol }}</span>
+                <span class="navbar-user-name">
+                  {% if nombre_usuario %}
+                    {{ nombre_usuario }}
+                  {% elif user %}
+                    {{ user.username }}
+                  {% else %}
+                    Usuario
+                  {% endif %}
+                </span>
+                <span class="navbar-user-role">{{ rol|default:"Usuario" }}</span>
               </div>
               <i class="bi bi-chevron-down ms-2" style="color: white;"></i>
             </div>
