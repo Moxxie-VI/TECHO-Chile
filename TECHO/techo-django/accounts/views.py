@@ -33,6 +33,11 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     user = request.user
+    
+    # Verificar que el usuario existe y está autenticado
+    if not user or not user.is_authenticated:
+        return redirect("login")
+    
     perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
     if user.is_superuser and perfil.rol != "Admin":
         perfil.rol = "Admin"; perfil.save()
@@ -40,6 +45,10 @@ def dashboard(request):
         perfil.rol = "Trabajador"; perfil.save()
 
     rol = perfil.rol
+    
+    # Determinar nombre de usuario de forma segura
+    nombre_usuario = perfil.nombre if perfil.nombre else (user.username if hasattr(user, 'username') else "Usuario")
+    
     ctx = {
         "rol": rol, 
         "mensaje": "", 
@@ -49,7 +58,8 @@ def dashboard(request):
         "actividad": [],
         "usuario": user,
         "perfil": perfil,
-        "nombre_usuario": perfil.nombre or user.username,
+        "nombre_usuario": nombre_usuario,
+        "user": user,  # Agregar user también
     }
 
     if rol == "Admin":
