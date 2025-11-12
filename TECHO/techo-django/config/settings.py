@@ -175,3 +175,10 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@techo.cl')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============================================================================
+# CONFIGURACIÓN DE AUTENTICACIÓN
+# ============================================================================
+LOGIN_URL = '/login/'  # URL a la que redirige cuando el usuario no está autenticado
+LOGIN_REDIRECT_URL = '/dashboard/'  # URL a la que redirige después de login exitoso
+LOGOUT_REDIRECT_URL = '/login/'  # URL a la que redirige después de logout
