@@ -40,7 +40,17 @@ def dashboard(request):
         perfil.rol = "Trabajador"; perfil.save()
 
     rol = perfil.rol
-    ctx = {"rol": rol, "mensaje": "", "proyectos": [], "viviendas": [], "registros": [], "actividad": []}
+    ctx = {
+        "rol": rol, 
+        "mensaje": "", 
+        "proyectos": [], 
+        "viviendas": [], 
+        "registros": [], 
+        "actividad": [],
+        "usuario": user,
+        "perfil": perfil,
+        "nombre_usuario": perfil.nombre or user.username,
+    }
 
     if rol == "Admin":
         ctx["proyectos"] = Proyecto.objects.all().order_by("codigo")[:200]
@@ -72,7 +82,7 @@ def dashboard(request):
             ctx["viviendas"] = [v]
             # Obtener observaciones reportadas por este usuario
             observaciones = RegistroPostventa.objects.filter(
-                reportante=request.user
+                reportante=user
             ).select_related('proyecto').prefetch_related('evidencia_set').order_by("-creado_en")[:50]
             ctx["observaciones"] = observaciones
             ctx["registros"] = observaciones  # Para compatibilidad con templates existentes
