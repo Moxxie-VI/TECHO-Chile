@@ -1,0 +1,407 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Fichas de Inmuebles · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+  --primary-blue: #0ea5e9;
+  --primary-green: #10b981;
+}
+
+.fichas-header {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(99, 102, 241, 0.3);
+}
+
+.fichas-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.fichas-header p {
+  font-size: 1.1rem;
+  opacity: 0.95;
+}
+
+.search-filters {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 2px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.filter-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+  align-items: end;
+}
+
+.form-label {
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control,
+.form-select {
+  padding: 0.875rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: var(--card);
+  color: var(--fg);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+  outline: none;
+}
+
+.btn-search {
+  padding: 0.875rem 2rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+}
+
+.fichas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ficha-card {
+  background: var(--card);
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.ficha-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  border-color: #8b5cf6;
+}
+
+.ficha-header {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ficha-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.ficha-title-group h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.ficha-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.ficha-body {
+  padding: 1.5rem;
+}
+
+.ficha-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ficha-info-row:last-child {
+  border-bottom: none;
+}
+
+.info-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b5cf6;
+  flex-shrink: 0;
+}
+
+.info-content {
+  flex: 1;
+}
+
+.info-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.125rem;
+}
+
+.info-value {
+  font-weight: 700;
+  color: var(--fg);
+  font-size: 0.95rem;
+}
+
+.ficha-footer {
+  padding: 1.25rem 1.5rem;
+  background: rgba(139, 92, 246, 0.05);
+  border-top: 2px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.stat-total {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.stat-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.stat-urgent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 5rem 2rem;
+  color: var(--muted);
+}
+
+.empty-state i {
+  font-size: 5rem;
+  opacity: 0.2;
+  margin-bottom: 2rem;
+}
+
+.empty-state h3 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .fichas-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-group {
+    grid-template-columns: 1fr;
+  }
+  
+  .fichas-header h1 {
+    font-size: 2rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="fichas-header">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+      <h1><i class="bi bi-folder-open me-3"></i>Fichas de Inmuebles</h1>
+      <p class="mb-0">Gestión completa de viviendas con sus observaciones y seguimiento</p>
+    </div>
+    <div>
+      <a href="{% url 'admin_viviendas' %}" class="btn btn-light btn-lg" style="border-radius: 14px; font-weight: 700;">
+        <i class="bi bi-plus-circle me-2"></i>Nueva Vivienda
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros de Búsqueda -->
+<div class="search-filters">
+  <form method="get">
+    <div class="filter-group">
+      <div>
+        <label class="form-label">
+          <i class="bi bi-search me-2"></i>Búsqueda General
+        </label>
+        <input type="text" 
+               name="q" 
+               class="form-control" 
+               placeholder="RUT, dirección, código de proyecto..." 
+               value="{{ busqueda }}">
+      </div>
+      
+      <div>
+        <label class="form-label">
+          <i class="bi bi-building me-2"></i>Filtrar por Proyecto
+        </label>
+        <select name="proyecto" class="form-select">
+          <option value="">Todos los proyectos</option>
+          {% for p in proyectos %}
+            <option value="{{ p.id }}" {% if proyecto_seleccionado == p.id|stringformat:"s" %}selected{% endif %}>
+              {{ p.codigo }} - {{ p.nombre }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div>
+        <button type="submit" class="btn-search">
+          <i class="bi bi-funnel me-2"></i>Filtrar Resultados
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- Grid de Fichas -->
+{% if fichas %}
+  <div class="fichas-grid">
+    {% for ficha in fichas %}
+      <a href="{% url 'detalle_ficha_inmueble' ficha.id %}" class="ficha-card">
+        <div class="ficha-header">
+          <div class="ficha-icon">
+            <i class="bi bi-house-door-fill"></i>
+          </div>
+          <div class="ficha-title-group">
+            <h3>{{ ficha.vivienda.direccion|default:"Sin dirección" }}</h3>
+            <p class="ficha-subtitle mb-0">
+              <i class="bi bi-geo-alt me-1"></i>{{ ficha.vivienda.comuna|default:"Sin comuna" }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="ficha-body">
+          <div class="ficha-info-row">
+            <div class="info-icon">
+              <i class="bi bi-card-text"></i>
+            </div>
+            <div class="info-content">
+              <div class="info-label">RUT Propietario</div>
+              <div class="info-value">{{ ficha.vivienda.rut_propietario|default:"No asignado" }}</div>
+            </div>
+          </div>
+          
+          <div class="ficha-info-row">
+            <div class="info-icon">
+              <i class="bi bi-building"></i>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Proyecto</div>
+              <div class="info-value">{{ ficha.proyecto.nombre }}</div>
+            </div>
+          </div>
+          
+          <div class="ficha-info-row">
+            <div class="info-icon">
+              <i class="bi bi-hash"></i>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Código</div>
+              <div class="info-value">{{ ficha.proyecto.codigo }}</div>
+            </div>
+          </div>
+          
+          <div class="ficha-info-row">
+            <div class="info-icon">
+              <i class="bi bi-calendar-check"></i>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Fecha Entrega</div>
+              <div class="info-value">{{ ficha.proyecto.fecha_entrega|date:"d/m/Y"|default:"No especificada" }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="ficha-footer">
+          <div class="stat-badge stat-total">
+            <i class="bi bi-clipboard-data"></i>
+            <span>{{ ficha.total_observaciones }} total</span>
+          </div>
+          
+          {% if ficha.observaciones_pendientes > 0 %}
+            <div class="stat-badge stat-pending">
+              <i class="bi bi-clock"></i>
+              <span>{{ ficha.observaciones_pendientes }} pend.</span>
+            </div>
+          {% endif %}
+          
+          {% if ficha.observaciones_urgentes > 0 %}
+            <div class="stat-badge stat-urgent">
+              <i class="bi bi-exclamation-triangle"></i>
+              <span>{{ ficha.observaciones_urgentes }} urg.</span>
+            </div>
+          {% endif %}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty-state">
+    <i class="bi bi-inbox"></i>
+    <h3>No se encontraron fichas</h3>
+    <p>Intenta ajustar los filtros de búsqueda o crea una nueva vivienda</p>
+    <a href="{% url 'admin_viviendas' %}" class="btn btn-primary btn-lg mt-3" style="border-radius: 14px; font-weight: 700;">
+      <i class="bi bi-plus-circle me-2"></i>Crear Vivienda
+    </a>
+  </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,490 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Ficha {{ ficha.vivienda.direccion }} · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+.detalle-header {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+}
+
+.detalle-header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.detalle-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  flex-wrap: wrap;
+}
+
+.detalle-breadcrumb a {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.detalle-breadcrumb a:hover {
+  opacity: 0.8;
+}
+
+.info-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-section {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--fg);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.info-value {
+  font-weight: 700;
+  color: var(--fg);
+  text-align: right;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--stat-color);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--stat-color);
+}
+
+.observaciones-list {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+}
+
+.observacion-item {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--urgencia-color);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.observacion-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.observacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.observacion-recinto {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-pendiente { background: #fef3c7; color: #92400e; }
+.badge-en-progreso { background: #dbeafe; color: #1e40af; }
+.badge-resuelto { background: #d1fae5; color: #065f46; }
+
+.observacion-text {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.observacion-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.evidencias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.evidencia-item {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid var(--border);
+}
+
+.evidencia-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.evidencia-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.btn-back {
+  padding: 0.875rem 1.75rem;
+  background: white;
+  color: #8b5cf6;
+  border: 2px solid white;
+  border-radius: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(-4px);
+  color: #7c3aed;
+}
+
+.empty-observaciones {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+}
+
+.empty-observaciones i {
+  font-size: 4rem;
+  opacity: 0.2;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .info-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .detalle-header h1 {
+    font-size: 1.75rem;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="detalle-header">
+  <a href="{% url 'fichas_inmuebles' %}" class="btn-back mb-3">
+    <i class="bi bi-arrow-left"></i>
+    Volver a Fichas
+  </a>
+  
+  <div class="detalle-breadcrumb mb-3">
+    <a href="{% url 'fichas_inmuebles' %}">Fichas de Inmuebles</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>{{ ficha.vivienda.direccion|default:"Sin dirección" }}</span>
+  </div>
+  
+  <h1>
+    <i class="bi bi-house-door-fill me-3"></i>{{ ficha.vivienda.direccion|default:"Sin dirección" }}
+  </h1>
+  <p class="mb-0" style="font-size: 1.1rem; opacity: 0.95;">
+    <i class="bi bi-geo-alt me-2"></i>{{ ficha.vivienda.comuna|default:"Sin comuna" }}, {{ ficha.vivienda.region|default:"Sin región" }}
+  </p>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-grid">
+  <div class="stat-card" style="--stat-color: #3b82f6;">
+    <div class="stat-label">
+      <i class="bi bi-clipboard-data me-2"></i>Total Observaciones
+    </div>
+    <div class="stat-value">{{ total_observaciones }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #f59e0b;">
+    <div class="stat-label">
+      <i class="bi bi-clock me-2"></i>Pendientes
+    </div>
+    <div class="stat-value">{{ observaciones_pendientes }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #ef4444;">
+    <div class="stat-label">
+      <i class="bi bi-exclamation-triangle me-2"></i>Urgentes
+    </div>
+    <div class="stat-value">{{ observaciones_urgentes }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #10b981;">
+    <div class="stat-label">
+      <i class="bi bi-calendar-event me-2"></i>Días en Postventa
+    </div>
+    <div class="stat-value">
+      {% if ficha.proyecto.fecha_entrega %}
+        {{ dias_postventa }}
+      {% else %}
+        N/A
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Información Detallada -->
+<div class="info-sections">
+  <!-- Información del Inmueble -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon">
+        <i class="bi bi-house-door"></i>
+      </div>
+      <span>Inmueble</span>
+    </h2>
+    
+    <div class="info-row">
+      <span class="info-label">Dirección</span>
+      <span class="info-value">{{ ficha.vivienda.direccion|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Número</span>
+      <span class="info-value">{{ ficha.vivienda.numero|default:"N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Comuna</span>
+      <span class="info-value">{{ ficha.vivienda.comuna|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Región</span>
+      <span class="info-value">{{ ficha.vivienda.region|default:"No especificada" }}</span>
+    </div>
+  </div>
+  
+  <!-- Información del Propietario -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon">
+        <i class="bi bi-person"></i>
+      </div>
+      <span>Propietario</span>
+    </h2>
+    
+    {% if propietario %}
+      <div class="info-row">
+        <span class="info-label">Nombre Completo</span>
+        <span class="info-value">{{ propietario.get_nombre_completo }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">RUT</span>
+        <span class="info-value">{{ propietario.rut|default:"No especificado" }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Teléfono</span>
+        <span class="info-value">{{ propietario.telefono|default:"No especificado" }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Correo</span>
+        <span class="info-value">{{ propietario.user.email|default:"No especificado" }}</span>
+      </div>
+    {% else %}
+      <p class="text-muted">No hay información del propietario disponible</p>
+    {% endif %}
+  </div>
+  
+  <!-- Información del Proyecto -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon">
+        <i class="bi bi-building"></i>
+      </div>
+      <span>Proyecto</span>
+    </h2>
+    
+    <div class="info-row">
+      <span class="info-label">Nombre</span>
+      <span class="info-value">{{ ficha.proyecto.nombre }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Código</span>
+      <span class="info-value">{{ ficha.proyecto.codigo }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Fecha Entrega</span>
+      <span class="info-value">{{ ficha.proyecto.fecha_entrega|date:"d/m/Y"|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Ubicación</span>
+      <span class="info-value">{{ ficha.proyecto.ubicacion|default:"No especificada" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de Observaciones -->
+<div class="observaciones-list">
+  <h2 class="section-title mb-4">
+    <div class="section-icon">
+      <i class="bi bi-list-check"></i>
+    </div>
+    <span>Observaciones Registradas</span>
+  </h2>
+  
+  {% if observaciones %}
+    {% for obs in observaciones %}
+      <div class="observacion-item" style="--urgencia-color: 
+        {% if obs.urgencia == 'ALTA' %}#ef4444
+        {% elif obs.urgencia == 'MEDIA' %}#f59e0b
+        {% else %}#10b981{% endif %}">
+        
+        <div class="observacion-header">
+          <div class="observacion-recinto">
+            <i class="bi bi-tools me-2"></i>{{ obs.recinto }}
+          </div>
+          <span class="badge badge-{{ obs.estado|lower|cut:' '|cut:'_' }}">
+            {{ obs.get_estado_display|default:obs.estado }}
+          </span>
+        </div>
+        
+        <p class="observacion-text">{{ obs.observacion }}</p>
+        
+        <div class="observacion-meta">
+          <div class="meta-item">
+            <i class="bi bi-{% if obs.urgencia == 'ALTA' %}exclamation-triangle-fill{% elif obs.urgencia == 'MEDIA' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            <span>{{ obs.get_urgencia_display|default:obs.urgencia }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-clock"></i>
+            <span>{{ obs.creado_en|timesince }} atrás</span>
+          </div>
+          {% if obs.reportante %}
+            <div class="meta-item">
+              <i class="bi bi-person"></i>
+              <span>{{ obs.reportante.get_full_name|default:obs.reportante.username }}</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        {% if obs.evidencias %}
+          <div class="evidencias-grid">
+            {% for ev in obs.evidencias %}
+              {% if ev.archivo %}
+                <div class="evidencia-item" onclick="window.open('{{ ev.archivo.url }}', '_blank')">
+                  <img src="{{ ev.archivo.url }}" class="evidencia-img" alt="Evidencia">
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-observaciones">
+      <i class="bi bi-inbox"></i>
+      <h3>No hay observaciones registradas</h3>
+      <p>Esta vivienda no tiene observaciones de postventa aún</p>
+    </div>
+  {% endif %}
+</div>
+
+{% endblock %}
