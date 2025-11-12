@@ -77,13 +77,47 @@ def dashboard(request):
 @login_required
 def perfil(request):
     perfil = request.user.perfil
+    es_primera_vez = not perfil.rut or not perfil.nombre or not perfil.apellido
+    
     if request.method == "POST":
         form = PerfilForm(request.POST, request.FILES, instance=perfil)
         if form.is_valid():
+            # Si no es la primera vez, no permitir cambiar RUT, nombre, apellido, fecha_nacimiento
+            if not es_primera_vez:
+                form.instance.rut = perfil.rut
+                form.instance.nombre = perfil.nombre
+                form.instance.apellido = perfil.apellido
+                form.instance.fecha_nacimiento = perfil.fecha_nacimiento
+            
             form.save()
+            messages.success(request, "✅ Perfil actualizado correctamente")
+            return redirect("perfil")
     else:
         form = PerfilForm(instance=perfil)
-    return render(request, "accounts/perfil.html", {"form": form, "rol": perfil.rol})
+        
+        # Deshabilitar campos si ya tienen valor
+        if perfil.rut:
+            form.fields['rut'].widget.attrs['readonly'] = 'readonly'
+            form.fields['rut'].widget.attrs['class'] += ' bg-light'
+            form.fields['rut'].help_text = "⚠️ El RUT no se puede modificar una vez establecido"
+        
+        if perfil.nombre:
+            form.fields['nombre'].widget.attrs['readonly'] = 'readonly'
+            form.fields['nombre'].widget.attrs['class'] += ' bg-light'
+        
+        if perfil.apellido:
+            form.fields['apellido'].widget.attrs['readonly'] = 'readonly'
+            form.fields['apellido'].widget.attrs['class'] += ' bg-light'
+        
+        if perfil.fecha_nacimiento:
+            form.fields['fecha_nacimiento'].widget.attrs['readonly'] = 'readonly'
+            form.fields['fecha_nacimiento'].widget.attrs['class'] += ' bg-light'
+    
+    return render(request, "accounts/perfil.html", {
+        "form": form,
+        "rol": perfil.rol,
+        "es_primera_vez": es_primera_vez
+    })
 
 @login_required
 def ayuda(request):
@@ -226,14 +260,26 @@ def crear_usuario(request):
         correo = request.POST.get("correo", "").strip()
         nombre = request.POST.get("nombre", "").strip()
         apellido = request.POST.get("apellido", "").strip()
+        rut = request.POST.get("rut", "").strip()
+        fecha_nacimiento = request.POST.get("fecha_nacimiento", "").strip()
+        nacionalidad = request.POST.get("nacionalidad", "").strip() or "Chilena"
+        telefono = request.POST.get("telefono", "").strip()
+        telefono_secundario = request.POST.get("telefono_secundario", "").strip()
+        direccion = request.POST.get("direccion", "").strip()
+        ciudad = request.POST.get("ciudad", "").strip()
+        comuna = request.POST.get("comuna", "").strip()
+        region = request.POST.get("region", "").strip()
+        contacto_emergencia_nombre = request.POST.get("contacto_emergencia_nombre", "").strip()
+        contacto_emergencia_telefono = request.POST.get("contacto_emergencia_telefono", "").strip()
+        contacto_emergencia_relacion = request.POST.get("contacto_emergencia_relacion", "").strip()
         rol = request.POST.get("rol", "")
         password = request.POST.get("password", "")
         proyecto_id = request.POST.get("proyecto_id")
         vivienda_id = request.POST.get("vivienda_id")
         
         # Validaciones
-        if not all([correo, nombre, apellido, rol, password]):
-            messages.error(request, "Todos los campos obligatorios deben estar completos")
+        if not all([correo, nombre, apellido, rut, telefono, rol, password]):
+            messages.error(request, "Todos los campos obligatorios deben estar completos (correo, nombre, apellido, RUT, teléfono, rol, contraseña)")
         elif rol not in ["Trabajador", "Familia", "Admin"]:
             messages.error(request, "Rol inválido")
         else:
@@ -272,7 +318,19 @@ def crear_usuario(request):
                     # Actualizar información adicional del perfil
                     perfil_nuevo.nombre = nombre
                     perfil_nuevo.apellido = apellido
+                    perfil_nuevo.rut = rut
+                    perfil_nuevo.fecha_nacimiento = fecha_nacimiento if fecha_nacimiento else None
+                    perfil_nuevo.nacionalidad = nacionalidad
+                    perfil_nuevo.telefono = telefono
+                    perfil_nuevo.telefono_secundario = telefono_secundario
                     perfil_nuevo.correo_personal = correo
+                    perfil_nuevo.direccion = direccion
+                    perfil_nuevo.ciudad = ciudad
+                    perfil_nuevo.comuna = comuna
+                    perfil_nuevo.region = region
+                    perfil_nuevo.contacto_emergencia_nombre = contacto_emergencia_nombre
+                    perfil_nuevo.contacto_emergencia_telefono = contacto_emergencia_telefono
+                    perfil_nuevo.contacto_emergencia_relacion = contacto_emergencia_relacion
                     
                     # Asignar proyecto si es Trabajador
                     if rol == "Trabajador" and proyecto_id:

@@ -291,6 +291,147 @@
             <input type="text" name="apellido" class="form-control" placeholder="Pérez" required>
           </div>
         </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-card-text"></i>
+              RUT <span class="required">*</span>
+            </label>
+            <input type="text" name="rut" class="form-control" placeholder="12.345.678-9" required>
+            <small class="text-muted">Formato: 12.345.678-9</small>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-calendar"></i>
+              Fecha de Nacimiento
+            </label>
+            <input type="date" name="fecha_nacimiento" class="form-control">
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-globe"></i>
+              Nacionalidad
+            </label>
+            <input type="text" name="nacionalidad" class="form-control" placeholder="Chilena" value="Chilena">
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-telephone"></i>
+              Teléfono Principal <span class="required">*</span>
+            </label>
+            <input type="text" name="telefono" class="form-control" placeholder="+56 9 1234 5678" required>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-telephone"></i>
+              Teléfono Secundario
+            </label>
+            <input type="text" name="telefono_secundario" class="form-control" placeholder="+56 9 8765 4321">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección 2: Dirección -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <i class="bi bi-geo-alt"></i>
+        Información de Dirección
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-house"></i>
+              Dirección
+            </label>
+            <input type="text" name="direccion" class="form-control" placeholder="Calle Los Aromos #123, Depto 4">
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-building"></i>
+              Ciudad
+            </label>
+            <input type="text" name="ciudad" class="form-control" placeholder="Santiago">
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-pin-map"></i>
+              Comuna
+            </label>
+            <input type="text" name="comuna" class="form-control" placeholder="Puente Alto">
+          </div>
+        </div>
+        
+        <div class="col-md-4">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-map"></i>
+              Región
+            </label>
+            <input type="text" name="region" class="form-control" placeholder="Metropolitana">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección 3: Contacto de Emergencia -->
+    <div class="form-section">
+      <h3 class="form-section-title">
+        <i class="bi bi-heart-pulse"></i>
+        Persona de Confianza / Contacto de Emergencia
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-person-check"></i>
+              Nombre Completo
+            </label>
+            <input type="text" name="contacto_emergencia_nombre" class="form-control" placeholder="María González">
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-telephone-forward"></i>
+              Teléfono
+            </label>
+            <input type="text" name="contacto_emergencia_telefono" class="form-control" placeholder="+56 9 8888 7777">
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="bi bi-people"></i>
+              Relación
+            </label>
+            <input type="text" name="contacto_emergencia_relacion" class="form-control" placeholder="Madre, Hermano, Amigo">
+          </div>
+        </div>
       </div>
     </div>
     
