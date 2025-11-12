@@ -18,23 +18,74 @@ class Constructora(models.Model):
     def __str__(self): return self.nombre
 
 class Proyecto(models.Model):
-    codigo = models.CharField(max_length=50, unique=True)
-    nombre = models.CharField(max_length=150)
-    ubicacion = models.CharField(max_length=200, blank=True)
-    fecha_inicio = models.DateField(null=True, blank=True)
-    fecha_estimada_termino = models.DateField(null=True, blank=True)
+    # IDENTIFICACIÓN
+    codigo = models.CharField(max_length=50, unique=True, verbose_name="Código Proyecto")
+    nombre = models.CharField(max_length=150, verbose_name="Nombre del Proyecto")
+    
+    # UBICACIÓN
+    ubicacion = models.CharField(max_length=200, blank=True, verbose_name="Ubicación")
+    comuna = models.CharField(max_length=100, blank=True, verbose_name="Comuna")
+    region = models.CharField(max_length=100, blank=True, verbose_name="Región")
+    direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección del Proyecto")
+    
+    # FECHAS
+    fecha_inicio = models.DateField(null=True, blank=True, verbose_name="Fecha de Inicio")
+    fecha_estimada_termino = models.DateField(null=True, blank=True, verbose_name="Fecha Estimada de Término")
+    fecha_entrega_efectiva = models.DateField(null=True, blank=True, verbose_name="Fecha Entrega Efectiva")
+    
+    # CONSTRUCTORA Y GESTIÓN
     constructora = models.ForeignKey(Constructora, null=True, blank=True, on_delete=models.SET_NULL)
+    encargado_techo = models.CharField(max_length=200, blank=True, verbose_name="Encargado TECHO")
+    telefono_encargado = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Encargado")
+    
+    # INFORMACIÓN ADICIONAL
+    cantidad_viviendas = models.IntegerField(null=True, blank=True, verbose_name="Cantidad Total de Viviendas")
+    descripcion = models.TextField(blank=True, verbose_name="Descripción del Proyecto")
+    estado = models.CharField(
+        max_length=50,
+        choices=(
+            ("PLANIFICACION", "Planificación"),
+            ("EN_CONSTRUCCION", "En Construcción"),
+            ("ENTREGADO", "Entregado"),
+            ("POSTVENTA", "En Postventa"),
+            ("FINALIZADO", "Finalizado")
+        ),
+        default="PLANIFICACION",
+        verbose_name="Estado del Proyecto"
+    )
+    
     def __str__(self): return f"{self.codigo} - {self.nombre}"
 
 class Vivienda(models.Model):
     TIPO = (("CASA","CASA"),("DEPARTAMENTO","DEPARTAMENTO"))
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    
+    # IDENTIFICACIÓN DE LA VIVIENDA
     tipo = models.CharField(max_length=20, choices=TIPO)
     modelo = models.CharField(max_length=100, blank=True)
-    cant_cuartos = models.IntegerField(null=True, blank=True)
-    cant_banos = models.IntegerField(null=True, blank=True)
-    piso = models.CharField(max_length=50, blank=True)
-    def __str__(self): return f"{self.proyecto.codigo}-{self.id}-{self.tipo}"
+    cant_cuartos = models.IntegerField(null=True, blank=True, verbose_name="Cantidad de Cuartos")
+    cant_banos = models.IntegerField(null=True, blank=True, verbose_name="Cantidad de Baños")
+    piso = models.CharField(max_length=50, blank=True, verbose_name="Piso")
+    
+    # UBICACIÓN DE LA VIVIENDA
+    direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección", help_text="Calle y número")
+    numero = models.CharField(max_length=20, blank=True, verbose_name="Número de Casa/Depto")
+    block_villa = models.CharField(max_length=50, blank=True, verbose_name="Block/Villa", help_text="Opcional")
+    comuna = models.CharField(max_length=100, blank=True, verbose_name="Comuna")
+    region = models.CharField(max_length=100, blank=True, verbose_name="Región")
+    
+    # PROPIETARIO/BENEFICIARIO
+    rut_propietario = models.CharField(
+        max_length=12,
+        blank=True,
+        verbose_name="RUT Propietario/Beneficiario",
+        help_text="RUT de la familia beneficiaria"
+    )
+    
+    def __str__(self): 
+        if self.direccion and self.numero:
+            return f"{self.proyecto.codigo} - {self.direccion} #{self.numero}"
+        return f"{self.proyecto.codigo}-{self.id}-{self.tipo}"
 
 class FichaInmueble(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
@@ -150,14 +201,21 @@ class PerfilUsuario(models.Model):
     nombre = models.CharField(max_length=100, blank=True, verbose_name="Nombre(s)")
     apellido = models.CharField(max_length=100, blank=True, verbose_name="Apellido(s)")
     fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name="Fecha de Nacimiento")
+    nacionalidad = models.CharField(max_length=100, blank=True, default="Chilena", verbose_name="Nacionalidad")
     
     # CONTACTO
     correo_personal = models.EmailField(blank=True, null=True, verbose_name="Correo Personal")
     telefono = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Principal")
     telefono_secundario = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Secundario")
     
+    # PERSONA DE CONFIANZA / CONTACTO DE EMERGENCIA
+    contacto_emergencia_nombre = models.CharField(max_length=200, blank=True, verbose_name="Nombre Persona de Confianza")
+    contacto_emergencia_telefono = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Persona de Confianza")
+    contacto_emergencia_relacion = models.CharField(max_length=100, blank=True, verbose_name="Relación", help_text="Ej: Madre, Hermano, Amigo")
+    
     # DIRECCIÓN
     direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección")
+    ciudad = models.CharField(max_length=100, blank=True, verbose_name="Ciudad")
     comuna = models.CharField(max_length=100, blank=True, verbose_name="Comuna")
     region = models.CharField(max_length=100, blank=True, verbose_name="Región")
     

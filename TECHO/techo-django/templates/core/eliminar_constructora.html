@@ -110,14 +110,29 @@
 
             <div class="card shadow-sm">
                 <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-shield-lock me-2"></i>
+                        <strong>Para confirmar la eliminación,</strong> escribe exactamente: <code class="text-dark">acepto eliminar constructora</code>
+                    </div>
+                    
                     <form method="post">
                         {% csrf_token %}
                         
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="confirmDelete" required>
-                            <label class="form-check-label" for="confirmDelete">
-                                He leído y confirmo que quiero eliminar esta constructora de forma permanente
+                        <div class="mb-4">
+                            <label for="confirmacion" class="form-label fw-bold">
+                                <i class="bi bi-keyboard me-2"></i>Texto de Confirmación
                             </label>
+                            <input 
+                                type="text" 
+                                class="form-control form-control-lg" 
+                                id="confirmacion" 
+                                name="confirmacion" 
+                                placeholder="Escribe: acepto eliminar constructora"
+                                required
+                                autocomplete="off">
+                            <div class="form-text">
+                                Debes escribir el texto exactamente como se muestra arriba
+                            </div>
                         </div>
 
                         <hr class="my-4">
@@ -126,7 +141,7 @@
                             <a href="{% url 'admin_constructoras' %}" class="btn btn-secondary">
                                 <i class="bi bi-x-circle me-2"></i>Cancelar
                             </a>
-                            <button type="submit" class="btn btn-danger" id="btnEliminar" disabled>
+                            <button type="submit" class="btn btn-danger">
                                 <i class="bi bi-trash me-2"></i>Sí, Eliminar Constructora
                             </button>
                         </div>
@@ -153,11 +168,5 @@
     </div>
 </div>
 
-<script>
-// Habilitar botón de eliminar solo si el checkbox está marcado
-document.getElementById('confirmDelete')?.addEventListener('change', function() {
-    document.getElementById('btnEliminar').disabled = !this.checked;
-});
-</script>
 {% endblock %}
 

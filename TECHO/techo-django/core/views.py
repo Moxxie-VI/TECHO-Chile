@@ -480,11 +480,20 @@ def editar_vivienda(request, vivienda_id):
 @require_role("Admin")
 def eliminar_vivienda(request, vivienda_id):
     """
-    Vista para eliminar una vivienda
+    Vista para eliminar una vivienda con confirmación de seguridad
     """
     vivienda = get_object_or_404(Vivienda, pk=vivienda_id)
     
     if request.method == "POST":
+        # Verificar texto de confirmación
+        confirmacion = request.POST.get('confirmacion', '').strip()
+        texto_esperado = f"acepto eliminar vivienda"
+        
+        if confirmacion.lower() != texto_esperado:
+            messages.error(request, 
+                f"⚠️ Debes escribir exactamente: '{texto_esperado}' para confirmar la eliminación")
+            return redirect("admin_viviendas")
+        
         # Verificar si tiene registros de postventa asociados
         registros_count = RegistroPostventa.objects.filter(
             ficha__vivienda=vivienda
@@ -595,12 +604,21 @@ def editar_constructora(request, constructora_id):
 @login_required
 @require_role("Admin")
 def eliminar_constructora(request, constructora_id):
-    """Vista para eliminar una constructora"""
+    """Vista para eliminar una constructora con confirmación de seguridad"""
     from .models import Constructora
     
     constructora = get_object_or_404(Constructora, pk=constructora_id)
     
     if request.method == "POST":
+        # Verificar texto de confirmación
+        confirmacion = request.POST.get('confirmacion', '').strip()
+        texto_esperado = f"acepto eliminar constructora"
+        
+        if confirmacion.lower() != texto_esperado:
+            messages.error(request, 
+                f"⚠️ Debes escribir exactamente: '{texto_esperado}' para confirmar la eliminación")
+            return redirect("admin_constructoras")
+        
         # Verificar si tiene proyectos asociados
         proyectos_count = Proyecto.objects.filter(constructora=constructora).count()
         

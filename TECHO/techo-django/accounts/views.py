@@ -443,7 +443,7 @@ def editar_usuario(request, user_id):
 
 @login_required
 def eliminar_usuario(request, user_id):
-    """Vista para eliminar un usuario"""
+    """Vista para eliminar un usuario con confirmación de seguridad"""
     perfil = request.user.perfil
     
     # Solo Admin puede acceder
@@ -459,6 +459,15 @@ def eliminar_usuario(request, user_id):
         return redirect("listar_usuarios")
     
     if request.method == "POST":
+        # Verificar texto de confirmación
+        confirmacion = request.POST.get('confirmacion', '').strip()
+        texto_esperado = "acepto eliminar usuario"
+        
+        if confirmacion.lower() != texto_esperado:
+            messages.error(request, 
+                f"⚠️ Debes escribir exactamente: '{texto_esperado}' para confirmar la eliminación")
+            return redirect("listar_usuarios")
+        
         nombre_completo = f"{usuario.first_name} {usuario.last_name}"
         correo = usuario.username
         usuario.delete()

@@ -678,25 +678,47 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
     z-index: 9998;
     display: none;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   
   .tour-popup {
     position: fixed;
-    background: white;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 
+      0 30px 80px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(139, 92, 246, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 3px solid rgba(139, 92, 246, 0.5);
     z-index: 9999;
-    max-width: 400px;
+    max-width: 480px;
     display: none;
+    animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
   
   [data-theme="dark"] .tour-popup {
-    background: #1f2937;
-    color: white;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   }
   
   .tour-popup-header {
@@ -707,36 +729,66 @@
   }
   
   .tour-popup-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     flex-shrink: 0;
+    box-shadow: 
+      0 10px 25px rgba(139, 92, 246, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: iconPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes iconPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(139, 92, 246, 0.6);
+    }
   }
   
   .tour-popup-title {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.35rem;
+    font-weight: 800;
     margin: 0 0 0.5rem 0;
     color: var(--fg);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
   
   .tour-popup-step {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    font-weight: 600;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.25rem 0.75rem;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
   }
   
   .tour-popup-content {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 1.05rem;
+    line-height: 1.7;
     color: var(--fg);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid #8b5cf6;
   }
   
   .tour-popup-actions {
@@ -746,47 +798,103 @@
   }
   
   .tour-btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 10px;
-    font-weight: 600;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
     border: none;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .tour-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .tour-btn:hover::before {
+    width: 300px;
+    height: 300px;
   }
   
   .tour-btn-primary {
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
   }
   
   .tour-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+  }
+  
+  .tour-btn-primary:active {
+    transform: translateY(-1px) scale(0.98);
   }
   
   .tour-btn-secondary {
-    background: transparent;
-    color: var(--muted);
-    border: 2px solid var(--border);
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    font-weight: 600;
   }
   
   .tour-btn-secondary:hover {
-    background: var(--hover);
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
   }
   
   .tour-highlight {
     position: relative;
     z-index: 9997 !important;
-    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.7) !important;
-    animation: pulse-highlight 2s infinite;
+    border-radius: 16px !important;
+    box-shadow: 
+      0 0 0 4px rgba(139, 92, 246, 0.6),
+      0 0 0 8px rgba(139, 92, 246, 0.3),
+      0 0 30px rgba(139, 92, 246, 0.5),
+      0 0 0 9999px rgba(0, 0, 0, 0.75) !important;
+    animation: pulse-highlight 2.5s ease-in-out infinite;
   }
   
   @keyframes pulse-highlight {
     0%, 100% {
-      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.7);
+      box-shadow: 
+        0 0 0 4px rgba(139, 92, 246, 0.6),
+        0 0 0 8px rgba(139, 92, 246, 0.3),
+        0 0 30px rgba(139, 92, 246, 0.5),
+        0 0 0 9999px rgba(0, 0, 0, 0.75);
+      transform: scale(1);
     }
     50% {
-      box-shadow: 0 0 0 8px rgba(139, 92, 246, 0.8), 0 0 0 9999px rgba(0, 0, 0, 0.7);
+      box-shadow: 
+        0 0 0 6px rgba(139, 92, 246, 0.8),
+        0 0 0 12px rgba(139, 92, 246, 0.4),
+        0 0 50px rgba(139, 92, 246, 0.8),
+        0 0 0 9999px rgba(0, 0, 0, 0.75);
+      transform: scale(1.02);
+    }
+  }
+  
+  /* Efecto de partículas al cambiar de paso */
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0;
+      transform: translateY(0) scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-20px) scale(1);
     }
   }
 </style>
@@ -799,26 +907,26 @@
 const tourSteps = [
   {
     target: '#tour-reportar',
-    title: '¡Bienvenido! 👋',
-    content: 'Este es tu panel de control. Aquí puedes reportar cualquier problema que encuentres en tu vivienda haciendo clic en el botón "Reportar Problema".',
+    title: '¡Bienvenido a tu Hogar! 👋',
+    content: '✨ <strong>Este es tu panel de control.</strong><br><br>Desde aquí puedes reportar cualquier problema o inquietud sobre tu vivienda de forma rápida y sencilla. Solo haz clic en el botón <strong>"Reportar Problema"</strong> y nosotros nos encargaremos del resto.',
     icon: 'house-heart'
   },
   {
     target: '.info-card',
-    title: 'Información de tu vivienda 🏠',
-    content: 'Aquí puedes ver toda la información sobre tu vivienda: tipo, modelo, proyecto y ubicación.',
+    title: 'Información de tu Vivienda 🏠',
+    content: '📍 <strong>Aquí encuentras todos los detalles importantes:</strong><br><br>• Tipo y modelo de tu casa<br>• Proyecto al que perteneces<br>• Ubicación y características<br><br>Toda la información que necesitas en un solo lugar.',
     icon: 'info-circle'
   },
   {
     target: '#tour-observaciones',
-    title: 'Tus observaciones 📋',
-    content: 'En esta sección puedes ver todas las observaciones que has reportado, con su estado actual y las evidencias que subiste.',
+    title: 'Historial de Reportes 📋',
+    content: '🔍 <strong>Revisa el estado de tus reportes:</strong><br><br>• Ve todas las observaciones que has enviado<br>• Conoce el estado de cada reporte<br>• Accede a las fotos y evidencias que subiste<br><br>Mantente informado en todo momento.',
     icon: 'clipboard-check'
   },
   {
     target: '#tour-ayuda',
-    title: '¿Necesitas ayuda? 💡',
-    content: 'Si tienes dudas, puedes ver el tutorial completo o contactar con nuestro equipo de soporte.',
+    title: '¿Necesitas Ayuda? 💡',
+    content: '🤝 <strong>Estamos aquí para ti:</strong><br><br>• Vuelve a ver este tutorial cuando quieras<br>• Contacta directamente con nuestro equipo<br>• Resuelve tus dudas rápidamente<br><br>Tu tranquilidad es nuestra prioridad.',
     icon: 'question-circle'
   }
 ];

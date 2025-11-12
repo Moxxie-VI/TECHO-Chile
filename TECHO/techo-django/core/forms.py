@@ -5,9 +5,10 @@ class PerfilForm(forms.ModelForm):
     class Meta:
         model = PerfilUsuario
         fields = [
-            "rut", "nombre", "apellido", "fecha_nacimiento",
+            "rut", "nombre", "apellido", "fecha_nacimiento", "nacionalidad",
             "correo_personal", "telefono", "telefono_secundario",
-            "direccion", "comuna", "region",
+            "direccion", "ciudad", "comuna", "region",
+            "contacto_emergencia_nombre", "contacto_emergencia_telefono", "contacto_emergencia_relacion",
             "avatar", "biografia"
         ]
         widgets = {
@@ -28,6 +29,10 @@ class PerfilForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'date'
             }),
+            'nacionalidad': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Chilena, Peruana, Venezolana'
+            }),
             'correo_personal': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'correo@ejemplo.cl'
@@ -44,6 +49,10 @@ class PerfilForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Calle Ejemplo #123, Depto 4'
             }),
+            'ciudad': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Santiago, Valparaíso, Concepción'
+            }),
             'comuna': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: Puente Alto, Maipú, etc.'
@@ -51,6 +60,18 @@ class PerfilForm(forms.ModelForm):
             'region': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ej: Metropolitana, Valparaíso, etc.'
+            }),
+            'contacto_emergencia_nombre': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre completo de persona de confianza'
+            }),
+            'contacto_emergencia_telefono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '+56 9 1234 5678'
+            }),
+            'contacto_emergencia_relacion': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: Madre, Hermano, Amigo'
             }),
             'avatar': forms.FileInput(attrs={
                 'class': 'form-control',
@@ -67,12 +88,17 @@ class PerfilForm(forms.ModelForm):
             'nombre': 'Nombre(s)',
             'apellido': 'Apellido(s)',
             'fecha_nacimiento': 'Fecha de Nacimiento',
+            'nacionalidad': 'Nacionalidad',
             'correo_personal': 'Correo Electrónico',
             'telefono': 'Teléfono Principal',
             'telefono_secundario': 'Teléfono Secundario',
             'direccion': 'Dirección',
+            'ciudad': 'Ciudad',
             'comuna': 'Comuna',
             'region': 'Región',
+            'contacto_emergencia_nombre': 'Nombre Persona de Confianza',
+            'contacto_emergencia_telefono': 'Teléfono Persona de Confianza',
+            'contacto_emergencia_relacion': 'Relación',
             'avatar': 'Foto de Perfil',
             'biografia': 'Sobre mí',
         }
@@ -86,20 +112,83 @@ class AyudaForm(forms.Form):
 class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
-        fields = ["codigo","nombre","ubicacion","constructora","fecha_inicio","fecha_estimada_termino"]
+        fields = [
+            "codigo", "nombre", "constructora",
+            "ubicacion", "direccion", "comuna", "region",
+            "fecha_inicio", "fecha_estimada_termino", "fecha_entrega_efectiva",
+            "encargado_techo", "telefono_encargado",
+            "cantidad_viviendas", "descripcion", "estado"
+        ]
         widgets = {
-            'codigo': forms.TextInput(attrs={'class': 'form-control'}),
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
+            'codigo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: PROY-2025-001'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del proyecto'}),
             'constructora': forms.Select(attrs={'class': 'form-select'}),
+            'ubicacion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ubicación general'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Dirección del proyecto'}),
+            'comuna': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Puente Alto'}),
+            'region': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Metropolitana'}),
             'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'fecha_estimada_termino': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'fecha_entrega_efectiva': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'encargado_techo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre del encargado'}),
+            'telefono_encargado': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '+56 9 1234 5678'}),
+            'cantidad_viviendas': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Descripción del proyecto'}),
+            'estado': forms.Select(attrs={'class': 'form-select'}),
+        }
+        labels = {
+            'codigo': 'Código del Proyecto',
+            'nombre': 'Nombre',
+            'constructora': 'Constructora',
+            'ubicacion': 'Ubicación General',
+            'direccion': 'Dirección',
+            'comuna': 'Comuna',
+            'region': 'Región',
+            'fecha_inicio': 'Fecha de Inicio',
+            'fecha_estimada_termino': 'Fecha Estimada de Término',
+            'fecha_entrega_efectiva': 'Fecha de Entrega Efectiva',
+            'encargado_techo': 'Encargado TECHO',
+            'telefono_encargado': 'Teléfono Encargado',
+            'cantidad_viviendas': 'Cantidad de Viviendas',
+            'descripcion': 'Descripción',
+            'estado': 'Estado del Proyecto',
         }
 
 class ViviendaForm(forms.ModelForm):
     class Meta:
         model = Vivienda
-        fields = ["proyecto","tipo","modelo","cant_cuartos","cant_banos","piso"]
+        fields = [
+            "proyecto", "tipo", "modelo", "cant_cuartos", "cant_banos", "piso",
+            "direccion", "numero", "block_villa", "comuna", "region", "rut_propietario"
+        ]
+        widgets = {
+            'proyecto': forms.Select(attrs={'class': 'form-select'}),
+            'tipo': forms.Select(attrs={'class': 'form-select'}),
+            'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Casa 45m²'}),
+            'cant_cuartos': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'cant_banos': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'piso': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Primer piso, PB'}),
+            'direccion': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Calle Los Aromos'}),
+            'numero': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: 1234 o Depto 4B'}),
+            'block_villa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Block A, Villa Los Álamos (opcional)'}),
+            'comuna': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Puente Alto'}),
+            'region': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Metropolitana'}),
+            'rut_propietario': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
+        }
+        labels = {
+            'proyecto': 'Proyecto',
+            'tipo': 'Tipo de Vivienda',
+            'modelo': 'Modelo',
+            'cant_cuartos': 'Cantidad de Cuartos',
+            'cant_banos': 'Cantidad de Baños',
+            'piso': 'Piso',
+            'direccion': 'Dirección (Calle)',
+            'numero': 'Número de Casa/Depto',
+            'block_villa': 'Block/Villa',
+            'comuna': 'Comuna',
+            'region': 'Región',
+            'rut_propietario': 'RUT Propietario/Beneficiario',
+        }
 
 class RegistroPostventaForm(forms.ModelForm):
     class Meta:

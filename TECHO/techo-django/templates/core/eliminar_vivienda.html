@@ -174,9 +174,37 @@
             </div>
             {% endif %}
 
+            <!-- Campo de confirmación -->
+            {% if registros_count == 0 and familias_count == 0 %}
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-shield-lock me-2"></i>
+                <strong>Para confirmar la eliminación,</strong> escribe exactamente: <code class="text-dark">acepto eliminar vivienda</code>
+            </div>
+            {% endif %}
+
             <!-- Botones -->
-            <form method="POST">
+            <form method="POST" id="form-eliminar">
                 {% csrf_token %}
+                
+                {% if registros_count == 0 and familias_count == 0 %}
+                <div class="mb-4">
+                    <label for="confirmacion" class="form-label fw-bold">
+                        <i class="bi bi-keyboard me-2"></i>Texto de Confirmación
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg" 
+                        id="confirmacion" 
+                        name="confirmacion" 
+                        placeholder="Escribe: acepto eliminar vivienda"
+                        required
+                        autocomplete="off">
+                    <div class="form-text">
+                        Debes escribir el texto exactamente como se muestra arriba
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="d-flex gap-3 justify-content-end">
                     <a href="{% url 'admin_viviendas' %}" class="btn btn-outline-secondary btn-lg">
                         <i class="bi bi-arrow-left me-2"></i>Volver
