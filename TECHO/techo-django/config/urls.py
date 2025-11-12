@@ -9,7 +9,8 @@ from core.views import (
     subir_evidencia, cambiar_estado_registro,
     monitoreo_ds49, actualizar_fecha_entrega,
     admin_viviendas, crear_vivienda, editar_vivienda, eliminar_vivienda,
-    admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora
+    admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora,
+    reportar_observacion_familia, buscar_familia_por_rut
 )
 from accounts.views import (
     login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
@@ -56,6 +57,10 @@ urlpatterns = [
     path("panel/admin/constructoras/crear/", crear_constructora, name="crear_constructora"),
     path("panel/admin/constructoras/editar/<int:constructora_id>/", editar_constructora, name="editar_constructora"),
     path("panel/admin/constructoras/eliminar/<int:constructora_id>/", eliminar_constructora, name="eliminar_constructora"),
+    # Familias - Reportar observaciones
+    path("familia/reportar-observacion/", reportar_observacion_familia, name="reportar_observacion_familia"),
+    # Admin - Asignación de viviendas por RUT
+    path("panel/admin/asignar-vivienda-rut/", buscar_familia_por_rut, name="buscar_familia_por_rut"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

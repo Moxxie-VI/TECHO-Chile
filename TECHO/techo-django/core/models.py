@@ -131,14 +131,71 @@ class PerfilUsuario(models.Model):
     rol = models.CharField(max_length=20, choices=(
         ("Admin","Admin"),("Trabajador","Trabajador"),("Familia","Familia")
     ))
+    
+    # IDENTIFICACIÓN (CRÍTICO PARA CHILE)
+    rut = models.CharField(
+        max_length=12, 
+        unique=True, 
+        null=True, 
+        blank=True,
+        verbose_name="RUT",
+        help_text="Formato: 12.345.678-9"
+    )
+    
+    # ASIGNACIONES
     proyecto_asignado = models.ForeignKey(Proyecto, null=True, blank=True, on_delete=models.SET_NULL)
     vivienda_asignada = models.ForeignKey(Vivienda, null=True, blank=True, on_delete=models.SET_NULL)
-    # Información personal:
-    nombre = models.CharField(max_length=100, blank=True)
-    apellido = models.CharField(max_length=100, blank=True)
-    correo_personal = models.EmailField(blank=True, null=True)
-    telefono = models.CharField(max_length=30, blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+    
+    # INFORMACIÓN PERSONAL COMPLETA
+    nombre = models.CharField(max_length=100, blank=True, verbose_name="Nombre(s)")
+    apellido = models.CharField(max_length=100, blank=True, verbose_name="Apellido(s)")
+    fecha_nacimiento = models.DateField(null=True, blank=True, verbose_name="Fecha de Nacimiento")
+    
+    # CONTACTO
+    correo_personal = models.EmailField(blank=True, null=True, verbose_name="Correo Personal")
+    telefono = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Principal")
+    telefono_secundario = models.CharField(max_length=30, blank=True, verbose_name="Teléfono Secundario")
+    
+    # DIRECCIÓN
+    direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección")
+    comuna = models.CharField(max_length=100, blank=True, verbose_name="Comuna")
+    region = models.CharField(max_length=100, blank=True, verbose_name="Región")
+    
+    # OTROS
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True, verbose_name="Foto de Perfil")
+    biografia = models.TextField(blank=True, verbose_name="Biografía", help_text="Información adicional")
+    
+    # METADATA
+    actualizado_en = models.DateTimeField(auto_now=True, verbose_name="Última Actualización")
 
     def __str__(self):
         return f"{self.user.username} ({self.rol})"
+    
+    def get_nombre_completo(self):
+        """Retorna el nombre completo del usuario"""
+        if self.nombre and self.apellido:
+            return f"{self.nombre} {self.apellido}"
+        elif self.nombre:
+            return self.nombre
+        elif self.apellido:
+            return self.apellido
+        return self.user.username
+    
+    def get_rut_formateado(self):
+        """Retorna el RUT formateado con puntos y guión"""
+        if not self.rut:
+            return "Sin RUT"
+        # Remover caracteres no numéricos excepto el dígito verificador
+        rut = self.rut.replace(".", "").replace("-", "")
+        if len(rut) < 2:
+            return self.rut
+        # Separar cuerpo y dígito verificador
+        cuerpo = rut[:-1]
+        dv = rut[-1]
+        # Formatear con puntos
+        cuerpo_formateado = "{:,}".format(int(cuerpo)).replace(",", ".")
+        return f"{cuerpo_formateado}-{dv}"
+    
+    class Meta:
+        verbose_name = "Perfil de Usuario"
+        verbose_name_plural = "Perfiles de Usuarios"

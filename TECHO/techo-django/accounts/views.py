@@ -571,20 +571,27 @@ Este es un correo automático, por favor no respondas.
                 return redirect("recuperar_password_verificar")
             
             except Exception as e:
-                # Si falla el envío, mostrar el código en consola (solo desarrollo)
-                if settings.DEBUG:
-                    print(f"⚠️ Error enviando email: {e}")
-                    print(f"🔑 Código de recuperación para {correo}: {codigo}")
+                # Registrar error en logs pero NUNCA mostrar el código
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Error enviando email de recuperación: {e}")
                 
-                # En producción, mostrar el código al usuario como fallback
-                messages.warning(request, 
-                    f"⚠️ Hubo un problema al enviar el correo. Tu código de recuperación es: {codigo}")
-                return redirect("recuperar_password_verificar")
+                # CRÍTICO: NUNCA mostrar el código en pantalla por seguridad
+                # Marcar el token como no usado para que el admin pueda ayudar
+                TokenRecuperacion.objects.filter(token=codigo).update(usado=False)
+                
+                messages.error(request, 
+                    "⚠️ Hubo un problema al enviar el correo. Por favor, contacta con soporte o intenta nuevamente más tarde.")
+                return redirect("recuperar_password_solicitar")
         else:
-            # Modo desarrollo: mostrar código en pantalla
-            messages.info(request, 
-                f"ℹ️ Email no configurado (modo desarrollo). Tu código de recuperación es: {codigo}")
-            return redirect("recuperar_password_verificar")
+            # Modo desarrollo: solo mostrar en consola del servidor, NUNCA en la vista
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Email no configurado. Código para {correo}: {codigo}")
+            
+            messages.error(request, 
+                "⚠️ El sistema de correos no está configurado. Contacta con el administrador.")
+            return redirect("recuperar_password_solicitar")
     
     return render(request, "accounts/recuperar_password_solicitar.html")
 

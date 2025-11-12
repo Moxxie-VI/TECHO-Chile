@@ -15,6 +15,14 @@
           <p class="text-muted mb-0">Información y seguimiento de tu nuevo hogar</p>
         </div>
       </div>
+      <div class="header-actions" id="tour-reportar">
+        <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-light btn-lg">
+          <i class="bi bi-pencil-square me-2"></i>Reportar Problema
+        </a>
+        <button onclick="startTour()" class="btn btn-outline-light" id="btn-tour">
+          <i class="bi bi-question-circle me-2"></i>Ver Tutorial
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -29,6 +37,49 @@
     border-radius: 20px;
     margin-bottom: 2rem;
     box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .header-actions .btn {
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+  
+  .header-actions .btn-light {
+    background: white;
+    color: #7c3aed;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-actions .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .header-actions .btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+  }
+  
+  .header-actions .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+    color: white;
   }
   
   .familia-icon {
@@ -175,15 +226,109 @@
   }
   
   .observation-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     background: #dbeafe;
     color: #0284c7;
+    flex-shrink: 0;
+  }
+  
+  .observation-icon.puerta {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .observation-icon.ventana {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+  
+  .observation-icon.bano {
+    background: #cffafe;
+    color: #0891b2;
+  }
+  
+  .observation-icon.cocina {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  
+  .observation-icon.dormitorio {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+  
+  .observation-icon.living {
+    background: #ede9fe;
+    color: #7c3aed;
+  }
+  
+  .observation-icon.piso {
+    background: #f1f5f9;
+    color: #475569;
+  }
+  
+  .observation-icon.muro {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  
+  .observation-icon.techo {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .observation-icon.electrica {
+    background: #fef9c3;
+    color: #ca8a04;
+  }
+  
+  .observation-icon.agua {
+    background: #cffafe;
+    color: #0891b2;
+  }
+  
+  .observation-icon.gas {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .observation-icon.otro {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  
+  .observation-evidences {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .observation-evidence-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .observation-evidence-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .observation-evidence-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .observation-date {
@@ -405,12 +550,62 @@
     
     {% if registros %}
       {% for r in registros %}
-      <div class="observation-item">
+      <div class="observation-item" id="tour-observaciones">
         <div class="observation-header">
           <div class="observation-title">
-            <div class="observation-icon">
+            {% if 'Puerta' in r.recinto %}
+            <div class="observation-icon puerta">
+              <i class="bi bi-door-closed"></i>
+            </div>
+            {% elif 'Ventana' in r.recinto %}
+            <div class="observation-icon ventana">
+              <i class="bi bi-window"></i>
+            </div>
+            {% elif 'Baño' in r.recinto or 'Bano' in r.recinto %}
+            <div class="observation-icon bano">
+              <i class="bi bi-droplet"></i>
+            </div>
+            {% elif 'Cocina' in r.recinto %}
+            <div class="observation-icon cocina">
+              <i class="bi bi-grid"></i>
+            </div>
+            {% elif 'Dormitorio' in r.recinto %}
+            <div class="observation-icon dormitorio">
+              <i class="bi bi-moon"></i>
+            </div>
+            {% elif 'Living' in r.recinto or 'Comedor' in r.recinto %}
+            <div class="observation-icon living">
+              <i class="bi bi-tv"></i>
+            </div>
+            {% elif 'Piso' in r.recinto %}
+            <div class="observation-icon piso">
+              <i class="bi bi-square"></i>
+            </div>
+            {% elif 'Muro' in r.recinto or 'Pared' in r.recinto %}
+            <div class="observation-icon muro">
+              <i class="bi bi-bricks"></i>
+            </div>
+            {% elif 'Techo' in r.recinto %}
+            <div class="observation-icon techo">
+              <i class="bi bi-box"></i>
+            </div>
+            {% elif 'Eléctrica' in r.recinto or 'Electrica' in r.recinto %}
+            <div class="observation-icon electrica">
+              <i class="bi bi-lightning-charge"></i>
+            </div>
+            {% elif 'Agua' in r.recinto %}
+            <div class="observation-icon agua">
+              <i class="bi bi-droplet-half"></i>
+            </div>
+            {% elif 'Gas' in r.recinto %}
+            <div class="observation-icon gas">
+              <i class="bi bi-fire"></i>
+            </div>
+            {% else %}
+            <div class="observation-icon otro">
               <i class="bi bi-info-circle"></i>
             </div>
+            {% endif %}
             <span>{{ r.recinto|default:"Observación General" }}</span>
           </div>
           <div class="observation-date">
@@ -422,6 +617,23 @@
         <div class="observation-content">
           {{ r.observacion|default:"Sin descripción disponible" }}
         </div>
+        
+        <!-- Evidencias -->
+        {% if r.evidencias.all %}
+        <div class="observation-evidences">
+          {% for evidencia in r.evidencias.all %}
+            <a href="{{ evidencia.archivo.url }}" target="_blank" class="observation-evidence-thumb" title="Ver evidencia">
+              {% if evidencia.archivo.url|slice:"-4:" == '.jpg' or evidencia.archivo.url|slice:"-4:" == '.png' or evidencia.archivo.url|slice:"-5:" == '.jpeg' or evidencia.archivo.url|slice:"-5:" == '.webp' %}
+                <img src="{{ evidencia.archivo.url }}" alt="Evidencia">
+              {% else %}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f3f4f6;">
+                  <i class="bi bi-file-earmark" style="font-size: 2rem; color: #6b7280;"></i>
+                </div>
+              {% endif %}
+            </a>
+          {% endfor %}
+        </div>
+        {% endif %}
         
         <div class="observation-meta">
           <span class="meta-badge urgency-{% if r.urgencia == 'ALTA' or r.urgencia == 'Alta' %}high{% elif r.urgencia == 'MEDIA' or r.urgencia == 'Media' %}medium{% else %}low{% endif %}">
@@ -445,7 +657,7 @@
   </div>
 
   <!-- Banner de ayuda -->
-  <div class="help-banner">
+  <div class="help-banner" id="tour-ayuda">
     <i class="bi bi-question-circle-fill help-banner-icon"></i>
     <div class="help-banner-content">
       <h4>¿Necesitas ayuda?</h4>
@@ -457,5 +669,287 @@
     </div>
   </div>
 {% endif %}
+
+<!-- Tour Guiado Interactivo -->
+<style>
+  .tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9998;
+    display: none;
+  }
+  
+  .tour-popup {
+    position: fixed;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    max-width: 400px;
+    display: none;
+  }
+  
+  [data-theme="dark"] .tour-popup {
+    background: #1f2937;
+    color: white;
+  }
+  
+  .tour-popup-header {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .tour-popup-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  
+  .tour-popup-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--fg);
+  }
+  
+  .tour-popup-step {
+    font-size: 0.9rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  
+  .tour-popup-content {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--fg);
+    margin-bottom: 1.5rem;
+  }
+  
+  .tour-popup-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+  
+  .tour-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .tour-btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+  }
+  
+  .tour-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+  
+  .tour-btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 2px solid var(--border);
+  }
+  
+  .tour-btn-secondary:hover {
+    background: var(--hover);
+  }
+  
+  .tour-highlight {
+    position: relative;
+    z-index: 9997 !important;
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.7) !important;
+    animation: pulse-highlight 2s infinite;
+  }
+  
+  @keyframes pulse-highlight {
+    0%, 100% {
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(139, 92, 246, 0.8), 0 0 0 9999px rgba(0, 0, 0, 0.7);
+    }
+  }
+</style>
+
+<div id="tour-overlay" class="tour-overlay"></div>
+<div id="tour-popup" class="tour-popup"></div>
+
+<script>
+// Tour Guiado Interactivo
+const tourSteps = [
+  {
+    target: '#tour-reportar',
+    title: '¡Bienvenido! 👋',
+    content: 'Este es tu panel de control. Aquí puedes reportar cualquier problema que encuentres en tu vivienda haciendo clic en el botón "Reportar Problema".',
+    icon: 'house-heart'
+  },
+  {
+    target: '.info-card',
+    title: 'Información de tu vivienda 🏠',
+    content: 'Aquí puedes ver toda la información sobre tu vivienda: tipo, modelo, proyecto y ubicación.',
+    icon: 'info-circle'
+  },
+  {
+    target: '#tour-observaciones',
+    title: 'Tus observaciones 📋',
+    content: 'En esta sección puedes ver todas las observaciones que has reportado, con su estado actual y las evidencias que subiste.',
+    icon: 'clipboard-check'
+  },
+  {
+    target: '#tour-ayuda',
+    title: '¿Necesitas ayuda? 💡',
+    content: 'Si tienes dudas, puedes ver el tutorial completo o contactar con nuestro equipo de soporte.',
+    icon: 'question-circle'
+  }
+];
+
+let currentStep = 0;
+
+function startTour() {
+  currentStep = 0;
+  showTourStep();
+}
+
+function showTourStep() {
+  if (currentStep >= tourSteps.length) {
+    endTour();
+    return;
+  }
+  
+  const step = tourSteps[currentStep];
+  const target = document.querySelector(step.target);
+  
+  if (!target) {
+    currentStep++;
+    showTourStep();
+    return;
+  }
+  
+  // Mostrar overlay
+  const overlay = document.getElementById('tour-overlay');
+  overlay.style.display = 'block';
+  
+  // Highlight del elemento
+  const prevHighlight = document.querySelector('.tour-highlight');
+  if (prevHighlight) {
+    prevHighlight.classList.remove('tour-highlight');
+  }
+  target.classList.add('tour-highlight');
+  target.style.position = 'relative';
+  target.style.zIndex = '9997';
+  
+  // Calcular posición del popup
+  const rect = target.getBoundingClientRect();
+  const popup = document.getElementById('tour-popup');
+  
+  // Contenido del popup
+  popup.innerHTML = `
+    <div class="tour-popup-header">
+      <div class="tour-popup-icon">
+        <i class="bi bi-${step.icon}"></i>
+      </div>
+      <div style="flex: 1;">
+        <div class="tour-popup-step">Paso ${currentStep + 1} de ${tourSteps.length}</div>
+        <h3 class="tour-popup-title">${step.title}</h3>
+      </div>
+    </div>
+    <div class="tour-popup-content">
+      ${step.content}
+    </div>
+    <div class="tour-popup-actions">
+      <button class="tour-btn tour-btn-secondary" onclick="endTour()">
+        Saltar tutorial
+      </button>
+      <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">
+        ${currentStep === tourSteps.length - 1 ? 'Finalizar' : 'Siguiente'} →
+      </button>
+    </div>
+  `;
+  
+  // Posicionar popup
+  popup.style.display = 'block';
+  
+  // Posicionar debajo del elemento si hay espacio, sino arriba
+  const popupRect = popup.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  
+  if (spaceBelow > popupRect.height + 20) {
+    // Debajo
+    popup.style.top = (rect.bottom + 20) + 'px';
+  } else if (spaceAbove > popupRect.height + 20) {
+    // Arriba
+    popup.style.top = (rect.top - popupRect.height - 20) + 'px';
+  } else {
+    // Centro vertical
+    popup.style.top = '50%';
+    popup.style.transform = 'translateY(-50%)';
+  }
+  
+  // Centro horizontal
+  popup.style.left = '50%';
+  popup.style.transform = 'translateX(-50%)';
+  
+  // Scroll suave al elemento
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function nextTourStep() {
+  currentStep++;
+  showTourStep();
+}
+
+function endTour() {
+  // Ocultar overlay y popup
+  document.getElementById('tour-overlay').style.display = 'none';
+  document.getElementById('tour-popup').style.display = 'none';
+  
+  // Remover highlights
+  const highlight = document.querySelector('.tour-highlight');
+  if (highlight) {
+    highlight.classList.remove('tour-highlight');
+    highlight.style.zIndex = '';
+  }
+  
+  // Guardar en localStorage que ya vio el tour
+  localStorage.setItem('familia_tour_completed', 'true');
+}
+
+// Mostrar tour automáticamente si es la primera vez
+window.addEventListener('load', function() {
+  const tourCompleted = localStorage.getItem('familia_tour_completed');
+  if (!tourCompleted && document.querySelector('#tour-reportar')) {
+    // Esperar 1 segundo antes de mostrar el tour
+    setTimeout(startTour, 1000);
+  }
+});
+
+// Cerrar tour con ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    endTour();
+  }
+});
+</script>
 {% endblock %}
 

@@ -624,3 +624,186 @@ def eliminar_constructora(request, constructora_id):
         "constructora": constructora,
         "proyectos_count": proyectos_count,
     })
+
+
+# =============================================================================
+# FORMULARIO DE OBSERVACIONES PARA FAMILIAS
+# =============================================================================
+
+@login_required
+def reportar_observacion_familia(request):
+    """Vista para que las familias reporten observaciones de su vivienda"""
+    from .forms import ObservacionFamiliaForm
+    from django.contrib import messages
+    
+    perfil = request.user.perfil
+    
+    # Solo las familias pueden acceder
+    if perfil.rol != "Familia":
+        messages.error(request, "Esta función es solo para familias")
+        return redirect("dashboard")
+    
+    # Verificar que la familia tenga vivienda asignada
+    if not perfil.vivienda_asignada:
+        messages.error(request, "Tu vivienda aún no ha sido vinculada. Contacta con el administrador.")
+        return redirect("dashboard")
+    
+    vivienda = perfil.vivienda_asignada
+    
+    if request.method == "POST":
+        form = ObservacionFamiliaForm(request.POST, request.FILES)
+        
+        if form.is_valid():
+            # Obtener la ficha de inmueble
+            try:
+                ficha = FichaInmueble.objects.get(
+                    proyecto=vivienda.proyecto,
+                    vivienda=vivienda
+                )
+            except FichaInmueble.DoesNotExist:
+                # Crear la ficha si no existe
+                ficha = FichaInmueble.objects.create(
+                    proyecto=vivienda.proyecto,
+                    vivienda=vivienda
+                )
+            
+            # Crear el registro de observación
+            registro = form.save(commit=False)
+            registro.proyecto = vivienda.proyecto
+            registro.ficha = ficha
+            registro.reportante = request.user
+            registro.save()
+            
+            # Procesar evidencias (archivos múltiples)
+            archivos = request.FILES.getlist('evidencias')
+            evidencias_creadas = 0
+            
+            for archivo in archivos[:5]:  # Máximo 5 archivos
+                if archivo.size <= 10 * 1024 * 1024:  # Máximo 10 MB por archivo
+                    Evidencia.objects.create(
+                        registro=registro,
+                        archivo=archivo,
+                        comentario=f"Evidencia subida por {request.user.username}",
+                        subido_por=request.user
+                    )
+                    evidencias_creadas += 1
+            
+            # Mensaje de éxito
+            mensaje = f"✅ Tu observación sobre '{registro.recinto}' ha sido registrada exitosamente."
+            if evidencias_creadas > 0:
+                mensaje += f" Se guardaron {evidencias_creadas} archivo(s) de evidencia."
+            
+            messages.success(request, mensaje)
+            return redirect("dashboard")
+    else:
+        form = ObservacionFamiliaForm()
+    
+    context = {
+        'rol': perfil.rol,
+        'form': form,
+        'vivienda': vivienda,
+    }
+    
+    return render(request, "core/reportar_observacion_familia.html", context)
+
+
+# =============================================================================
+# ASIGNACIÓN DE VIVIENDAS POR RUT
+# =============================================================================
+
+@login_required
+@require_role("Admin")
+def buscar_familia_por_rut(request):
+    """Vista para buscar familias por RUT y asignar viviendas"""
+    from .utils import validar_rut
+    
+    perfil = request.user.perfil
+    familias = []
+    rut_busqueda = None
+    viviendas_disponibles = Vivienda.objects.select_related('proyecto').filter(
+        perfilusuario__isnull=True  # Viviendas sin familia asignada
+    ).order_by('proyecto__codigo')
+    
+    if request.method == "POST":
+        accion = request.POST.get('accion')
+        
+        if accion == 'buscar':
+            rut_busqueda = request.POST.get('rut', '').strip()
+            
+            if rut_busqueda:
+                # Validar RUT
+                es_valido, rut_formateado = validar_rut(rut_busqueda)
+                
+                if es_valido:
+                    # Buscar por RUT exacto (limpio)
+                    from .utils import limpiar_rut
+                    rut_limpio = limpiar_rut(rut_busqueda)
+                    
+                    familias = PerfilUsuario.objects.filter(
+                        rol="Familia",
+                        rut__icontains=rut_limpio[:8]  # Buscar por los primeros 8 dígitos
+                    ).select_related('user', 'vivienda_asignada', 'vivienda_asignada__proyecto')
+                    
+                    if not familias.exists():
+                        messages.warning(request, 
+                            f"No se encontraron familias con RUT {rut_formateado}")
+                    else:
+                        messages.success(request, 
+                            f"Se encontraron {familias.count()} familia(s) con RUT similar a {rut_formateado}")
+                else:
+                    messages.error(request, "El RUT ingresado no es válido")
+        
+        elif accion == 'asignar':
+            perfil_id = request.POST.get('perfil_id')
+            vivienda_id = request.POST.get('vivienda_id')
+            
+            try:
+                perfil_familia = PerfilUsuario.objects.get(id=perfil_id, rol="Familia")
+                vivienda = Vivienda.objects.get(id=vivienda_id)
+                
+                # Verificar que la vivienda no esté asignada
+                if PerfilUsuario.objects.filter(vivienda_asignada=vivienda).exclude(id=perfil_id).exists():
+                    messages.error(request, 
+                        f"La vivienda ya está asignada a otra familia")
+                else:
+                    # Asignar vivienda
+                    perfil_familia.vivienda_asignada = vivienda
+                    perfil_familia.save()
+                    
+                    messages.success(request, 
+                        f"✅ Vivienda {vivienda.proyecto.codigo}-{vivienda.id} asignada exitosamente a {perfil_familia.get_nombre_completo()}")
+                    
+                    return redirect('buscar_familia_por_rut')
+            
+            except PerfilUsuario.DoesNotExist:
+                messages.error(request, "Familia no encontrada")
+            except Vivienda.DoesNotExist:
+                messages.error(request, "Vivienda no encontrada")
+        
+        elif accion == 'desasignar':
+            perfil_id = request.POST.get('perfil_id')
+            
+            try:
+                perfil_familia = PerfilUsuario.objects.get(id=perfil_id, rol="Familia")
+                vivienda_anterior = perfil_familia.vivienda_asignada
+                
+                perfil_familia.vivienda_asignada = None
+                perfil_familia.save()
+                
+                messages.success(request, 
+                    f"✅ Vivienda {vivienda_anterior.proyecto.codigo}-{vivienda_anterior.id} desasignada de {perfil_familia.get_nombre_completo()}")
+                
+                return redirect('buscar_familia_por_rut')
+            
+            except PerfilUsuario.DoesNotExist:
+                messages.error(request, "Familia no encontrada")
+    
+    context = {
+        'rol': perfil.rol,
+        'familias': familias,
+        'rut_busqueda': rut_busqueda,
+        'viviendas_disponibles': viviendas_disponibles,
+        'total_viviendas_disponibles': viviendas_disponibles.count(),
+    }
+    
+    return render(request, "core/buscar_familia_rut.html", context)
