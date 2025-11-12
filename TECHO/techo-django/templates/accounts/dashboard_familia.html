@@ -1,898 +1,1063 @@
 {% extends "layout/base.html" %}
 {% load static %}
-
-{% block title %}Mi Hogar · TECHO{% endblock %}
-
-{% block extra_css %}
-<style>
-/* Variables */
-:root {
-  --familia-primary: #f97316;
-  --familia-secondary: #ea580c;
-  --familia-accent: #dc2626;
-  --familia-light: #ffedd5;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --info: #3b82f6;
-}
-
-/* Hero Familia - Super Amigable */
-.familia-hero {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
-  color: white;
-  padding: 3rem 2rem;
-  border-radius: 30px;
-  margin-bottom: 2.5rem;
-  box-shadow: 0 20px 60px rgba(249, 115, 22, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.familia-hero::before {
-  content: '🏠';
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  font-size: 350px;
-  opacity: 0.08;
-  transform: rotate(-12deg);
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(-12deg); }
-  50% { transform: translateY(-20px) rotate(-12deg); }
-}
-
-.familia-hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-greeting {
-  font-size: 2.75rem;
-  font-weight: 900;
-  margin-bottom: 0.75rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  line-height: 1.2;
-}
-
-.hero-subtitle {
-  font-size: 1.3rem;
-  opacity: 0.95;
-  font-weight: 500;
-  margin-bottom: 2rem;
-}
-
-.hero-actions {
-  display: flex;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-}
-
-.btn-hero {
-  padding: 1rem 2rem;
-  border-radius: 16px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-}
-
-.btn-hero-primary {
-  background: white;
-  color: var(--familia-primary);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-}
-
-.btn-hero-primary:hover {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
-  color: var(--familia-secondary);
-}
-
-.btn-hero-secondary {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-}
-
-.btn-hero-secondary:hover {
-  background: rgba(255, 255, 255, 0.35);
-  border-color: white;
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Info Cards Grid */
-.info-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.info-card {
-  background: var(--card);
-  border-radius: 24px;
-  padding: 2rem;
-  border: 3px solid var(--border);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.info-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, var(--card-color) 0%, transparent 100%);
-}
-
-.info-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
-  border-color: var(--card-color);
-}
-
-.info-card-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  background: var(--card-bg);
-  color: var(--card-color);
-}
-
-.info-card-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 0.75rem;
-  color: var(--fg);
-}
-
-.info-card-content {
-  color: var(--muted);
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
-.info-card-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--card-color);
-  margin-bottom: 0.5rem;
-}
-
-/* Quick Tips Section */
-.quick-tips {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
-  border: 3px solid #3b82f6;
-  border-radius: 24px;
-  padding: 2.5rem;
-  margin-bottom: 2.5rem;
-}
-
-[data-theme="dark"] .quick-tips {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
-}
-
-.tips-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.tips-icon {
-  width: 64px;
-  height: 64px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-}
-
-.tips-title {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: #1e40af;
-  margin: 0;
-}
-
-[data-theme="dark"] .tips-title {
-  color: #60a5fa;
-}
-
-.tips-list {
-  display: grid;
-  gap: 1rem;
-}
-
-.tip-item {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: start;
-  gap: 1rem;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-[data-theme="dark"] .tip-item {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(59, 130, 246, 0.2);
-}
-
-.tip-item:hover {
-  transform: translateX(8px);
-  border-color: #3b82f6;
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
-}
-
-.tip-number {
-  width: 40px;
-  height: 40px;
-  background: #3b82f6;
-  color: white;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-.tip-content {
-  flex: 1;
-}
-
-.tip-text {
-  color: #1e40af;
-  font-weight: 600;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  margin: 0;
-}
-
-[data-theme="dark"] .tip-text {
-  color: #93c5fd;
-}
-
-/* Mis Observaciones */
-.observaciones-section {
-  background: var(--card);
-  border-radius: 24px;
-  padding: 2.5rem;
-  border: 3px solid var(--border);
-  margin-bottom: 2.5rem;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.section-title {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--fg);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.section-title i {
-  color: var(--familia-primary);
-}
-
-.observacion-card {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 20px;
-  padding: 1.75rem;
-  margin-bottom: 1.25rem;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.observacion-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 6px;
-  height: 100%;
-  background: var(--urgencia-color);
-}
-
-.observacion-card:hover {
-  transform: translateX(8px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-}
-
-.observacion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 1rem;
-}
-
-.observacion-recinto {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--fg);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.estado-badge {
-  padding: 0.6rem 1.25rem;
-  border-radius: 25px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.estado-pendiente { background: #fef3c7; color: #92400e; }
-.estado-en-progreso { background: #dbeafe; color: #1e40af; }
-.estado-resuelto { background: #d1fae5; color: #065f46; }
-
-.observacion-text {
-  color: var(--muted);
-  font-size: 1.05rem;
-  line-height: 1.7;
-  margin-bottom: 1rem;
-}
-
-.observacion-meta {
-  display: flex;
-  gap: 1.5rem;
-  flex-wrap: wrap;
-  font-size: 0.95rem;
-  color: var(--muted);
-}
-
-.meta-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.evidencias-preview {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.evidencia-thumb {
-  width: 80px;
-  height: 80px;
-  border-radius: 12px;
-  object-fit: cover;
-  border: 2px solid var(--border);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.evidencia-thumb:hover {
-  transform: scale(1.1);
-  border-color: var(--familia-primary);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Empty State */
-.empty-state {
-  text-align: center;
-  padding: 5rem 2rem;
-  color: var(--muted);
-}
-
-.empty-state i {
-  font-size: 6rem;
-  opacity: 0.2;
-  margin-bottom: 2rem;
-}
-
-.empty-state h3 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
-
-.empty-state p {
-  font-size: 1.15rem;
-  margin-bottom: 2rem;
-}
-
-/* Tour Popup - Mejorado */
-.tour-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  z-index: 9998;
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
-
-.tour-overlay.active {
-  display: block;
-}
-
-.tour-popup {
-  position: fixed;
-  background: white;
-  border-radius: 28px;
-  padding: 2.5rem;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-  z-index: 9999;
-  min-width: 400px;
-  max-width: 500px;
-  transform: scale(0.9);
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-[data-theme="dark"] .tour-popup {
-  background: #1a1a1a;
-  border: 2px solid #333;
-}
-
-.tour-popup.active {
-  transform: scale(1);
-  opacity: 1;
-}
-
-.tour-popup-icon {
-  width: 90px;
-  height: 90px;
-  background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
-  border-radius: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  margin: 0 auto 1.5rem;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-.tour-popup h3 {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--fg);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.tour-popup p {
-  font-size: 1.1rem;
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.tour-progress {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.progress-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: #e5e7eb;
-  transition: all 0.3s ease;
-}
-
-.progress-dot.active {
-  background: var(--familia-primary);
-  width: 32px;
-  border-radius: 6px;
-}
-
-.tour-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.tour-btn {
-  flex: 1;
-  padding: 1rem;
-  border-radius: 14px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.tour-btn-primary {
-  background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
-  color: white;
-}
-
-.tour-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
-}
-
-.tour-btn-secondary {
-  background: var(--border);
-  color: var(--muted);
-}
-
-.tour-btn-secondary:hover {
-  background: var(--hover);
-  color: var(--fg);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero-greeting {
-    font-size: 2rem;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.1rem;
-  }
-  
-  .info-cards {
-    grid-template-columns: 1fr;
-  }
-  
-  .tour-popup {
-    min-width: 90%;
-    max-width: 90%;
-    padding: 2rem;
-  }
-  
-  .hero-actions {
-    width: 100%;
-  }
-  
-  .btn-hero {
-    flex: 1;
-    justify-content: center;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-</style>
+{% block title %}Mi Vivienda · TECHO{% endblock %}
+
+{% block page_intro %}
+<div class="container-fluid pt-4">
+  <div class="dashboard-header familia-header">
+    <div class="header-content">
+      <div class="d-flex align-items-center gap-3">
+        <div class="header-icon familia-icon">
+          <i class="bi bi-house-heart"></i>
+        </div>
+        <div>
+          <h1 class="mb-1">Mi Vivienda</h1>
+          <p class="text-muted mb-0">Información y seguimiento de tu nuevo hogar</p>
+        </div>
+      </div>
+      <div class="header-actions" id="tour-reportar">
+        <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-light btn-lg">
+          <i class="bi bi-pencil-square me-2"></i>Reportar Problema
+        </a>
+        <button onclick="startTour()" class="btn btn-outline-light" id="btn-tour">
+          <i class="bi bi-question-circle me-2"></i>Ver Tutorial
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<!-- Hero Familia -->
-<div class="familia-hero">
-  <div class="familia-hero-content">
-    <h1 class="hero-greeting">
-      ¡Hola, {{ nombre_usuario }}! 👋
-    </h1>
-    <p class="hero-subtitle">
-      ¡Bienvenido a tu nuevo hogar TECHO! Aquí puedes gestionar todo lo relacionado con tu vivienda.
-    </p>
+<style>
+  .familia-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.2);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .header-actions .btn {
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+  
+  .header-actions .btn-light {
+    background: white;
+    color: #7c3aed;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-actions .btn-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .header-actions .btn-outline-light {
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: white;
+  }
+  
+  .header-actions .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+    color: white;
+  }
+  
+  .familia-icon {
+    width: 72px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+  }
+  
+  .welcome-card {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .welcome-card i {
+    font-size: 3rem;
+    color: #d97706;
+    margin-bottom: 1rem;
+  }
+  
+  .welcome-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #78350f;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-card p {
+    color: #92400e;
+    font-size: 1.05rem;
+    margin: 0;
+  }
+  
+  .info-card {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .info-card-header {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.12) 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border);
+  }
+  
+  [data-theme="dark"] .info-card-header {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  }
+  
+  .info-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--fg);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .info-card-title i {
+    font-size: 1.75rem;
+    color: #8b5cf6;
+  }
+  
+  .info-card-body {
+    padding: 2rem;
+  }
+  
+  .info-row {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1rem;
+    padding: 1.25rem 0;
+    border-bottom: 2px solid var(--border);
+    align-items: start;
+  }
+  
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  
+  .info-label {
+    font-weight: 700;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  
+  .info-value {
+    font-size: 1.1rem;
+    color: var(--fg);
+    font-weight: 600;
+  }
+  
+  .observations-list {
+    background: var(--card);
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  
+  .observation-item {
+    padding: 1.75rem 2rem;
+    border-bottom: 2px solid var(--border);
+    transition: background 0.2s;
+  }
+  
+  .observation-item:hover {
+    background: rgba(139, 92, 246, 0.05);
+  }
+  
+  .observation-item:last-child {
+    border-bottom: none;
+  }
+  
+  .observation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .observation-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--fg);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  
+  .observation-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: #dbeafe;
+    color: #0284c7;
+    flex-shrink: 0;
+  }
+  
+  .observation-icon.puerta {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .observation-icon.ventana {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+  
+  .observation-icon.bano {
+    background: #cffafe;
+    color: #0891b2;
+  }
+  
+  .observation-icon.cocina {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  
+  .observation-icon.dormitorio {
+    background: #e0f2fe;
+    color: #0284c7;
+  }
+  
+  .observation-icon.living {
+    background: #ede9fe;
+    color: #7c3aed;
+  }
+  
+  .observation-icon.piso {
+    background: #f1f5f9;
+    color: #475569;
+  }
+  
+  .observation-icon.muro {
+    background: #fce7f3;
+    color: #be185d;
+  }
+  
+  .observation-icon.techo {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .observation-icon.electrica {
+    background: #fef9c3;
+    color: #ca8a04;
+  }
+  
+  .observation-icon.agua {
+    background: #cffafe;
+    color: #0891b2;
+  }
+  
+  .observation-icon.gas {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+  
+  .observation-icon.otro {
+    background: #f3f4f6;
+    color: #6b7280;
+  }
+  
+  .observation-evidences {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .observation-evidence-thumb {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .observation-evidence-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .observation-evidence-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .observation-date {
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  
+  .observation-content {
+    color: var(--fg);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .observation-meta {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .meta-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .meta-badge.urgency-high {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .meta-badge.urgency-medium {
+    background: #fef3c7;
+    color: #d97706;
+  }
+  
+  .meta-badge.urgency-low {
+    background: #dbeafe;
+    color: #0369a1;
+  }
+  
+  .meta-badge.status {
+    background: #dcfce7;
+    color: #166534;
+  }
+  
+  .empty-state-familia {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--muted);
+  }
+  
+  .empty-state-familia i {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+    color: #8b5cf6;
+  }
+  
+  .empty-state-familia h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--fg);
+  }
+  
+  .empty-state-familia p {
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+  
+  .help-banner {
+    background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+    border: 2px solid #8b5cf6;
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    margin-top: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  [data-theme="dark"] .help-banner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
+  }
+  
+  .help-banner-icon {
+    font-size: 3rem;
+    color: #7c3aed;
+    flex-shrink: 0;
+  }
+  
+  [data-theme="dark"] .help-banner-icon {
+    color: #a78bfa;
+  }
+  
+  .help-banner-content h4 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #5b21b6;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  [data-theme="dark"] .help-banner-content h4 {
+    color: #c4b5fd;
+  }
+  
+  .help-banner-content p {
+    margin: 0 0 1rem 0;
+    color: #6d28d9;
+    font-size: 1rem;
+  }
+  
+  [data-theme="dark"] .help-banner-content p {
+    color: #c4b5fd;
+  }
+  
+  .help-banner-content a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #8b5cf6;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  
+  .help-banner-content a:hover {
+    background: #7c3aed;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  }
+  
+  @media (max-width: 768px) {
+    .info-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
     
-    <div class="hero-actions">
-      <a href="{% url 'reportar_observacion_familia' %}" class="btn-hero btn-hero-primary">
-        <i class="bi bi-exclamation-circle-fill"></i>
-        <span>Reportar un Problema</span>
-      </a>
-      <button onclick="startTour()" class="btn-hero btn-hero-secondary">
-        <i class="bi bi-question-circle"></i>
-        <span>¿Cómo funciona?</span>
-      </button>
-    </div>
-  </div>
-</div>
+    .observation-header {
+      flex-direction: column;
+    }
+    
+    .help-banner {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+</style>
 
-<!-- Info Cards -->
-<div class="info-cards">
-  <!-- Mi Vivienda -->
-  <div class="info-card" style="--card-color: #f97316; --card-bg: #ffedd5;">
-    <div class="info-card-icon">
-      <i class="bi bi-house-door-fill"></i>
-    </div>
-    <h3 class="info-card-title">Mi Vivienda</h3>
-    <div class="info-card-content">
-      {% if vivienda %}
-        <p><strong>Dirección:</strong> {{ vivienda.direccion|default:"No especificada" }}</p>
-        <p><strong>Comuna:</strong> {{ vivienda.comuna|default:"No especificada" }}</p>
-        <p><strong>Región:</strong> {{ vivienda.region|default:"No especificada" }}</p>
-      {% else %}
-        <p>Aún no tienes una vivienda asignada. Contacta con tu administrador.</p>
-      {% endif %}
-    </div>
+{% if mensaje %}
+  <div class="welcome-card">
+    <i class="bi bi-exclamation-circle"></i>
+    <h2>Información Importante</h2>
+    <p>{{ mensaje }}</p>
   </div>
-  
-  <!-- Mis Observaciones -->
-  <div class="info-card" style="--card-color: #3b82f6; --card-bg: #dbeafe;">
-    <div class="info-card-icon">
-      <i class="bi bi-clipboard-check"></i>
-    </div>
-    <h3 class="info-card-title">Mis Reportes</h3>
-    <div class="info-card-value">{{ observaciones|length }}</div>
-    <div class="info-card-content">
-      {% if observaciones %}
-        <p>Tienes {{ observaciones|length }} reporte(s) registrado(s)</p>
-      {% else %}
-        <p>No has reportado ningún problema aún</p>
-      {% endif %}
-    </div>
-  </div>
-  
-  <!-- Mi Proyecto -->
-  <div class="info-card" style="--card-color: #10b981; --card-bg: #d1fae5;">
-    <div class="info-card-icon">
-      <i class="bi bi-building"></i>
-    </div>
-    <h3 class="info-card-title">Mi Proyecto</h3>
-    <div class="info-card-content">
-      {% if proyecto %}
-        <p><strong>Nombre:</strong> {{ proyecto.nombre }}</p>
-        <p><strong>Código:</strong> {{ proyecto.codigo }}</p>
-        <p><strong>Ubicación:</strong> {{ proyecto.ubicacion|default:"No especificada" }}</p>
-      {% else %}
-        <p>No tienes proyecto asignado aún</p>
-      {% endif %}
-    </div>
-  </div>
-</div>
-
-<!-- Consejos Rápidos -->
-<div class="quick-tips">
-  <div class="tips-header">
-    <div class="tips-icon">
-      <i class="bi bi-lightbulb-fill"></i>
-    </div>
-    <h2 class="tips-title">💡 Consejos para el cuidado de tu hogar</h2>
-  </div>
-  
-  <div class="tips-list">
-    <div class="tip-item">
-      <div class="tip-number">1</div>
-      <div class="tip-content">
-        <p class="tip-text">
-          <strong>Revisa regularmente:</strong> Inspecciona puertas, ventanas y techos cada mes para detectar problemas temprano.
-        </p>
+{% else %}
+  <!-- Información de la vivienda -->
+  {% if viviendas %}
+    {% with v=viviendas.0 %}
+    <div class="info-card">
+      <div class="info-card-header">
+        <h2 class="info-card-title">
+          <i class="bi bi-house-door"></i>
+          Información de Tu Vivienda
+        </h2>
       </div>
-    </div>
-    
-    <div class="tip-item">
-      <div class="tip-number">2</div>
-      <div class="tip-content">
-        <p class="tip-text">
-          <strong>Reporta rápido:</strong> Si encuentras algún problema, repórtalo inmediatamente para una solución más rápida.
-        </p>
-      </div>
-    </div>
-    
-    <div class="tip-item">
-      <div class="tip-number">3</div>
-      <div class="tip-content">
-        <p class="tip-text">
-          <strong>Toma fotos:</strong> Siempre adjunta fotografías claras cuando reportes un problema. ¡Nos ayuda mucho!
-        </p>
-      </div>
-    </div>
-    
-    <div class="tip-item">
-      <div class="tip-number">4</div>
-      <div class="tip-content">
-        <p class="tip-text">
-          <strong>Mantén contacto:</strong> Revisa regularmente el estado de tus reportes y mantente en comunicación con tu trabajador asignado.
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Mis Observaciones -->
-<div class="observaciones-section">
-  <div class="section-header">
-    <h2 class="section-title">
-      <i class="bi bi-list-check"></i>
-      Mis Reportes
-    </h2>
-    <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); color: white; border-radius: 16px; font-weight: 700;">
-      <i class="bi bi-plus-circle me-2"></i>Nuevo Reporte
-    </a>
-  </div>
-  
-  {% if observaciones %}
-    {% for obs in observaciones %}
-      <div class="observacion-card" style="--urgencia-color: 
-        {% if obs.urgencia == 'ALTA' %}#ef4444
-        {% elif obs.urgencia == 'MEDIA' %}#f59e0b
-        {% else %}#10b981{% endif %}">
-        
-        <div class="observacion-header">
-          <div class="observacion-recinto">
-            <i class="bi bi-{% if 'puerta' in obs.recinto|lower %}door-closed{% elif 'ventana' in obs.recinto|lower %}window{% elif 'techo' in obs.recinto|lower %}house-door{% else %}tools{% endif %}"></i>
-            {{ obs.recinto }}
+      <div class="info-card-body">
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-building me-2"></i>Tipo de Vivienda:
           </div>
-          <span class="estado-badge estado-{{ obs.estado|lower|cut:' '|cut:'_' }}">
-            {{ obs.get_estado_display|default:obs.estado }}
+          <div class="info-value">{{ v.tipo|default:"No especificado" }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-grid me-2"></i>Modelo:
+          </div>
+          <div class="info-value">{{ v.modelo|default:"No especificado" }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-diagram-3 me-2"></i>Proyecto:
+          </div>
+          <div class="info-value">{{ v.proyecto.nombre }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-tag me-2"></i>Código Proyecto:
+          </div>
+          <div class="info-value">{{ v.proyecto.codigo }}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-geo-alt me-2"></i>Ubicación:
+          </div>
+          <div class="info-value">{{ v.proyecto.comuna|default:"No especificado" }}</div>
+        </div>
+      </div>
+    </div>
+    {% endwith %}
+  {% endif %}
+
+  <!-- Observaciones -->
+  <div class="observations-list">
+    <div class="info-card-header">
+      <h2 class="info-card-title">
+        <i class="bi bi-clipboard-check"></i>
+        Mis Observaciones
+      </h2>
+    </div>
+    
+    {% if registros %}
+      {% for r in registros %}
+      <div class="observation-item" id="tour-observaciones">
+        <div class="observation-header">
+          <div class="observation-title">
+            {% if 'Puerta' in r.recinto %}
+            <div class="observation-icon puerta">
+              <i class="bi bi-door-closed"></i>
+            </div>
+            {% elif 'Ventana' in r.recinto %}
+            <div class="observation-icon ventana">
+              <i class="bi bi-window"></i>
+            </div>
+            {% elif 'Baño' in r.recinto or 'Bano' in r.recinto %}
+            <div class="observation-icon bano">
+              <i class="bi bi-droplet"></i>
+            </div>
+            {% elif 'Cocina' in r.recinto %}
+            <div class="observation-icon cocina">
+              <i class="bi bi-grid"></i>
+            </div>
+            {% elif 'Dormitorio' in r.recinto %}
+            <div class="observation-icon dormitorio">
+              <i class="bi bi-moon"></i>
+            </div>
+            {% elif 'Living' in r.recinto or 'Comedor' in r.recinto %}
+            <div class="observation-icon living">
+              <i class="bi bi-tv"></i>
+            </div>
+            {% elif 'Piso' in r.recinto %}
+            <div class="observation-icon piso">
+              <i class="bi bi-square"></i>
+            </div>
+            {% elif 'Muro' in r.recinto or 'Pared' in r.recinto %}
+            <div class="observation-icon muro">
+              <i class="bi bi-bricks"></i>
+            </div>
+            {% elif 'Techo' in r.recinto %}
+            <div class="observation-icon techo">
+              <i class="bi bi-box"></i>
+            </div>
+            {% elif 'Eléctrica' in r.recinto or 'Electrica' in r.recinto %}
+            <div class="observation-icon electrica">
+              <i class="bi bi-lightning-charge"></i>
+            </div>
+            {% elif 'Agua' in r.recinto %}
+            <div class="observation-icon agua">
+              <i class="bi bi-droplet-half"></i>
+            </div>
+            {% elif 'Gas' in r.recinto %}
+            <div class="observation-icon gas">
+              <i class="bi bi-fire"></i>
+            </div>
+            {% else %}
+            <div class="observation-icon otro">
+              <i class="bi bi-info-circle"></i>
+            </div>
+            {% endif %}
+            <span>{{ r.recinto|default:"Observación General" }}</span>
+          </div>
+          <div class="observation-date">
+            <i class="bi bi-calendar3 me-1"></i>
+            {{ r.creado_en|date:"d/m/Y H:i" }}
+          </div>
+        </div>
+        
+        <div class="observation-content">
+          {{ r.observacion|default:"Sin descripción disponible" }}
+        </div>
+        
+        <!-- Evidencias -->
+        {% if r.evidencias.all %}
+        <div class="observation-evidences">
+          {% for evidencia in r.evidencias.all %}
+            <a href="{{ evidencia.archivo.url }}" target="_blank" class="observation-evidence-thumb" title="Ver evidencia">
+              {% if evidencia.archivo.url|slice:"-4:" == '.jpg' or evidencia.archivo.url|slice:"-4:" == '.png' or evidencia.archivo.url|slice:"-5:" == '.jpeg' or evidencia.archivo.url|slice:"-5:" == '.webp' %}
+                <img src="{{ evidencia.archivo.url }}" alt="Evidencia">
+              {% else %}
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #f3f4f6;">
+                  <i class="bi bi-file-earmark" style="font-size: 2rem; color: #6b7280;"></i>
+                </div>
+              {% endif %}
+            </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <div class="observation-meta">
+          <span class="meta-badge urgency-{% if r.urgencia == 'ALTA' or r.urgencia == 'Alta' %}high{% elif r.urgencia == 'MEDIA' or r.urgencia == 'Media' %}medium{% else %}low{% endif %}">
+            <i class="bi bi-exclamation-triangle"></i>
+            Urgencia: {{ r.urgencia|upper }}
+          </span>
+          <span class="meta-badge status">
+            <i class="bi bi-check-circle"></i>
+            Estado: {{ r.estado|default:"En proceso" }}
           </span>
         </div>
-        
-        <p class="observacion-text">{{ obs.observacion }}</p>
-        
-        <div class="observacion-meta">
-          <div class="meta-item">
-            <i class="bi bi-{% if obs.urgencia == 'ALTA' %}exclamation-triangle-fill{% elif obs.urgencia == 'MEDIA' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
-            <span>{{ obs.get_urgencia_display|default:obs.urgencia }}</span>
-          </div>
-          <div class="meta-item">
-            <i class="bi bi-clock"></i>
-            <span>{{ obs.creado_en|timesince }} atrás</span>
-          </div>
-          {% if obs.evidencia_set.count > 0 %}
-            <div class="meta-item">
-              <i class="bi bi-paperclip"></i>
-              <span>{{ obs.evidencia_set.count }} archivo(s)</span>
-            </div>
-          {% endif %}
-        </div>
-        
-        {% if obs.evidencia_set.all %}
-          <div class="evidencias-preview">
-            {% for ev in obs.evidencia_set.all|slice:":4" %}
-              {% if ev.archivo %}
-                <img src="{{ ev.archivo.url }}" class="evidencia-thumb" alt="Evidencia" onclick="window.open('{{ ev.archivo.url }}', '_blank')">
-              {% endif %}
-            {% endfor %}
-          </div>
-        {% endif %}
       </div>
-    {% endfor %}
-  {% else %}
-    <div class="empty-state">
-      <i class="bi bi-inbox"></i>
-      <h3>No tienes reportes aún</h3>
-      <p>Cuando encuentres algún problema en tu vivienda, repórtalo aquí</p>
-      <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); color: white; border-radius: 16px; font-weight: 700; padding: 1rem 2rem;">
-        <i class="bi bi-plus-circle me-2"></i>Crear mi primer reporte
+      {% endfor %}
+    {% else %}
+      <div class="empty-state-familia">
+        <i class="bi bi-emoji-smile"></i>
+        <h3>¡Todo en orden!</h3>
+        <p>No tienes observaciones registradas en este momento</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Banner de ayuda -->
+  <div class="help-banner" id="tour-ayuda">
+    <i class="bi bi-question-circle-fill help-banner-icon"></i>
+    <div class="help-banner-content">
+      <h4>¿Necesitas ayuda?</h4>
+      <p>Tenemos tutoriales y guías para ayudarte a usar la plataforma de manera sencilla</p>
+      <a href="/tutorial/">
+        <i class="bi bi-book"></i>
+        Ver Tutorial
       </a>
     </div>
-  {% endif %}
-</div>
-
-<!-- Tour Overlay -->
-<div class="tour-overlay" id="tourOverlay"></div>
-
-<!-- Tour Popup -->
-<div class="tour-popup" id="tourPopup">
-  <div class="tour-popup-icon" id="tourIcon">
-    👋
   </div>
-  <h3 id="tourTitle">¡Bienvenido a tu hogar!</h3>
-  <p id="tourText">Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento.</p>
-  
-  <div class="tour-progress">
-    <div class="progress-dot active" id="dot1"></div>
-    <div class="progress-dot" id="dot2"></div>
-    <div class="progress-dot" id="dot3"></div>
-    <div class="progress-dot" id="dot4"></div>
-  </div>
-  
-  <div class="tour-actions">
-    <button class="tour-btn tour-btn-secondary" onclick="closeTour()">Saltar</button>
-    <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">Siguiente</button>
-  </div>
-</div>
+{% endif %}
 
-<script>
-let currentTourStep = 0;
-
-const tourSteps = [
-  {
-    icon: '👋',
-    title: '¡Bienvenido a tu hogar!',
-    text: 'Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento de tu vivienda TECHO.'
-  },
-  {
-    icon: '📝',
-    title: 'Reporta Problemas Fácilmente',
-    text: 'Si encuentras algún problema en tu casa (goteras, puertas, ventanas), usa el botón "Reportar un Problema" para notificarnos. ¡Es súper fácil!'
-  },
-  {
-    icon: '📸',
-    title: 'Adjunta Fotos',
-    text: 'Cuando reportes un problema, puedes subir fotos. Esto nos ayuda a entender mejor la situación y resolverla más rápido.'
-  },
-  {
-    icon: '✅',
-    title: 'Haz Seguimiento',
-    text: 'En la sección "Mis Reportes" puedes ver el estado de todos tus reportes: pendientes, en progreso o resueltos. ¡Siempre estarás informado!'
+<!-- Tour Guiado Interactivo -->
+<style>
+  .tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    z-index: 9998;
+    display: none;
+    animation: fadeIn 0.3s ease-out;
   }
-];
-
-function startTour() {
-  currentTourStep = 0;
-  document.getElementById('tourOverlay').classList.add('active');
-  document.getElementById('tourPopup').classList.add('active');
-  updateTourStep();
-}
-
-function closeTour() {
-  document.getElementById('tourOverlay').classList.remove('active');
-  document.getElementById('tourPopup').classList.remove('active');
-}
-
-function nextTourStep() {
-  if (currentTourStep < tourSteps.length - 1) {
-    currentTourStep++;
-    updateTourStep();
-  } else {
-    closeTour();
-  }
-}
-
-function updateTourStep() {
-  const step = tourSteps[currentTourStep];
-  document.getElementById('tourIcon').textContent = step.icon;
-  document.getElementById('tourTitle').textContent = step.title;
-  document.getElementById('tourText').textContent = step.text;
   
-  // Update progress dots
-  for (let i = 1; i <= 4; i++) {
-    const dot = document.getElementById(`dot${i}`);
-    if (i - 1 === currentTourStep) {
-      dot.classList.add('active');
-    } else {
-      dot.classList.remove('active');
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .tour-popup {
+    position: fixed;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 
+      0 30px 80px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(139, 92, 246, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 3px solid rgba(139, 92, 246, 0.5);
+    z-index: 9999;
+    max-width: 480px;
+    display: none;
+    animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  @keyframes popIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
     }
   }
   
-  // Update button text on last step
-  const nextBtn = document.querySelector('.tour-btn-primary');
-  if (currentTourStep === tourSteps.length - 1) {
-    nextBtn.textContent = '¡Entendido!';
-  } else {
-    nextBtn.textContent = 'Siguiente';
+  [data-theme="dark"] .tour-popup {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   }
+  
+  .tour-popup-header {
+    display: flex;
+    align-items: start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .tour-popup-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    flex-shrink: 0;
+    box-shadow: 
+      0 10px 25px rgba(139, 92, 246, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: iconPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes iconPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 15px 30px rgba(139, 92, 246, 0.6);
+    }
+  }
+  
+  .tour-popup-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    color: var(--fg);
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .tour-popup-step {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0.25rem 0.75rem;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tour-popup-content {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--fg);
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 12px;
+    border-left: 4px solid #8b5cf6;
+  }
+  
+  .tour-popup-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+  
+  .tour-btn {
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .tour-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .tour-btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .tour-btn-primary {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  }
+  
+  .tour-btn-primary:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+  }
+  
+  .tour-btn-primary:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+  
+  .tour-btn-secondary {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    font-weight: 600;
+  }
+  
+  .tour-btn-secondary:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-2px);
+  }
+  
+  .tour-highlight {
+    position: relative;
+    z-index: 9997 !important;
+    border-radius: 16px !important;
+    box-shadow: 
+      0 0 0 4px rgba(139, 92, 246, 0.6),
+      0 0 0 8px rgba(139, 92, 246, 0.3),
+      0 0 30px rgba(139, 92, 246, 0.5),
+      0 0 0 9999px rgba(0, 0, 0, 0.75) !important;
+    animation: pulse-highlight 2.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-highlight {
+    0%, 100% {
+      box-shadow: 
+        0 0 0 4px rgba(139, 92, 246, 0.6),
+        0 0 0 8px rgba(139, 92, 246, 0.3),
+        0 0 30px rgba(139, 92, 246, 0.5),
+        0 0 0 9999px rgba(0, 0, 0, 0.75);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 
+        0 0 0 6px rgba(139, 92, 246, 0.8),
+        0 0 0 12px rgba(139, 92, 246, 0.4),
+        0 0 50px rgba(139, 92, 246, 0.8),
+        0 0 0 9999px rgba(0, 0, 0, 0.75);
+      transform: scale(1.02);
+    }
+  }
+  
+  /* Efecto de partículas al cambiar de paso */
+  @keyframes sparkle {
+    0%, 100% {
+      opacity: 0;
+      transform: translateY(0) scale(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-20px) scale(1);
+    }
+  }
+</style>
+
+<div id="tour-overlay" class="tour-overlay"></div>
+<div id="tour-popup" class="tour-popup"></div>
+
+<script>
+// Tour Guiado Interactivo
+const tourSteps = [
+  {
+    target: '#tour-reportar',
+    title: '¡Bienvenido a tu Hogar! 👋',
+    content: '✨ <strong>Este es tu panel de control.</strong><br><br>Desde aquí puedes reportar cualquier problema o inquietud sobre tu vivienda de forma rápida y sencilla. Solo haz clic en el botón <strong>"Reportar Problema"</strong> y nosotros nos encargaremos del resto.',
+    icon: 'house-heart'
+  },
+  {
+    target: '.info-card',
+    title: 'Información de tu Vivienda 🏠',
+    content: '📍 <strong>Aquí encuentras todos los detalles importantes:</strong><br><br>• Tipo y modelo de tu casa<br>• Proyecto al que perteneces<br>• Ubicación y características<br><br>Toda la información que necesitas en un solo lugar.',
+    icon: 'info-circle'
+  },
+  {
+    target: '#tour-observaciones',
+    title: 'Historial de Reportes 📋',
+    content: '🔍 <strong>Revisa el estado de tus reportes:</strong><br><br>• Ve todas las observaciones que has enviado<br>• Conoce el estado de cada reporte<br>• Accede a las fotos y evidencias que subiste<br><br>Mantente informado en todo momento.',
+    icon: 'clipboard-check'
+  },
+  {
+    target: '#tour-ayuda',
+    title: '¿Necesitas Ayuda? 💡',
+    content: '🤝 <strong>Estamos aquí para ti:</strong><br><br>• Vuelve a ver este tutorial cuando quieras<br>• Contacta directamente con nuestro equipo<br>• Resuelve tus dudas rápidamente<br><br>Tu tranquilidad es nuestra prioridad.',
+    icon: 'question-circle'
+  }
+];
+
+let currentStep = 0;
+
+function startTour() {
+  currentStep = 0;
+  showTourStep();
 }
 
-// Close tour on overlay click
-document.getElementById('tourOverlay').addEventListener('click', closeTour);
-</script>
+function showTourStep() {
+  if (currentStep >= tourSteps.length) {
+    endTour();
+    return;
+  }
+  
+  const step = tourSteps[currentStep];
+  const target = document.querySelector(step.target);
+  
+  if (!target) {
+    currentStep++;
+    showTourStep();
+    return;
+  }
+  
+  // Mostrar overlay
+  const overlay = document.getElementById('tour-overlay');
+  overlay.style.display = 'block';
+  
+  // Highlight del elemento
+  const prevHighlight = document.querySelector('.tour-highlight');
+  if (prevHighlight) {
+    prevHighlight.classList.remove('tour-highlight');
+  }
+  target.classList.add('tour-highlight');
+  target.style.position = 'relative';
+  target.style.zIndex = '9997';
+  
+  // Calcular posición del popup
+  const rect = target.getBoundingClientRect();
+  const popup = document.getElementById('tour-popup');
+  
+  // Contenido del popup
+  popup.innerHTML = `
+    <div class="tour-popup-header">
+      <div class="tour-popup-icon">
+        <i class="bi bi-${step.icon}"></i>
+      </div>
+      <div style="flex: 1;">
+        <div class="tour-popup-step">Paso ${currentStep + 1} de ${tourSteps.length}</div>
+        <h3 class="tour-popup-title">${step.title}</h3>
+      </div>
+    </div>
+    <div class="tour-popup-content">
+      ${step.content}
+    </div>
+    <div class="tour-popup-actions">
+      <button class="tour-btn tour-btn-secondary" onclick="endTour()">
+        Saltar tutorial
+      </button>
+      <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">
+        ${currentStep === tourSteps.length - 1 ? 'Finalizar' : 'Siguiente'} →
+      </button>
+    </div>
+  `;
+  
+  // Posicionar popup
+  popup.style.display = 'block';
+  
+  // Posicionar debajo del elemento si hay espacio, sino arriba
+  const popupRect = popup.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+  
+  if (spaceBelow > popupRect.height + 20) {
+    // Debajo
+    popup.style.top = (rect.bottom + 20) + 'px';
+  } else if (spaceAbove > popupRect.height + 20) {
+    // Arriba
+    popup.style.top = (rect.top - popupRect.height - 20) + 'px';
+  } else {
+    // Centro vertical
+    popup.style.top = '50%';
+    popup.style.transform = 'translateY(-50%)';
+  }
+  
+  // Centro horizontal
+  popup.style.left = '50%';
+  popup.style.transform = 'translateX(-50%)';
+  
+  // Scroll suave al elemento
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
+function nextTourStep() {
+  currentStep++;
+  showTourStep();
+}
+
+function endTour() {
+  // Ocultar overlay y popup
+  document.getElementById('tour-overlay').style.display = 'none';
+  document.getElementById('tour-popup').style.display = 'none';
+  
+  // Remover highlights
+  const highlight = document.querySelector('.tour-highlight');
+  if (highlight) {
+    highlight.classList.remove('tour-highlight');
+    highlight.style.zIndex = '';
+  }
+  
+  // Guardar en localStorage que ya vio el tour
+  localStorage.setItem('familia_tour_completed', 'true');
+}
+
+// Mostrar tour automáticamente si es la primera vez
+window.addEventListener('load', function() {
+  const tourCompleted = localStorage.getItem('familia_tour_completed');
+  if (!tourCompleted && document.querySelector('#tour-reportar')) {
+    // Esperar 1 segundo antes de mostrar el tour
+    setTimeout(startTour, 1000);
+  }
+});
+
+// Cerrar tour con ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    endTour();
+  }
+});
+</script>
 {% endblock %}
 

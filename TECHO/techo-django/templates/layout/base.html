@@ -662,17 +662,6 @@
           </li>
           {% endif %}
           
-          <!-- FICHAS DE INMUEBLES (Admin y Trabajador) -->
-          {% if rol == 'Admin' or rol == 'Trabajador' %}
-          <li class="nav-item">
-            <a class="nav-link {% if 'fichas-inmuebles' in request.path %}active{% endif %}" href="{% url 'fichas_inmuebles' %}">
-              <i class="bi bi-folder-open"></i>
-              Fichas de Inmuebles
-              <span class="badge bg-info ms-2" style="font-size: 0.7rem;">NUEVO</span>
-            </a>
-          </li>
-          {% endif %}
-          
           <!-- MENU ADMIN -->
           {% if rol == 'Admin' %}
           <li class="nav-item dropdown">
@@ -681,16 +670,7 @@
               Administración
             </a>
             <ul class="dropdown-menu">
-              <li><h6 class="dropdown-header">🎯 Accesos Rápidos</h6></li>
-              <li><a class="dropdown-item" href="{% url 'fichas_inmuebles' %}">
-                <i class="bi bi-folder-open"></i> Fichas de Inmuebles
-                <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
-              </a></li>
-              <li><a class="dropdown-item" href="{% url 'buscar_familia_por_rut' %}">
-                <i class="bi bi-search"></i> Buscar por RUT
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📋 Gestión</h6></li>
+              <li><h6 class="dropdown-header">Gestión</h6></li>
               <li><a class="dropdown-item" href="/panel/admin/proyectos/">
                 <i class="bi bi-diagram-3"></i> Proyectos
               </a></li>
@@ -704,7 +684,7 @@
                 <i class="bi bi-people"></i> Usuarios
               </a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📊 Monitoreo</h6></li>
+              <li><h6 class="dropdown-header">Monitoreo</h6></li>
               <li><a class="dropdown-item" href="{% url 'monitoreo_ds49' %}">
                 <i class="bi bi-calendar-check"></i> DS 49 (120 días)
               </a></li>
@@ -725,24 +705,14 @@
               Mi Trabajo
             </a>
             <ul class="dropdown-menu">
-              <li><h6 class="dropdown-header">🏗️ Mi Trabajo</h6></li>
-              <li><a class="dropdown-item" href="{% url 'fichas_inmuebles' %}">
-                <i class="bi bi-folder-open"></i> Fichas de Inmuebles
-                <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
-              </a></li>
               <li><a class="dropdown-item" href="/proyectos/">
                 <i class="bi bi-diagram-3"></i> Mi Proyecto
               </a></li>
               <li><a class="dropdown-item" href="/viviendas/">
                 <i class="bi bi-houses"></i> Viviendas
               </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📋 Seguimiento</h6></li>
               <li><a class="dropdown-item" href="{% url 'monitoreo_ds49' %}">
                 <i class="bi bi-calendar-check"></i> DS 49 (120 días)
-              </a></li>
-              <li><a class="dropdown-item" href="/postventa/monitoreo/">
-                <i class="bi bi-clipboard-data"></i> Mis Observaciones
               </a></li>
             </ul>
           </li>
@@ -752,12 +722,6 @@
             <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="/dashboard/">
               <i class="bi bi-house-heart-fill"></i>
               Mi Vivienda
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link {% if 'reportar' in request.path %}active{% endif %}" href="{% url 'reportar_observacion_familia' %}">
-              <i class="bi bi-exclamation-circle-fill"></i>
-              Reportar Problema
             </a>
           </li>
           {% endif %}
@@ -800,24 +764,16 @@
           <!-- Dropdown de usuario -->
           <div class="dropdown">
             <div class="navbar-user" data-bs-toggle="dropdown" aria-expanded="false">
-              {% if perfil and perfil.avatar %}
-                <img src="{{ perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
+              {% if request.user.perfil.avatar %}
+                <img src="{{ request.user.perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
               {% else %}
                 <div class="navbar-user-avatar-placeholder">
                   <i class="bi bi-person-fill"></i>
                 </div>
               {% endif %}
               <div class="navbar-user-info">
-                <span class="navbar-user-name">
-                  {% if nombre_usuario %}
-                    {{ nombre_usuario }}
-                  {% elif user %}
-                    {{ user.username }}
-                  {% else %}
-                    Usuario
-                  {% endif %}
-                </span>
-                <span class="navbar-user-role">{{ rol|default:"Usuario" }}</span>
+                <span class="navbar-user-name">{{ request.user.perfil.nombre|default:request.user.username }}</span>
+                <span class="navbar-user-role">{{ rol }}</span>
               </div>
               <i class="bi bi-chevron-down ms-2" style="color: white;"></i>
             </div>

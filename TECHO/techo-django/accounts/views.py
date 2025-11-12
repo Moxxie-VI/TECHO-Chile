@@ -32,11 +32,6 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    # Verificación adicional de autenticación
-    if not request.user.is_authenticated:
-        from django.contrib.auth.views import redirect_to_login
-        return redirect_to_login(request.get_full_path())
-    
     user = request.user
     perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
     if user.is_superuser and perfil.rol != "Admin":
@@ -45,17 +40,7 @@ def dashboard(request):
         perfil.rol = "Trabajador"; perfil.save()
 
     rol = perfil.rol
-    ctx = {
-        "rol": rol, 
-        "mensaje": "", 
-        "proyectos": [], 
-        "viviendas": [], 
-        "registros": [], 
-        "actividad": [],
-        "usuario": user,
-        "perfil": perfil,
-        "nombre_usuario": perfil.nombre or user.username,
-    }
+    ctx = {"rol": rol, "mensaje": "", "proyectos": [], "viviendas": [], "registros": [], "actividad": []}
 
     if rol == "Admin":
         ctx["proyectos"] = Proyecto.objects.all().order_by("codigo")[:200]
@@ -69,32 +54,20 @@ def dashboard(request):
     elif rol == "Trabajador":
         p = perfil.proyecto_asignado
         if p:
-            ctx["proyecto_asignado"] = p
             ctx["proyectos"] = [p]
             ctx["viviendas"] = Vivienda.objects.filter(proyecto=p)[:200]
-            ctx["registros"] = RegistroPostventa.objects.filter(proyecto=p).select_related('reportante').order_by("-creado_en")[:20]
+            ctx["registros"] = RegistroPostventa.objects.filter(proyecto=p).order_by("-creado_en")[:20]
         else:
-            ctx["proyecto_asignado"] = None
             ctx["mensaje"] = "Aún no tienes un proyecto asignado."
         return render(request, "accounts/dashboard_trabajador.html", ctx)
     
     elif rol == "Familia":
         v = perfil.vivienda_asignada
         if v:
-            ctx["vivienda"] = v
-            ctx["proyecto"] = v.proyecto
             ctx["proyectos"] = [v.proyecto]
             ctx["viviendas"] = [v]
-            # Obtener observaciones reportadas por este usuario
-            observaciones = RegistroPostventa.objects.filter(
-                reportante=user
-            ).select_related('proyecto').prefetch_related('evidencia_set').order_by("-creado_en")[:50]
-            ctx["observaciones"] = observaciones
-            ctx["registros"] = observaciones  # Para compatibilidad con templates existentes
+            ctx["registros"] = RegistroPostventa.objects.filter(ficha__vivienda=v).order_by("-creado_en")[:20]
         else:
-            ctx["vivienda"] = None
-            ctx["proyecto"] = None
-            ctx["observaciones"] = []
             ctx["mensaje"] = "Tu vivienda aún no ha sido vinculada."
         return render(request, "accounts/dashboard_familia.html", ctx)
     
