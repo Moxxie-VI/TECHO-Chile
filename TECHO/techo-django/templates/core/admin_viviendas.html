@@ -188,11 +188,10 @@
                     <tr>
                         <th>ID</th>
                         <th>Proyecto</th>
+                        <th>Constructora</th>
+                        <th>Dirección</th>
+                        <th>Propietario</th>
                         <th>Tipo</th>
-                        <th>Modelo</th>
-                        <th>Cuartos</th>
-                        <th>Baños</th>
-                        <th>Piso</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -207,20 +206,55 @@
                             </div>
                         </td>
                         <td>
+                            {% if v.constructora %}
+                                <div>
+                                    <strong>{{ v.constructora.nombre }}</strong>
+                                    <div class="text-muted small">RUT: {{ v.constructora.rut }}</div>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if v.direccion %}
+                                <div>
+                                    <strong>{{ v.direccion }} #{{ v.numero }}</strong>
+                                    <div class="text-muted small">
+                                        {% if v.block_villa %}{{ v.block_villa }}, {% endif %}
+                                        {{ v.comuna|default:"" }}
+                                    </div>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Sin dirección</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if v.nombre_propietario %}
+                                <div>
+                                    <strong>{{ v.nombre_propietario }}</strong>
+                                    <div class="text-muted small">RUT: {{ v.rut_propietario|default:"—" }}</div>
+                                    {% if v.telefono_propietario %}
+                                        <div class="text-muted small"><i class="bi bi-telephone"></i> {{ v.telefono_propietario }}</div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-muted">Sin propietario</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             {% if v.tipo == "CASA" %}
                             <span class="badge-tipo badge-casa">
                                 <i class="bi bi-house-door me-1"></i>Casa
                             </span>
                             {% else %}
                             <span class="badge-tipo badge-departamento">
-                                <i class="bi bi-building me-1"></i>Departamento
+                                <i class="bi bi-building me-1"></i>Depto
                             </span>
                             {% endif %}
+                            <div class="text-muted small mt-1">
+                                {{ v.cant_cuartos|default:"?" }}D · {{ v.cant_banos|default:"?" }}B
+                            </div>
                         </td>
-                        <td>{{ v.modelo|default:"—" }}</td>
-                        <td>{{ v.cant_cuartos|default:"—" }}</td>
-                        <td>{{ v.cant_banos|default:"—" }}</td>
-                        <td>{{ v.piso|default:"—" }}</td>
                         <td>
                             <div class="d-flex gap-2">
                                 <a href="{% url 'editar_vivienda' v.id %}" 

@@ -1,27 +1,82 @@
 <tbody id="tb-proy">
 {% for p in proyectos %}
 <tr id="proy-{{ p.id }}">
-  <td><b>{{ p.codigo }}</b></td>
-  <td>{{ p.nombre }}</td>
-  <td>{{ p.ubicacion|default:"s/i" }}</td>
-  <td>{{ p.constructora.nombre|default:"s/i" }}</td>
+  <td>
+    <div>
+      <strong>{{ p.codigo }}</strong>
+      {% if p.estado %}
+        <div class="mt-1">
+          {% if p.estado == "PLANIFICACION" %}
+          <span class="badge bg-secondary"><i class="bi bi-clipboard-check me-1"></i>Planificación</span>
+          {% elif p.estado == "EN_CONSTRUCCION" %}
+          <span class="badge bg-warning"><i class="bi bi-tools me-1"></i>En Construcción</span>
+          {% elif p.estado == "ENTREGADO" %}
+          <span class="badge bg-info"><i class="bi bi-box-seam me-1"></i>Entregado</span>
+          {% elif p.estado == "POSTVENTA" %}
+          <span class="badge bg-primary"><i class="bi bi-headset me-1"></i>Postventa</span>
+          {% elif p.estado == "FINALIZADO" %}
+          <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Finalizado</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </td>
+  <td>
+    <div>
+      <strong>{{ p.nombre }}</strong>
+      {% if p.cantidad_viviendas %}
+        <div class="text-muted small mt-1">
+          <i class="bi bi-houses"></i> {{ p.cantidad_viviendas }} viviendas
+        </div>
+      {% endif %}
+    </div>
+  </td>
+  <td>
+    {% if p.direccion %}
+      <div>
+        {{ p.direccion }}
+        {% if p.comuna %}
+          <div class="text-muted small">{{ p.comuna }}{% if p.region %}, {{ p.region }}{% endif %}</div>
+        {% endif %}
+      </div>
+    {% elif p.ubicacion %}
+      {{ p.ubicacion }}
+    {% else %}
+      <span class="text-muted">s/i</span>
+    {% endif %}
+  </td>
+  <td>
+    {% if p.constructora %}
+      <div>
+        <strong>{{ p.constructora.nombre }}</strong>
+        <div class="text-muted small">RUT: {{ p.constructora.rut }}</div>
+      </div>
+    {% else %}
+      <span class="text-muted">Sin asignar</span>
+    {% endif %}
+  </td>
   <td class="text-end">
-    <button class="btn btn-sm btn-outline-secondary"
+    <button class="btn btn-sm btn-outline-primary"
             hx-get="{% url 'admin_proyecto_edit' p.id %}"
             hx-target="#modal-body"
-            hx-swap="innerHTML">
-      Editar
+            hx-swap="innerHTML"
+            title="Editar proyecto">
+      <i class="bi bi-pencil"></i>
     </button>
     <button class="btn btn-sm btn-outline-danger"
             hx-post="{% url 'admin_proyecto_delete' p.id %}"
-            hx-confirm="¿Eliminar proyecto?"
-            hx-target="#proy-{{ p.id }}" hx-swap="outerHTML">
-      Eliminar
+            hx-confirm="¿Seguro que deseas eliminar el proyecto '{{ p.codigo }}'?"
+            hx-target="#proy-{{ p.id }}" hx-swap="outerHTML"
+            title="Eliminar proyecto">
+      <i class="bi bi-trash"></i>
     </button>
   </td>
 </tr>
 {% empty %}
-<tr><td colspan="5" class="text-muted">Sin proyectos</td></tr>
+<tr><td colspan="5" class="text-muted text-center py-4">
+  <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.5;"></i>
+  <div class="mt-2">No hay proyectos registrados</div>
+</td></tr>
 {% endfor %}
 </tbody>
 

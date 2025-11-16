@@ -1,3 +1,23 @@
+<style>
+.form-section-mini {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+.form-section-mini:last-of-type {
+    border-bottom: none;
+}
+.form-section-title-mini {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0ea5e9;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+</style>
+
 <form method="post" 
       {% if form.instance.pk %}
       hx-post="{% url 'admin_proyecto_edit' form.instance.pk %}"
@@ -7,52 +27,159 @@
       hx-target="#modal-body" 
       hx-swap="innerHTML">
   {% csrf_token %}
-  <div class="mb-3">
-    <label for="{{ form.codigo.id_for_label }}" class="form-label">Código *</label>
-    {{ form.codigo }}
-    {% if form.codigo.errors %}
-    <div class="text-danger small">{{ form.codigo.errors }}</div>
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
-    {{ form.nombre }}
-    {% if form.nombre.errors %}
-    <div class="text-danger small">{{ form.nombre.errors }}</div>
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    <label for="{{ form.ubicacion.id_for_label }}" class="form-label">Ubicación</label>
-    {{ form.ubicacion }}
-    {% if form.ubicacion.errors %}
-    <div class="text-danger small">{{ form.ubicacion.errors }}</div>
-    {% endif %}
-  </div>
-  <div class="mb-3">
-    <label for="{{ form.constructora.id_for_label }}" class="form-label">Constructora</label>
-    {{ form.constructora }}
-    {% if form.constructora.errors %}
-    <div class="text-danger small">{{ form.constructora.errors }}</div>
-    {% endif %}
-  </div>
-  <div class="row g-2 mb-3">
-    <div class="col-md-6">
-      <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">Fecha Inicio</label>
-      {{ form.fecha_inicio }}
-      {% if form.fecha_inicio.errors %}
-      <div class="text-danger small">{{ form.fecha_inicio.errors }}</div>
-      {% endif %}
+  
+  <!-- Identificación -->
+  <div class="form-section-mini">
+    <div class="form-section-title-mini">
+      <i class="bi bi-tag-fill"></i> Identificación
     </div>
-    <div class="col-md-6">
-      <label for="{{ form.fecha_estimada_termino.id_for_label }}" class="form-label">Fecha Estimada Término</label>
-      {{ form.fecha_estimada_termino }}
-      {% if form.fecha_estimada_termino.errors %}
-      <div class="text-danger small">{{ form.fecha_estimada_termino.errors }}</div>
-      {% endif %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="{{ form.codigo.id_for_label }}" class="form-label">Código *</label>
+        {{ form.codigo }}
+        {% if form.codigo.errors %}
+        <div class="text-danger small">{{ form.codigo.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre *</label>
+        {{ form.nombre }}
+        {% if form.nombre.errors %}
+        <div class="text-danger small">{{ form.nombre.errors }}</div>
+        {% endif %}
+      </div>
     </div>
   </div>
+
+  <!-- Ubicación -->
+  <div class="form-section-mini">
+    <div class="form-section-title-mini">
+      <i class="bi bi-geo-alt-fill"></i> Ubicación
+    </div>
+    <div class="row g-3">
+      <div class="col-12">
+        <label for="{{ form.direccion.id_for_label }}" class="form-label">Dirección del Proyecto</label>
+        {{ form.direccion }}
+        {% if form.direccion.errors %}
+        <div class="text-danger small">{{ form.direccion.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.comuna.id_for_label }}" class="form-label">Comuna</label>
+        {{ form.comuna }}
+        {% if form.comuna.errors %}
+        <div class="text-danger small">{{ form.comuna.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.region.id_for_label }}" class="form-label">Región</label>
+        {{ form.region }}
+        {% if form.region.errors %}
+        <div class="text-danger small">{{ form.region.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-12">
+        <label for="{{ form.ubicacion.id_for_label }}" class="form-label">Ubicación (Referencia)</label>
+        {{ form.ubicacion }}
+        {% if form.ubicacion.errors %}
+        <div class="text-danger small">{{ form.ubicacion.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Constructora y Gestión -->
+  <div class="form-section-mini">
+    <div class="form-section-title-mini">
+      <i class="bi bi-building"></i> Constructora y Gestión
+    </div>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="{{ form.constructora.id_for_label }}" class="form-label">Constructora</label>
+        {{ form.constructora }}
+        {% if form.constructora.errors %}
+        <div class="text-danger small">{{ form.constructora.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.encargado_techo.id_for_label }}" class="form-label">Encargado TECHO</label>
+        {{ form.encargado_techo }}
+        {% if form.encargado_techo.errors %}
+        <div class="text-danger small">{{ form.encargado_techo.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.telefono_encargado.id_for_label }}" class="form-label">Teléfono Encargado</label>
+        {{ form.telefono_encargado }}
+        {% if form.telefono_encargado.errors %}
+        <div class="text-danger small">{{ form.telefono_encargado.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-6">
+        <label for="{{ form.cantidad_viviendas.id_for_label }}" class="form-label">Cantidad de Viviendas</label>
+        {{ form.cantidad_viviendas }}
+        {% if form.cantidad_viviendas.errors %}
+        <div class="text-danger small">{{ form.cantidad_viviendas.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Fechas y Estado -->
+  <div class="form-section-mini">
+    <div class="form-section-title-mini">
+      <i class="bi bi-calendar-event"></i> Fechas y Estado
+    </div>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label for="{{ form.fecha_inicio.id_for_label }}" class="form-label">Fecha Inicio</label>
+        {{ form.fecha_inicio }}
+        {% if form.fecha_inicio.errors %}
+        <div class="text-danger small">{{ form.fecha_inicio.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <label for="{{ form.fecha_estimada_termino.id_for_label }}" class="form-label">Fecha Est. Término</label>
+        {{ form.fecha_estimada_termino }}
+        {% if form.fecha_estimada_termino.errors %}
+        <div class="text-danger small">{{ form.fecha_estimada_termino.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-4">
+        <label for="{{ form.fecha_entrega_efectiva.id_for_label }}" class="form-label">Fecha Entrega Efectiva</label>
+        {{ form.fecha_entrega_efectiva }}
+        {% if form.fecha_entrega_efectiva.errors %}
+        <div class="text-danger small">{{ form.fecha_entrega_efectiva.errors }}</div>
+        {% endif %}
+      </div>
+      <div class="col-md-12">
+        <label for="{{ form.estado.id_for_label }}" class="form-label">Estado del Proyecto</label>
+        {{ form.estado }}
+        {% if form.estado.errors %}
+        <div class="text-danger small">{{ form.estado.errors }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Descripción -->
+  <div class="form-section-mini">
+    <div class="form-section-title-mini">
+      <i class="bi bi-file-text"></i> Descripción
+    </div>
+    <div class="mb-3">
+      <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción del Proyecto</label>
+      {{ form.descripcion }}
+      {% if form.descripcion.errors %}
+      <div class="text-danger small">{{ form.descripcion.errors }}</div>
+      {% endif %}
+    </div>
+  </div>
+
   <div class="d-flex gap-2 justify-content-end">
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-    <button type="submit" class="btn btn-primary">Guardar</button>
+    <button type="submit" class="btn btn-primary">
+      <i class="bi bi-check-circle me-1"></i> Guardar
+    </button>
   </div>
 </form>

@@ -120,6 +120,22 @@
                     </div>
                 </div>
 
+                <!-- Constructora -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="bi bi-building me-2"></i>Constructora
+                    </h5>
+                    <div class="mb-3">
+                        <label for="{{ form.constructora.id_for_label }}" class="form-label">
+                            Constructora <small class="text-muted">(Opcional)</small>
+                        </label>
+                        {{ form.constructora }}
+                        {% if form.constructora.errors %}
+                        <div class="text-danger small mt-1">{{ form.constructora.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <!-- Información de la Vivienda -->
                 <div class="form-section">
                     <h5 class="form-section-title">
@@ -176,6 +192,118 @@
                             {{ form.piso }}
                             {% if form.piso.errors %}
                             <div class="text-danger small mt-1">{{ form.piso.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ubicación -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="bi bi-geo-alt me-2"></i>Ubicación de la Vivienda
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="{{ form.direccion.id_for_label }}" class="form-label">
+                                Dirección (Calle)
+                            </label>
+                            {{ form.direccion }}
+                            {% if form.direccion.errors %}
+                            <div class="text-danger small mt-1">{{ form.direccion.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.numero.id_for_label }}" class="form-label">
+                                Número
+                            </label>
+                            {{ form.numero }}
+                            {% if form.numero.errors %}
+                            <div class="text-danger small mt-1">{{ form.numero.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.block_villa.id_for_label }}" class="form-label">
+                                Block/Villa
+                            </label>
+                            {{ form.block_villa }}
+                            {% if form.block_villa.errors %}
+                            <div class="text-danger small mt-1">{{ form.block_villa.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.comuna.id_for_label }}" class="form-label">
+                                Comuna
+                            </label>
+                            {{ form.comuna }}
+                            {% if form.comuna.errors %}
+                            <div class="text-danger small mt-1">{{ form.comuna.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="{{ form.region.id_for_label }}" class="form-label">
+                                Región
+                            </label>
+                            {{ form.region }}
+                            {% if form.region.errors %}
+                            <div class="text-danger small mt-1">{{ form.region.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Propietario/Beneficiario -->
+                <div class="form-section">
+                    <h5 class="form-section-title">
+                        <i class="bi bi-person-fill me-2"></i>Información del Propietario/Beneficiario
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.rut_propietario.id_for_label }}" class="form-label">
+                                RUT del Propietario
+                            </label>
+                            {{ form.rut_propietario }}
+                            {% if form.rut_propietario.errors %}
+                            <div class="text-danger small mt-1">{{ form.rut_propietario.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.nombre_propietario.id_for_label }}" class="form-label">
+                                Nombre Completo
+                            </label>
+                            {{ form.nombre_propietario }}
+                            {% if form.nombre_propietario.errors %}
+                            <div class="text-danger small mt-1">{{ form.nombre_propietario.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.telefono_propietario.id_for_label }}" class="form-label">
+                                Teléfono de Contacto
+                            </label>
+                            {{ form.telefono_propietario }}
+                            {% if form.telefono_propietario.errors %}
+                            <div class="text-danger small mt-1">{{ form.telefono_propietario.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.email_propietario.id_for_label }}" class="form-label">
+                                Email
+                            </label>
+                            {{ form.email_propietario }}
+                            {% if form.email_propietario.errors %}
+                            <div class="text-danger small mt-1">{{ form.email_propietario.errors }}</div>
                             {% endif %}
                         </div>
                     </div>

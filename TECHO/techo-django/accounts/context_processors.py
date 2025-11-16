@@ -17,13 +17,14 @@ def user_data(request):
         
         # Obtener o crear perfil
         try:
-            from .models import PerfilUsuario
+            from core.models import PerfilUsuario
             perfil, _ = PerfilUsuario.objects.get_or_create(user=request.user)
             context['perfil'] = perfil
             context['nombre_usuario'] = perfil.nombre or request.user.username
-        except Exception:
+        except Exception as e:
             # Si hay algún error, usar username
             context['nombre_usuario'] = request.user.username
+            print(f"Error en context processor: {e}")  # Para debug
     
     return context
 

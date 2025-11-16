@@ -40,7 +40,17 @@ def dashboard(request):
         perfil.rol = "Trabajador"; perfil.save()
 
     rol = perfil.rol
-    ctx = {"rol": rol, "mensaje": "", "proyectos": [], "viviendas": [], "registros": [], "actividad": []}
+    ctx = {
+        "rol": rol, 
+        "mensaje": "", 
+        "proyectos": [], 
+        "viviendas": [], 
+        "registros": [], 
+        "actividad": [],
+        "usuario": user,
+        "perfil": perfil,
+        "nombre_usuario": perfil.nombre or user.username,
+    }
 
     if rol == "Admin":
         ctx["proyectos"] = Proyecto.objects.all().order_by("codigo")[:200]
@@ -54,20 +64,47 @@ def dashboard(request):
     elif rol == "Trabajador":
         p = perfil.proyecto_asignado
         if p:
+            ctx["proyecto_asignado"] = p
             ctx["proyectos"] = [p]
             ctx["viviendas"] = Vivienda.objects.filter(proyecto=p)[:200]
-            ctx["registros"] = RegistroPostventa.objects.filter(proyecto=p).order_by("-creado_en")[:20]
+            ctx["registros"] = RegistroPostventa.objects.filter(proyecto=p).select_related('reportante').order_by("-creado_en")[:20]
         else:
+            ctx["proyecto_asignado"] = None
             ctx["mensaje"] = "Aún no tienes un proyecto asignado."
         return render(request, "accounts/dashboard_trabajador.html", ctx)
     
     elif rol == "Familia":
         v = perfil.vivienda_asignada
         if v:
+            ctx["vivienda"] = v
+            ctx["proyecto"] = v.proyecto
             ctx["proyectos"] = [v.proyecto]
             ctx["viviendas"] = [v]
-            ctx["registros"] = RegistroPostventa.objects.filter(ficha__vivienda=v).order_by("-creado_en")[:20]
+            
+            # Obtener la ficha de la vivienda
+            try:
+                from core.models import FichaInmueble
+                ficha = FichaInmueble.objects.get(
+                    proyecto=v.proyecto,
+                    vivienda=v
+                )
+                # Obtener TODAS las observaciones de la vivienda (no solo las del usuario)
+                # Para que las familias vean lo que reportan admin/trabajadores
+                observaciones = RegistroPostventa.objects.filter(
+                    ficha=ficha
+                ).select_related('proyecto', 'reportante').prefetch_related('evidencias').order_by("-creado_en")[:50]
+            except FichaInmueble.DoesNotExist:
+                # Si no hay ficha, solo mostrar las observaciones del usuario
+                observaciones = RegistroPostventa.objects.filter(
+                    reportante=user
+                ).select_related('proyecto', 'reportante').prefetch_related('evidencias').order_by("-creado_en")[:50]
+            
+            ctx["observaciones"] = observaciones
+            ctx["registros"] = observaciones  # Para compatibilidad con templates existentes
         else:
+            ctx["vivienda"] = None
+            ctx["proyecto"] = None
+            ctx["observaciones"] = []
             ctx["mensaje"] = "Tu vivienda aún no ha sido vinculada."
         return render(request, "accounts/dashboard_familia.html", ctx)
     

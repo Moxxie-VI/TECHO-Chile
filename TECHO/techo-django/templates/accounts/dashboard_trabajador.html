@@ -1,506 +1,1037 @@
 {% extends "layout/base.html" %}
 {% load static %}
+
 {% block title %}Dashboard Trabajador · TECHO{% endblock %}
 
-{% block page_intro %}
-<div class="container-fluid pt-4">
-  <div class="dashboard-header trabajador-header">
-    <div class="header-content">
-      <div class="d-flex align-items-center gap-3">
-        <div class="header-icon trabajador-icon">
-          <i class="bi bi-tools"></i>
-        </div>
-        <div>
-          <h1 class="mb-1">Mi Área de Trabajo</h1>
-          <p class="text-muted mb-0">Gestión de observaciones y tareas de postventa en terreno</p>
-        </div>
-      </div>
-      <div class="header-badge">
-        <i class="bi bi-briefcase me-2"></i>
-        <span>Construcción Técnica</span>
-      </div>
-    </div>
-  </div>
-</div>
+{% block extra_css %}
+<style>
+:root {
+  --worker-primary: #10b981;
+  --worker-secondary: #059669;
+  --worker-accent: #047857;
+  --urgent: #ef4444;
+  --warning: #f59e0b;
+}
+
+/* Hero Trabajador */
+.worker-hero {
+  background: linear-gradient(135deg, var(--worker-primary) 0%, var(--worker-secondary) 50%, var(--worker-accent) 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.worker-hero::before {
+  content: '🏗️';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  font-size: 300px;
+  opacity: 0.1;
+  transform: rotate(-15deg);
+}
+
+.worker-hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-greeting {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  opacity: 0.95;
+  font-weight: 500;
+}
+
+/* Proyecto Asignado Card */
+.proyecto-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.proyecto-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.proyecto-info h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.proyecto-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+/* Action Cards Grid */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--fg);
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent 0%, rgba(16, 185, 129, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  border-color: var(--worker-primary);
+}
+
+.action-card:hover::before {
+  opacity: 1;
+}
+
+.action-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.action-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.action-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+}
+
+.action-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  z-index: 2;
+}
+
+/* Observaciones List */
+.observaciones-list {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+}
+
+.observacion-item {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 1.25rem;
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  background: var(--card);
+}
+
+.observacion-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.urgencia-badge {
+  width: 8px;
+  height: 100%;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.urgencia-alta { background: #ef4444; }
+.urgencia-media { background: #f59e0b; }
+.urgencia-baja { background: #10b981; }
+
+.observacion-content {
+  flex: 1;
+}
+
+.observacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 0.75rem;
+}
+
+.observacion-recinto {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.estado-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.estado-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-en-progreso {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-resuelto {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.observacion-text {
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.observacion-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.meta-item-obs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-title i {
+  color: var(--worker-primary);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+}
+
+.empty-state i {
+  font-size: 4rem;
+  opacity: 0.3;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* Stats Mini Cards */
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.mini-stat-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.mini-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.mini-stat-label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.mini-stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--fg);
+}
+
+/* Quick Tips Grid */
+.quick-tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.tip-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 18px;
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+}
+
+.tip-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  border-color: var(--worker-primary);
+}
+
+.tip-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.tip-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 0.75rem;
+}
+
+.tip-text {
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* About Platform Section */
+.about-platform-section {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 24px;
+  padding: 3rem;
+  margin-top: 3rem;
+  border: 2px solid #bbf7d0;
+}
+
+.about-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+}
+
+.about-logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--worker-primary) 0%, var(--worker-secondary) 100%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+.about-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #064e3b;
+  margin-bottom: 0.5rem;
+}
+
+.about-subtitle {
+  font-size: 1.15rem;
+  color: #047857;
+  font-weight: 600;
+  margin: 0;
+}
+
+.about-description {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  border-left: 4px solid var(--worker-primary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.about-description p {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0;
+}
+
+.about-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.about-feature {
+  background: white;
+  padding: 1.75rem;
+  border-radius: 16px;
+  display: flex;
+  gap: 1.25rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.about-feature:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+  border-color: var(--worker-primary);
+}
+
+.feature-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.about-feature h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.about-feature p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.about-mission {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 2.5rem;
+  border-radius: 20px;
+  display: flex;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 2rem;
+  border: 2px solid #fbbf24;
+}
+
+.mission-icon {
+  width: 72px;
+  height: 72px;
+  background: white;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #dc2626;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
+}
+
+.mission-content h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #78350f;
+  margin-bottom: 1rem;
+}
+
+.mission-content p {
+  font-size: 1.05rem;
+  color: #92400e;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.about-stats-worker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.worker-stat-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  display: flex;
+  gap: 1.5rem;
+  align-items: start;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.worker-stat-box:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+  border-color: var(--worker-primary);
+}
+
+.worker-stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  flex-shrink: 0;
+}
+
+.worker-stat-box h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.worker-stat-box p {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.about-footer {
+  background: white;
+  padding: 1.75rem;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.about-footer p {
+  margin: 0;
+  font-size: 1rem;
+  color: #475569;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-greeting {
+    font-size: 1.75rem;
+  }
+  
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .proyecto-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .proyecto-meta {
+    justify-content: center;
+  }
+  
+  .about-platform-section {
+    padding: 2rem 1.5rem;
+  }
+  
+  .about-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .about-title {
+    font-size: 1.5rem;
+  }
+  
+  .about-features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .about-mission {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .about-stats-worker {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<style>
-  .trabajador-header {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 2rem;
-    border-radius: 16px;
-    margin-bottom: 2rem;
-    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
-  }
-  
-  .trabajador-icon {
-    width: 64px;
-    height: 64px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-  }
-  
-  .header-badge {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    backdrop-filter: blur(10px);
-  }
-  
-  .quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  
-  .quick-stat-card {
-    background: var(--card);
-    border-radius: 12px;
-    padding: 1.25rem;
-    box-shadow: var(--shadow-sm);
-    border-left: 4px solid var(--accent-color);
-    transition: all 0.3s ease;
-  }
-  
-  .quick-stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-  
-  .quick-stat-card.green { --accent-color: #10b981; }
-  .quick-stat-card.yellow { --accent-color: #f59e0b; }
-  .quick-stat-card.blue { --accent-color: #3b82f6; }
-  
-  .quick-stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--accent-color);
-    margin-bottom: 0.25rem;
-  }
-  
-  .quick-stat-label {
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 500;
-  }
-  
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  
-  .section-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--fg);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .work-card {
-    background: var(--card);
-    border-radius: 16px;
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border);
-    margin-bottom: 2rem;
-    overflow: hidden;
-  }
-  
-  .work-card-header {
-    background: rgba(14, 165, 233, 0.05);
-    padding: 1rem 1.5rem;
-    border-bottom: 2px solid var(--border);
-  }
-  
-  [data-theme="dark"] .work-card-header {
-    background: rgba(14, 165, 233, 0.1);
-  }
-  
-  .work-card-title {
-    font-weight: 700;
-    color: var(--fg);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .table-modern {
-    width: 100%;
-    margin: 0;
-    color: var(--fg);
-  }
-  
-  .table-modern thead {
-    background: rgba(14, 165, 233, 0.05);
-  }
-  
-  [data-theme="dark"] .table-modern thead {
-    background: rgba(14, 165, 233, 0.1);
-  }
-  
-  .table-modern th {
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    color: var(--fg);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 2px solid var(--border);
-  }
-  
-  .table-modern td {
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-    color: var(--fg);
-  }
-  
-  .table-modern tbody tr {
-    transition: background 0.2s;
-  }
-  
-  .table-modern tbody tr:hover {
-    background: rgba(16, 185, 129, 0.05);
-  }
-  
-  .status-select {
-    padding: 0.5rem 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  
-  .status-select:focus {
-    outline: none;
-    border-color: #10b981;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  }
-  
-  .btn-action {
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: all 0.2s;
-    border: 2px solid transparent;
-  }
-  
-  .btn-action-primary {
-    background: #10b981;
-    color: white;
-    border-color: #10b981;
-  }
-  
-  .btn-action-primary:hover {
-    background: #059669;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-  }
-  
-  .badge-urgency {
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-block;
-  }
-  
-  .badge-urgency.high {
-    background: #fee2e2;
-    color: #991b1b;
-  }
-  
-  .badge-urgency.medium {
-    background: #fef3c7;
-    color: #d97706;
-  }
-  
-  .badge-urgency.low {
-    background: #dbeafe;
-    color: #0369a1;
-  }
-  
-  .empty-workspace {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: var(--muted);
-  }
-  
-  .empty-workspace i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.3;
-    color: var(--muted);
-  }
-  
-  .empty-workspace h3 {
-    font-size: 1.25rem;
-    margin-bottom: 0.5rem;
-    color: var(--muted);
-  }
-  
-  .empty-workspace p {
-    color: var(--muted);
-  }
-  
-  .info-banner {
-    background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
-    border: 2px solid #0ea5e9;
-    border-radius: 12px;
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .info-banner i {
-    font-size: 2rem;
-    color: #0284c7;
-  }
-  
-  .info-banner-content h4 {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0c4a6e;
-    margin: 0 0 0.25rem 0;
-  }
-  
-  .info-banner-content p {
-    margin: 0;
-    color: #075985;
-    font-size: 0.9rem;
-  }
-  
-  @media (max-width: 768px) {
-    .quick-stats {
-      grid-template-columns: 1fr;
-    }
+<!-- Hero Trabajador -->
+<div class="worker-hero">
+  <div class="worker-hero-content">
+    <h1 class="hero-greeting">
+      ¡Hola, {{ nombre_usuario }}! 👷
+    </h1>
+    <p class="hero-subtitle">
+      Bienvenido a tu panel de trabajo en campo. Aquí puedes gestionar tu proyecto asignado.
+    </p>
     
-    .table-modern {
-      font-size: 0.85rem;
-    }
-    
-    .table-modern th,
-    .table-modern td {
-      padding: 0.75rem 1rem;
-    }
-  }
-</style>
-
-{% if mensaje %}
-  <div class="info-banner">
-    <i class="bi bi-info-circle-fill"></i>
-    <div class="info-banner-content">
-      <h4>Información</h4>
-      <p>{{ mensaje }}</p>
-    </div>
-  </div>
-{% else %}
-  <!-- Accesos Rápidos -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-6">
-      <a href="{% url 'monitoreo_ds49' %}" class="card border-0 shadow-sm text-decoration-none h-100" style="transition: all 0.3s ease;">
-        <div class="card-body d-flex align-items-center gap-3">
-          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="bi bi-calendar-check" style="font-size: 2rem; color: white;"></i>
-          </div>
-          <div>
-            <h5 class="mb-1">Monitoreo DS 49</h5>
-            <p class="text-muted small mb-0">Seguimiento 120 días post-entrega</p>
+    {% if proyecto_asignado %}
+      <div class="proyecto-card">
+        <div class="proyecto-icon">
+          <i class="bi bi-building"></i>
+        </div>
+        <div class="proyecto-info flex-grow-1">
+          <h3>{{ proyecto_asignado.nombre }}</h3>
+          <div class="proyecto-meta">
+            <div class="meta-item">
+              <i class="bi bi-hash"></i>
+              <span>{{ proyecto_asignado.codigo }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-geo-alt-fill"></i>
+              <span>{{ proyecto_asignado.ubicacion|default:"Sin ubicación" }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-houses"></i>
+              <span>{{ viviendas|length }} viviendas</span>
+            </div>
           </div>
         </div>
-      </a>
-    </div>
-    <div class="col-md-6">
-      <a href="/viviendas/" class="card border-0 shadow-sm text-decoration-none h-100" style="transition: all 0.3s ease;">
-        <div class="card-body d-flex align-items-center gap-3">
-          <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-            <i class="bi bi-houses" style="font-size: 2rem; color: white;"></i>
-          </div>
-          <div>
-            <h5 class="mb-1">Viviendas</h5>
-            <p class="text-muted small mb-0">Ver listado completo de viviendas</p>
-          </div>
-        </div>
-      </a>
-    </div>
-  </div>
-
-  <!-- Estadísticas rápidas -->
-  <div class="quick-stats">
-    <div class="quick-stat-card green">
-      <div class="quick-stat-value">{{ registros|length }}</div>
-      <div class="quick-stat-label">Registros Asignados</div>
-    </div>
-    <div class="quick-stat-card yellow">
-      <div class="quick-stat-value">
-        {% widthratio registros|length 1 0.6 as pending %}
-        {{ pending|floatformat:0 }}
-      </div>
-      <div class="quick-stat-label">En Gestión</div>
-    </div>
-    <div class="quick-stat-card blue">
-      <div class="quick-stat-value">{{ viviendas|length }}</div>
-      <div class="quick-stat-label">Viviendas del Proyecto</div>
-    </div>
-  </div>
-
-  <!-- Tabla de registros -->
-  <div class="work-card">
-    <div class="work-card-header">
-      <h2 class="work-card-title">
-        <i class="bi bi-clipboard-check"></i>
-        Registros de Postventa
-      </h2>
-    </div>
-    
-    {% if registros %}
-      <div class="table-responsive">
-        <table class="table-modern">
-          <thead>
-            <tr>
-              <th>Recinto</th>
-              <th>Descripción</th>
-              <th>Urgencia</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for r in registros %}
-            <tr id="row-reg-{{ r.id }}">
-              <td>
-                <strong>{{ r.recinto|default:"No especificado" }}</strong>
-              </td>
-              <td>
-                <span class="text-muted">{{ r.observacion|truncatewords:8|default:"Sin descripción" }}</span>
-              </td>
-              <td>
-                <span class="badge-urgency {% if r.urgencia == 'ALTA' or r.urgencia == 'Alta' %}high{% elif r.urgencia == 'MEDIA' or r.urgencia == 'Media' %}medium{% else %}low{% endif %}">
-                  {{ r.urgencia|upper }}
-                </span>
-              </td>
-              <td>
-                <form hx-post="/trabajo/registro/{{ r.id }}/estado/" hx-target="#row-reg-{{ r.id }}" hx-swap="none">
-                  {% csrf_token %}
-                  <select name="estado" class="status-select" onchange="this.form.requestSubmit()">
-                    <option value="ABIERTA" {% if r.estado == "ABIERTA" %}selected{% endif %}>Abierta</option>
-                    <option value="EN_GESTION" {% if r.estado == "EN_GESTION" %}selected{% endif %}>En Gestión</option>
-                    <option value="RESUELTA" {% if r.estado == "RESUELTA" %}selected{% endif %}>Resuelta</option>
-                  </select>
-                </form>
-              </td>
-              <td>
-                <button class="btn btn-action btn-action-primary"
-                        hx-get="/trabajo/registro/{{ r.id }}/evidencia/"
-                        hx-target="#modal-body" 
-                        hx-trigger="click" 
-                        data-bs-toggle="modal" 
-                        data-bs-target="#modal">
-                  <i class="bi bi-paperclip me-1"></i> Evidencia
-                </button>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
       </div>
     {% else %}
-      <div class="empty-workspace">
-        <i class="bi bi-clipboard-x"></i>
-        <h3>No hay registros pendientes</h3>
-        <p>Todos los registros están al día</p>
+      <div class="proyecto-card">
+        <div class="proyecto-info text-center w-100">
+          <h3>No tienes proyecto asignado</h3>
+          <p class="mb-0 opacity-75">Contacta con tu administrador para que te asigne un proyecto</p>
+        </div>
       </div>
     {% endif %}
   </div>
+</div>
 
-  <!-- Información del proyecto -->
-  {% if proyectos %}
-  <div class="row g-3">
-    <div class="col-md-6">
-      <div class="work-card">
-        <div class="work-card-header">
-          <h3 class="work-card-title">
-            <i class="bi bi-building"></i>
-            Mi Proyecto Asignado
-          </h3>
+{% if proyecto_asignado %}
+  <!-- Mini Stats -->
+  <div class="mini-stats">
+    <div class="mini-stat-card" style="border-color: var(--worker-primary);">
+      <div class="mini-stat-label">
+        <i class="bi bi-houses me-2"></i>Viviendas
+      </div>
+      <div class="mini-stat-value" style="color: var(--worker-primary);">{{ viviendas|length }}</div>
+    </div>
+    
+    <div class="mini-stat-card" style="border-color: #3b82f6;">
+      <div class="mini-stat-label">
+        <i class="bi bi-clipboard-data me-2"></i>Observaciones
+      </div>
+      <div class="mini-stat-value" style="color: #3b82f6;">{{ registros|length }}</div>
+    </div>
+    
+    <div class="mini-stat-card" style="border-color: var(--urgent);">
+      <div class="mini-stat-label">
+        <i class="bi bi-exclamation-triangle me-2"></i>Urgentes
+      </div>
+      <div class="mini-stat-value" style="color: var(--urgent);">
+        {{ registros|length|add:-5|default:0 }}
+      </div>
+    </div>
+    
+    <div class="mini-stat-card" style="border-color: var(--success);">
+      <div class="mini-stat-label">
+        <i class="bi bi-check-circle me-2"></i>Resueltas Hoy
+      </div>
+      <div class="mini-stat-value" style="color: var(--success);">0</div>
+    </div>
+  </div>
+
+  <!-- Acciones Rápidas -->
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="bi bi-lightning-charge-fill"></i>
+      Acciones Rápidas
+    </h2>
+  </div>
+
+  <div class="action-grid">
+    <!-- Ver Fichas de Inmuebles -->
+    <a href="{% url 'fichas_inmuebles' %}?proyecto={{ proyecto_asignado.id }}" class="action-card">
+      <div class="action-badge" style="background: #8b5cf6; color: white;">
+        <i class="bi bi-star-fill me-1"></i>NUEVO
+      </div>
+      <div class="action-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white;">
+        <i class="bi bi-folder-open"></i>
+      </div>
+      <h3 class="action-title">Fichas de Inmuebles</h3>
+      <p class="action-description">
+        Ver todas las viviendas del proyecto con sus observaciones y estado.
+      </p>
+    </a>
+    
+    <!-- Registrar Observación -->
+    <a href="{% url 'reportar_observacion_trabajador' %}" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;">
+        <i class="bi bi-plus-circle"></i>
+      </div>
+      <h3 class="action-title">Nueva Observación</h3>
+      <p class="action-description">
+        Registrar una nueva observación o incidencia en terreno.
+      </p>
+    </a>
+    
+    <!-- Mis Observaciones -->
+    <a href="{% url 'fichas_inmuebles' %}" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white;">
+        <i class="bi bi-clipboard-data"></i>
+      </div>
+      <h3 class="action-title">Ver Fichas</h3>
+      <p class="action-description">
+        Ver todas las fichas de inmuebles y sus observaciones.
+      </p>
+    </a>
+    
+    <!-- Mi Perfil -->
+    <a href="{% url 'perfil' %}" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <h3 class="action-title">Mi Perfil</h3>
+      <p class="action-description">
+        Ver y editar mi información personal y de contacto.
+      </p>
+    </a>
+  </div>
+
+  <!-- Observaciones Recientes -->
+  <div class="section-header">
+    <h2 class="section-title">
+      <i class="bi bi-clock-history"></i>
+      Observaciones Recientes
+    </h2>
+    <a href="{% url 'fichas_inmuebles' %}" class="btn btn-outline-success">
+      Ver Todas <i class="bi bi-arrow-right ms-2"></i>
+    </a>
+  </div>
+
+  <div class="observaciones-list">
+    {% if registros %}
+      {% for reg in registros|slice:":10" %}
+        <div class="observacion-item">
+          <div class="urgencia-badge urgencia-{{ reg.urgencia|lower }}"></div>
+          
+          <div class="observacion-content">
+            <div class="observacion-header">
+              <div>
+                <div class="observacion-recinto">
+                  <i class="bi bi-house-door me-2"></i>{{ reg.recinto }}
+                </div>
+              </div>
+              <span class="estado-badge estado-{{ reg.estado|lower|cut:' '|cut:'_' }}">
+                {{ reg.get_estado_display }}
+              </span>
+            </div>
+            
+            <p class="observacion-text">{{ reg.observacion|truncatewords:20 }}</p>
+            
+            <div class="observacion-meta">
+              <div class="meta-item-obs">
+                <i class="bi bi-exclamation-circle"></i>
+                <span>{{ reg.get_urgencia_display }}</span>
+              </div>
+              <div class="meta-item-obs">
+                <i class="bi bi-clock"></i>
+                <span>{{ reg.creado_en|timesince }} atrás</span>
+              </div>
+              {% if reg.reportante %}
+                <div class="meta-item-obs">
+                  <i class="bi bi-person"></i>
+                  <span>
+                    {% if reg.reportante.first_name %}
+                      {{ reg.reportante.first_name }} {{ reg.reportante.last_name|default:"" }}
+                    {% else %}
+                      {{ reg.reportante.username }}
+                    {% endif %}
+                  </span>
+                </div>
+              {% endif %}
+              {% if reg.evidencias.count > 0 %}
+                <div class="meta-item-obs">
+                  <i class="bi bi-paperclip"></i>
+                  <span>{{ reg.evidencias.count }} archivo(s)</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
-        <div class="p-3">
-          {% with p=proyectos.0 %}
-          <div class="mb-2">
-            <strong>Código:</strong> {{ p.codigo }}
-          </div>
-          <div class="mb-2">
-            <strong>Nombre:</strong> {{ p.nombre }}
-          </div>
-          <div>
-            <strong>Ubicación:</strong> {{ p.comuna|default:"No especificado" }}, {{ p.region|default:"Chile" }}
-          </div>
-          {% endwith %}
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <i class="bi bi-inbox"></i>
+        <h3>No hay observaciones recientes</h3>
+        <p>Las observaciones registradas aparecerán aquí</p>
+        <a href="{% url 'reportar_observacion_trabajador' %}" class="btn btn-success btn-lg mt-3">
+          <i class="bi bi-plus-circle me-2"></i>Registrar Primera Observación
+        </a>
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <!-- Sin Proyecto Asignado -->
+  <div class="empty-state">
+    <i class="bi bi-building"></i>
+    <h3>No tienes un proyecto asignado</h3>
+    <p>Contacta con tu administrador para que te asigne un proyecto y puedas comenzar a trabajar</p>
+    <a href="{% url 'perfil' %}" class="btn btn-primary btn-lg mt-3">
+      <i class="bi bi-person-circle me-2"></i>Ver Mi Perfil
+    </a>
+  </div>
+{% endif %}
+
+<!-- Tips para Trabajo en Terreno -->
+<div class="section-header mt-5">
+  <h2 class="section-title">
+    <i class="bi bi-tools"></i>
+    Guía de Trabajo en Terreno
+  </h2>
+</div>
+
+<div class="quick-tips-grid">
+  <div class="tip-card">
+    <div class="tip-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+      <i class="bi bi-camera-fill"></i>
+    </div>
+    <h4 class="tip-title">Documenta con Evidencias</h4>
+    <p class="tip-text">Siempre toma fotos de las observaciones. Las evidencias fotográficas son cruciales para el seguimiento.</p>
+  </div>
+  
+  <div class="tip-card">
+    <div class="tip-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <h4 class="tip-title">Prioriza Urgencias</h4>
+    <p class="tip-text">Clasifica correctamente la urgencia de cada observación. Las urgencias altas notifican automáticamente al equipo.</p>
+  </div>
+  
+  <div class="tip-card">
+    <div class="tip-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">
+      <i class="bi bi-chat-dots-fill"></i>
+    </div>
+    <h4 class="tip-title">Comunicación Clara</h4>
+    <p class="tip-text">Describe las observaciones de forma clara y detallada. Esto facilita la resolución rápida de problemas.</p>
+  </div>
+  
+  <div class="tip-card">
+    <div class="tip-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+      <i class="bi bi-clock-history"></i>
+    </div>
+    <h4 class="tip-title">Seguimiento Constante</h4>
+    <p class="tip-text">Actualiza el estado de las observaciones regularmente para mantener al equipo informado del progreso.</p>
+  </div>
+</div>
+
+<!-- Sobre la Plataforma -->
+<div class="about-platform-section">
+  <div class="about-content">
+    <div class="about-header">
+      <div class="about-logo">
+        <i class="bi bi-hammer"></i>
+      </div>
+      <div>
+        <h2 class="about-title">Tu Herramienta de Trabajo en Terreno</h2>
+        <p class="about-subtitle">Gestión profesional post-venta para trabajadores TECHO</p>
+      </div>
+    </div>
+    
+    <div class="about-description">
+      <p>
+        Esta plataforma está diseñada para facilitarte el <strong>trabajo en terreno</strong>, permitiéndote 
+        registrar observaciones, hacer seguimiento y comunicarte eficientemente con el equipo administrativo 
+        y las familias beneficiarias.
+      </p>
+    </div>
+    
+    <div class="about-features-grid">
+      <div class="about-feature">
+        <div class="feature-icon" style="background: #d1fae5; color: #065f46;">
+          <i class="bi bi-clipboard-check-fill"></i>
+        </div>
+        <div>
+          <h4>Registro Rápido de Observaciones</h4>
+          <p>Registra problemas y observaciones directamente desde el terreno con fotos y clasificación de urgencia.</p>
+        </div>
+      </div>
+      
+      <div class="about-feature">
+        <div class="feature-icon" style="background: #dbeafe; color: #1e40af;">
+          <i class="bi bi-house-check-fill"></i>
+        </div>
+        <div>
+          <h4>Fichas Completas de Viviendas</h4>
+          <p>Accede a información completa de cada vivienda: propietarios, historial de observaciones y estado.</p>
+        </div>
+      </div>
+      
+      <div class="about-feature">
+        <div class="feature-icon" style="background: #fef3c7; color: #92400e;">
+          <i class="bi bi-speedometer2"></i>
+        </div>
+        <div>
+          <h4>Monitoreo en Tiempo Real</h4>
+          <p>Visualiza el progreso de todas las observaciones y actualiza estados en tiempo real desde cualquier lugar.</p>
+        </div>
+      </div>
+      
+      <div class="about-feature">
+        <div class="feature-icon" style="background: #fce7f3; color: #9f1239;">
+          <i class="bi bi-people-fill"></i>
+        </div>
+        <div>
+          <h4>Conexión con Familias</h4>
+          <p>Las familias pueden reportar problemas que llegarán directamente a tu panel para atención inmediata.</p>
         </div>
       </div>
     </div>
     
-    <div class="col-md-6">
-      <div class="work-card">
-        <div class="work-card-header">
-          <h3 class="work-card-title">
-            <i class="bi bi-house"></i>
-            Viviendas
-          </h3>
+    <div class="about-mission">
+      <div class="mission-icon">
+        <i class="bi bi-heart-fill"></i>
+      </div>
+      <div class="mission-content">
+        <h3>Tu Rol es Fundamental</h3>
+        <p>
+          Como trabajador en terreno, eres el <strong>puente entre TECHO y las familias</strong>. Tu labor diaria 
+          asegura que cada vivienda entregada cumpla con los estándares de calidad y que las familias reciban 
+          el apoyo que necesitan durante los primeros 120 días críticos post-entrega.
+        </p>
+      </div>
+    </div>
+    
+    <div class="about-stats-worker">
+      <div class="worker-stat-box">
+        <div class="worker-stat-icon" style="background: #dbeafe; color: #1e40af;">
+          <i class="bi bi-shield-check"></i>
         </div>
-        <div class="p-3">
-          <div class="mb-2">
-            <strong>Total de viviendas:</strong> {{ viviendas|length }}
-          </div>
-          <div class="mb-2">
-            <strong>Estado:</strong> <span class="badge-urgency low">Activo</span>
-          </div>
-          <div>
-            <a href="/viviendas/" class="btn btn-sm btn-outline-primary">
-              <i class="bi bi-list me-1"></i> Ver listado completo
-            </a>
-          </div>
+        <div>
+          <h4>Cumplimiento Legal</h4>
+          <p>Tu trabajo contribuye al cumplimiento del DS49, asegurando los derechos de las familias.</p>
+        </div>
+      </div>
+      
+      <div class="worker-stat-box">
+        <div class="worker-stat-icon" style="background: #d1fae5; color: #065f46;">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div>
+          <h4>Mejora Continua</h4>
+          <p>Tus reportes ayudan a identificar áreas de mejora en los procesos constructivos.</p>
         </div>
       </div>
     </div>
-  </div>
-  {% endif %}
-{% endif %}
-
-<!-- Modal para evidencias (HTMX) -->
-<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-paperclip me-2"></i>
-          Gestión de Evidencia
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <!-- Contenido cargado dinámicamente -->
-      </div>
+    
+    <div class="about-footer">
+      <p>
+        <i class="bi bi-question-circle-fill me-2"></i>
+        <strong>¿Tienes dudas?</strong> Contacta a tu coordinador o visita el 
+        <a href="/ayuda/" style="color: var(--worker-primary); text-decoration: underline;">Centro de Ayuda</a>.
+      </p>
     </div>
   </div>
 </div>
-{% endblock %}
 
+{% endblock %}

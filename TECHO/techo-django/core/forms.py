@@ -158,11 +158,13 @@ class ViviendaForm(forms.ModelForm):
     class Meta:
         model = Vivienda
         fields = [
-            "proyecto", "tipo", "modelo", "cant_cuartos", "cant_banos", "piso",
-            "direccion", "numero", "block_villa", "comuna", "region", "rut_propietario"
+            "proyecto", "constructora", "tipo", "modelo", "cant_cuartos", "cant_banos", "piso",
+            "direccion", "numero", "block_villa", "comuna", "region", 
+            "rut_propietario", "nombre_propietario", "telefono_propietario", "email_propietario"
         ]
         widgets = {
             'proyecto': forms.Select(attrs={'class': 'form-select'}),
+            'constructora': forms.Select(attrs={'class': 'form-select'}),
             'tipo': forms.Select(attrs={'class': 'form-select'}),
             'modelo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Casa 45m²'}),
             'cant_cuartos': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
@@ -173,10 +175,14 @@ class ViviendaForm(forms.ModelForm):
             'block_villa': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Block A, Villa Los Álamos (opcional)'}),
             'comuna': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Puente Alto'}),
             'region': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Metropolitana'}),
-            'rut_propietario': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9'}),
+            'rut_propietario': forms.TextInput(attrs={'class': 'form-control', 'placeholder': '12.345.678-9', 'id': 'id_rut_propietario'}),
+            'nombre_propietario': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Juan Pablo Pérez González', 'id': 'id_nombre_propietario'}),
+            'telefono_propietario': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: +56 9 1234 5678', 'id': 'id_telefono_propietario'}),
+            'email_propietario': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Ej: correo@ejemplo.cl', 'id': 'id_email_propietario'}),
         }
         labels = {
             'proyecto': 'Proyecto',
+            'constructora': 'Constructora',
             'tipo': 'Tipo de Vivienda',
             'modelo': 'Modelo',
             'cant_cuartos': 'Cantidad de Cuartos',
@@ -188,6 +194,9 @@ class ViviendaForm(forms.ModelForm):
             'comuna': 'Comuna',
             'region': 'Región',
             'rut_propietario': 'RUT Propietario/Beneficiario',
+            'nombre_propietario': 'Nombre Completo del Propietario',
+            'telefono_propietario': 'Teléfono de Contacto',
+            'email_propietario': 'Email del Propietario',
         }
 
 class RegistroPostventaForm(forms.ModelForm):

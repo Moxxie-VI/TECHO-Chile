@@ -58,7 +58,9 @@ class Proyecto(models.Model):
 
 class Vivienda(models.Model):
     TIPO = (("CASA","CASA"),("DEPARTAMENTO","DEPARTAMENTO"))
-    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
+    proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE, related_name="viviendas")
+    constructora = models.ForeignKey(Constructora, on_delete=models.SET_NULL, null=True, blank=True, 
+                                     verbose_name="Constructora", help_text="Constructora asignada a esta vivienda")
     
     # IDENTIFICACIÓN DE LA VIVIENDA
     tipo = models.CharField(max_length=20, choices=TIPO)
@@ -68,24 +70,53 @@ class Vivienda(models.Model):
     piso = models.CharField(max_length=50, blank=True, verbose_name="Piso")
     
     # UBICACIÓN DE LA VIVIENDA
-    direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección", help_text="Calle y número")
+    direccion = models.CharField(max_length=250, blank=True, verbose_name="Dirección", help_text="Calle principal")
     numero = models.CharField(max_length=20, blank=True, verbose_name="Número de Casa/Depto")
     block_villa = models.CharField(max_length=50, blank=True, verbose_name="Block/Villa", help_text="Opcional")
     comuna = models.CharField(max_length=100, blank=True, verbose_name="Comuna")
     region = models.CharField(max_length=100, blank=True, verbose_name="Región")
     
-    # PROPIETARIO/BENEFICIARIO
+    # PROPIETARIO/BENEFICIARIO (FAMILIA)
     rut_propietario = models.CharField(
         max_length=12,
         blank=True,
-        verbose_name="RUT Propietario/Beneficiario",
-        help_text="RUT de la familia beneficiaria"
+        verbose_name="RUT Propietario",
+        help_text="RUT de la familia beneficiaria (ej: 12.345.678-9)"
+    )
+    nombre_propietario = models.CharField(
+        max_length=200,
+        blank=True,
+        verbose_name="Nombre Completo Propietario",
+        help_text="Nombre y apellidos del beneficiario"
+    )
+    telefono_propietario = models.CharField(
+        max_length=20,
+        blank=True,
+        verbose_name="Teléfono de Contacto",
+        help_text="Teléfono del propietario"
+    )
+    email_propietario = models.EmailField(
+        blank=True,
+        verbose_name="Email Propietario",
+        help_text="Correo electrónico del beneficiario"
     )
     
     def __str__(self): 
         if self.direccion and self.numero:
             return f"{self.proyecto.codigo} - {self.direccion} #{self.numero}"
+        elif self.nombre_propietario:
+            return f"{self.proyecto.codigo} - {self.nombre_propietario}"
         return f"{self.proyecto.codigo}-{self.id}-{self.tipo}"
+    
+    def get_direccion_completa(self):
+        """Retorna la dirección completa formateada"""
+        parts = [self.direccion, self.numero, self.block_villa, self.comuna, self.region]
+        return ", ".join([p for p in parts if p])
+    
+    class Meta:
+        verbose_name = "Vivienda"
+        verbose_name_plural = "Viviendas"
+        ordering = ['proyecto__codigo', 'numero']
 
 class FichaInmueble(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)

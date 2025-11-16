@@ -2,13 +2,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.decorators import require_role
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.mail import EmailMessage
-from django.db.models import Count
+from django.db.models import Count, Q
 from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario
 from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
@@ -825,3 +825,335 @@ def buscar_familia_por_rut(request):
     }
     
     return render(request, "core/buscar_familia_rut.html", context)
+
+
+# ============================================
+# NUEVAS VISTAS - FICHA DE INMUEBLES
+# ============================================
+
+@login_required
+@require_role("Admin", "Trabajador")
+def fichas_inmuebles(request):
+    """Vista para ver todas las fichas de inmuebles con observaciones"""
+    perfil = request.user.perfil
+    
+    # Obtener parámetros de búsqueda
+    proyecto_id = request.GET.get('proyecto')
+    busqueda = request.GET.get('q', '').strip()
+    
+    # Filtrar fichas según rol
+    if perfil.rol == "Admin":
+        fichas = FichaInmueble.objects.select_related(
+            'proyecto', 'vivienda'
+        ).prefetch_related('registropostventa_set')
+    else:  # Trabajador
+        if perfil.proyecto_asignado:
+            fichas = FichaInmueble.objects.filter(
+                proyecto=perfil.proyecto_asignado
+            ).select_related('proyecto', 'vivienda').prefetch_related('registropostventa_set')
+        else:
+            fichas = FichaInmueble.objects.none()
+    
+    # Aplicar filtros
+    if proyecto_id:
+        fichas = fichas.filter(proyecto_id=proyecto_id)
+    
+    if busqueda:
+        fichas = fichas.filter(
+            Q(vivienda__rut_propietario__icontains=busqueda) |
+            Q(vivienda__direccion__icontains=busqueda) |
+            Q(vivienda__numero__icontains=busqueda) |
+            Q(proyecto__codigo__icontains=busqueda) |
+            Q(proyecto__nombre__icontains=busqueda)
+        )
+    
+    # Anotar cantidad de observaciones
+    fichas = fichas.annotate(
+        total_observaciones=Count('registropostventa'),
+        observaciones_pendientes=Count('registropostventa', filter=Q(registropostventa__estado='PENDIENTE')),
+        observaciones_urgentes=Count('registropostventa', filter=Q(registropostventa__urgencia='ALTA'))
+    ).order_by('-observaciones_urgentes', '-total_observaciones')
+    
+    # Obtener proyectos para el filtro
+    if perfil.rol == "Admin":
+        proyectos = Proyecto.objects.all().order_by('codigo')
+    else:
+        proyectos = Proyecto.objects.filter(id=perfil.proyecto_asignado_id) if perfil.proyecto_asignado else []
+    
+    context = {
+        'rol': perfil.rol,
+        'fichas': fichas[:100],  # Limitar a 100 para rendimiento
+        'proyectos': proyectos,
+        'proyecto_seleccionado': proyecto_id,
+        'busqueda': busqueda,
+    }
+    
+    return render(request, 'core/fichas_inmuebles.html', context)
+
+
+@login_required
+@require_role("Admin", "Trabajador")
+def detalle_ficha_inmueble(request, ficha_id):
+    """Vista detallada de una ficha de inmueble con todas sus observaciones"""
+    perfil = request.user.perfil
+    
+    ficha = get_object_or_404(
+        FichaInmueble.objects.select_related('proyecto', 'vivienda'),
+        id=ficha_id
+    )
+    
+    # Verificar permisos
+    if perfil.rol == "Trabajador" and ficha.proyecto != perfil.proyecto_asignado:
+        messages.error(request, "No tienes permisos para ver esta ficha")
+        return redirect('fichas_inmuebles')
+    
+    # Obtener observaciones con evidencias
+    observaciones = RegistroPostventa.objects.filter(
+        ficha=ficha
+    ).select_related('reportante').prefetch_related('evidencias').order_by('-creado_en')
+    
+    # Obtener perfil del propietario si existe
+    propietario = None
+    if ficha.vivienda.rut_propietario:
+        try:
+            propietario = PerfilUsuario.objects.filter(
+                rut=ficha.vivienda.rut_propietario
+            ).select_related('user').first()
+        except:
+            pass
+    
+    # Calcular días en postventa
+    dias_postventa = ficha.dias_desde_entrega() if ficha.fecha_entrega else 0
+    dias_restantes_ds49 = ficha.dias_restantes_ds49() if ficha.fecha_entrega else None
+    estado_ds49 = ficha.estado_ds49()
+    porcentaje_ds49 = ficha.porcentaje_ds49()
+    
+    context = {
+        'rol': perfil.rol,
+        'ficha': ficha,
+        'vivienda': ficha.vivienda,
+        'proyecto': ficha.proyecto,
+        'observaciones': observaciones,
+        'propietario': propietario,
+        'total_observaciones': observaciones.count(),
+        'observaciones_pendientes': observaciones.filter(estado='PENDIENTE').count(),
+        'observaciones_urgentes': observaciones.filter(urgencia='ALTA').count(),
+        'dias_postventa': dias_postventa,
+        'dias_restantes_ds49': dias_restantes_ds49,
+        'estado_ds49': estado_ds49,
+        'porcentaje_ds49': porcentaje_ds49,
+    }
+    
+    return render(request, 'core/detalle_ficha_inmueble.html', context)
+
+
+@login_required
+@require_POST
+def actualizar_fecha_entrega(request, ficha_id):
+    """Actualiza la fecha de entrega de una ficha de inmueble"""
+    ficha = get_object_or_404(FichaInmueble, id=ficha_id)
+    
+    # Verificar permisos
+    try:
+        perfil = request.user.perfil
+        rol = perfil.rol if hasattr(perfil, 'rol') else None
+    except:
+        return JsonResponse({'error': 'No se pudo obtener el perfil del usuario'}, status=400)
+    
+    if rol not in ["Admin", "Trabajador"]:
+        return JsonResponse({'error': 'No tienes permisos para realizar esta acción'}, status=403)
+    
+    if rol == "Trabajador" and hasattr(perfil, 'proyecto_asignado'):
+        if ficha.proyecto != perfil.proyecto_asignado:
+            return JsonResponse({'error': 'No tienes permisos para editar esta ficha'}, status=403)
+    
+    # Obtener la fecha del request
+    fecha_entrega = request.POST.get('fecha_entrega')
+    
+    if not fecha_entrega:
+        return JsonResponse({'error': 'Debe proporcionar una fecha de entrega'}, status=400)
+    
+    try:
+        from datetime import datetime
+        ficha.fecha_entrega = datetime.strptime(fecha_entrega, '%Y-%m-%d').date()
+        ficha.save()
+        
+        messages.success(request, f'Fecha de entrega actualizada correctamente a {ficha.fecha_entrega.strftime("%d/%m/%Y")}')
+        
+        return JsonResponse({
+            'success': True,
+            'fecha_entrega': ficha.fecha_entrega.strftime('%Y-%m-%d'),
+            'dias_desde_entrega': ficha.dias_desde_entrega(),
+            'dias_restantes_ds49': ficha.dias_restantes_ds49(),
+            'estado_ds49': ficha.estado_ds49(),
+            'porcentaje_ds49': ficha.porcentaje_ds49(),
+        })
+    except ValueError:
+        return JsonResponse({'error': 'Formato de fecha inválido'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+@require_role("Admin")
+def buscar_usuario_por_rut(request):
+    """API para buscar usuario por RUT (para autocompletar en formulario de vivienda)"""
+    rut = request.GET.get('rut', '').strip()
+    
+    if not rut:
+        return JsonResponse({'error': 'RUT requerido'}, status=400)
+    
+    try:
+        perfil = PerfilUsuario.objects.filter(rut=rut).select_related('user').first()
+        
+        if perfil:
+            return JsonResponse({
+                'found': True,
+                'nombre': perfil.nombre,
+                'apellido': perfil.apellido,
+                'nombre_completo': perfil.get_nombre_completo(),
+                'telefono': perfil.telefono or '',
+                'direccion': perfil.direccion or '',
+                'ciudad': perfil.ciudad or '',
+                'comuna': perfil.comuna or '',
+                'region': perfil.region or '',
+                'correo': perfil.user.email if perfil.user else '',
+                'rol': perfil.rol,
+            })
+        else:
+            return JsonResponse({'found': False})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+# =============================================================================
+# ASIGNACIÓN DE TRABAJADORES A PROYECTOS
+# =============================================================================
+
+@login_required
+@require_role("Admin")
+def asignar_trabajadores_proyecto(request):
+    """Vista para que Admin asigne trabajadores a proyectos"""
+    perfil = request.user.perfil
+    
+    # Obtener todos los proyectos y trabajadores
+    proyectos = Proyecto.objects.all().order_by('codigo')
+    trabajadores = PerfilUsuario.objects.filter(rol="Trabajador").select_related('user', 'proyecto_asignado')
+    
+    if request.method == "POST":
+        trabajador_id = request.POST.get('trabajador_id')
+        proyecto_id = request.POST.get('proyecto_id')
+        accion = request.POST.get('accion')
+        
+        try:
+            trabajador = PerfilUsuario.objects.get(id=trabajador_id, rol="Trabajador")
+            
+            if accion == 'asignar' and proyecto_id:
+                proyecto = Proyecto.objects.get(id=proyecto_id)
+                trabajador.proyecto_asignado = proyecto
+                trabajador.save()
+                messages.success(request, f'✅ {trabajador.get_nombre_completo()} asignado al proyecto {proyecto.codigo}')
+            elif accion == 'desasignar':
+                proyecto_anterior = trabajador.proyecto_asignado
+                trabajador.proyecto_asignado = None
+                trabajador.save()
+                messages.success(request, f'✅ {trabajador.get_nombre_completo()} removido del proyecto {proyecto_anterior.codigo if proyecto_anterior else ""}')
+                
+            return redirect('asignar_trabajadores_proyecto')
+        except Exception as e:
+            messages.error(request, f'❌ Error: {str(e)}')
+            return redirect('asignar_trabajadores_proyecto')
+    
+    context = {
+        'rol': perfil.rol,
+        'proyectos': proyectos,
+        'trabajadores': trabajadores,
+        'trabajadores_sin_proyecto': trabajadores.filter(proyecto_asignado__isnull=True),
+        'trabajadores_con_proyecto': trabajadores.filter(proyecto_asignado__isnull=False),
+    }
+    
+    return render(request, 'core/asignar_trabajadores_proyecto.html', context)
+
+
+# =============================================================================
+# REPORTAR OBSERVACIONES - TRABAJADOR
+# =============================================================================
+
+@login_required
+@require_role("Trabajador")
+def reportar_observacion_trabajador(request):
+    """Vista para que los trabajadores reporten observaciones"""
+    from .forms import ObservacionFamiliaForm
+    
+    perfil = request.user.perfil
+    
+    # Verificar que el trabajador tenga proyecto asignado
+    if not perfil.proyecto_asignado:
+        messages.error(request, "Aún no tienes un proyecto asignado. Contacta con el administrador.")
+        return redirect("dashboard")
+    
+    proyecto = perfil.proyecto_asignado
+    
+    # Obtener todas las viviendas del proyecto
+    viviendas = Vivienda.objects.filter(proyecto=proyecto).order_by('numero')
+    
+    if request.method == "POST":
+        form = ObservacionFamiliaForm(request.POST, request.FILES)
+        vivienda_id = request.POST.get('vivienda_id')
+        
+        if not vivienda_id:
+            messages.error(request, "Debes seleccionar una vivienda")
+            return redirect('reportar_observacion_trabajador')
+        
+        try:
+            vivienda = Vivienda.objects.get(id=vivienda_id, proyecto=proyecto)
+        except Vivienda.DoesNotExist:
+            messages.error(request, "Vivienda no encontrada en tu proyecto")
+            return redirect('reportar_observacion_trabajador')
+        
+        if form.is_valid():
+            # Obtener o crear la ficha de inmueble
+            ficha, created = FichaInmueble.objects.get_or_create(
+                proyecto=proyecto,
+                vivienda=vivienda
+            )
+            
+            # Crear el registro de observación
+            registro = form.save(commit=False)
+            registro.proyecto = proyecto
+            registro.ficha = ficha
+            registro.reportante = request.user
+            registro.save()
+            
+            # Procesar evidencias (archivos múltiples - fotos y videos)
+            archivos = request.FILES.getlist('evidencias')
+            evidencias_creadas = 0
+            
+            for archivo in archivos[:10]:  # Máximo 10 archivos
+                if archivo.size <= 50 * 1024 * 1024:  # Máximo 50 MB por archivo (para videos)
+                    Evidencia.objects.create(
+                        registro=registro,
+                        archivo=archivo,
+                        comentario=f"Evidencia subida por {request.user.username} (Trabajador)",
+                        subido_por=request.user
+                    )
+                    evidencias_creadas += 1
+            
+            # Mensaje de éxito
+            mensaje = f"✅ Tu observación sobre '{registro.recinto}' en {vivienda} ha sido registrada exitosamente."
+            if evidencias_creadas > 0:
+                mensaje += f" Se guardaron {evidencias_creadas} archivo(s) de evidencia."
+            
+            messages.success(request, mensaje)
+            return redirect("dashboard")
+    else:
+        form = ObservacionFamiliaForm()
+    
+    context = {
+        'rol': perfil.rol,
+        'form': form,
+        'proyecto': proyecto,
+        'viviendas': viviendas,
+    }
+    
+    return render(request, "core/reportar_observacion_trabajador.html", context)

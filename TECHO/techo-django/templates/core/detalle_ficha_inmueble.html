@@ -1,0 +1,1393 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Ficha {{ ficha.vivienda.direccion }} · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+.detalle-header {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+}
+
+.detalle-header h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.detalle-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+  flex-wrap: wrap;
+}
+
+.detalle-breadcrumb a {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+.detalle-breadcrumb a:hover {
+  opacity: 0.8;
+}
+
+.info-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-section {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--fg);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.info-value {
+  font-weight: 700;
+  color: var(--fg);
+  text-align: right;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--stat-color);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--stat-color);
+}
+
+.observaciones-list {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 2px solid var(--border);
+}
+
+.observacion-item {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-left: 5px solid var(--urgencia-color);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.observacion-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.observacion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 1rem;
+}
+
+.observacion-recinto {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-pendiente { background: #fef3c7; color: #92400e; }
+.badge-en-progreso { background: #dbeafe; color: #1e40af; }
+.badge-resuelto { background: #d1fae5; color: #065f46; }
+
+.observacion-text {
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.observacion-meta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.evidencias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.evidencia-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid var(--border);
+  background: var(--card);
+}
+
+.evidencia-foto {
+  cursor: pointer;
+}
+
+.evidencia-foto:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border-color: #8b5cf6;
+}
+
+.evidencia-video {
+  padding: 0;
+}
+
+.evidencia-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.evidencia-video-player {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.evidencia-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  color: white;
+  font-weight: 700;
+  gap: 0.5rem;
+}
+
+.evidencia-foto:hover .evidencia-overlay {
+  opacity: 1;
+}
+
+.evidencia-overlay i {
+  font-size: 2rem;
+}
+
+.btn-ver-completo {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.btn-ver-completo:hover {
+  background: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
+}
+
+.evidencia-comentario {
+  padding: 0.75rem 1rem;
+  background: var(--hover);
+  border-top: 1px solid var(--border);
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.evidencia-meta {
+  padding: 0.5rem 1rem;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Modal para ver imágenes */
+.modal-evidencia {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99999;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.modal-evidencia.active {
+  display: flex;
+}
+
+.modal-evidencia-content {
+  max-width: 90%;
+  max-height: 90%;
+  position: relative;
+}
+
+.modal-evidencia-content img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: white;
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.modal-close-btn:hover {
+  background: #f1f5f9;
+}
+
+.btn-back {
+  padding: 0.875rem 1.75rem;
+  background: white;
+  color: #8b5cf6;
+  border: 2px solid white;
+  border-radius: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateX(-4px);
+  color: #7c3aed;
+}
+
+.empty-observaciones {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+}
+
+.empty-observaciones i {
+  font-size: 4rem;
+  opacity: 0.2;
+  margin-bottom: 1.5rem;
+}
+
+/* DS49 Section */
+.ds49-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 24px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  border: 2px solid #bae6fd;
+}
+
+.ds49-header h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0c4a6e;
+  margin-bottom: 0.5rem;
+}
+
+.ds49-subtitle {
+  color: #0369a1;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ds49-content {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+}
+
+.ds49-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.ds49-date-display {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 280px;
+}
+
+.ds49-date-display i {
+  font-size: 2rem;
+  color: #3b82f6;
+}
+
+.ds49-date-display .label {
+  display: block;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ds49-date-display .value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.btn-edit-date {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-edit-date:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.ds49-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.ds49-stat {
+  background: #f8fafc;
+  padding: 1.25rem;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 160px;
+}
+
+.ds49-stat i {
+  font-size: 1.75rem;
+  color: #10b981;
+}
+
+.ds49-stat .label {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ds49-stat .value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.ds49-progress-bar {
+  background: #e2e8f0;
+  height: 32px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.5s ease;
+}
+
+.progress-fill.estado-normal { background: linear-gradient(90deg, #10b981 0%, #059669 100%); }
+.progress-fill.estado-advertencia { background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%); }
+.progress-fill.estado-critico { background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); }
+.progress-fill.estado-vencido { background: linear-gradient(90deg, #991b1b 0%, #7f1d1d 100%); }
+
+.ds49-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.75rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.ds49-status-badge.estado-normal {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.ds49-status-badge.estado-advertencia {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.ds49-status-badge.estado-critico {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.ds49-status-badge.estado-vencido {
+  background: #450a0a;
+  color: white;
+}
+
+.ds49-no-date {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.ds49-no-date i {
+  font-size: 4rem;
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.ds49-no-date h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.75rem;
+}
+
+.ds49-no-date p {
+  color: #64748b;
+  margin-bottom: 2rem;
+}
+
+.btn-add-date {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-date:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-header {
+  padding: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.modal-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+/* Beneficiario Badge */
+.beneficiario-badge {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid #6ee7b7;
+}
+
+.no-beneficiario-info {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: #f8fafc;
+  border-radius: 14px;
+}
+
+.info-label i {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .info-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .detalle-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .ds49-section {
+    padding: 1.5rem;
+  }
+  
+  .ds49-info-row {
+    flex-direction: column;
+  }
+  
+  .ds49-stats {
+    flex-direction: column;
+  }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editarFechaEntrega() {
+  console.log('Abriendo modal de fecha de entrega');
+  const modal = document.getElementById('modalFechaEntrega');
+  if (modal) {
+    modal.style.display = 'flex';
+  } else {
+    console.error('Modal no encontrado');
+  }
+}
+
+function cerrarModalFecha() {
+  console.log('Cerrando modal');
+  const modal = document.getElementById('modalFechaEntrega');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+async function guardarFechaEntrega(event) {
+  event.preventDefault();
+  console.log('Guardando fecha de entrega');
+  
+  const form = event.target;
+  const fechaInput = document.getElementById('fecha_entrega');
+  const fechaValue = fechaInput.value;
+  
+  console.log('Fecha seleccionada:', fechaValue);
+  
+  if (!fechaValue) {
+    alert('Por favor ingrese una fecha válida');
+    return;
+  }
+  
+  // Deshabilitar el botón de guardar para evitar múltiples clics
+  const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+  }
+  
+  try {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const url = '{% url "actualizar_fecha_entrega" ficha.id %}';
+    
+    console.log('Enviando a URL:', url);
+    console.log('CSRF Token:', csrftoken);
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrftoken,
+      },
+      body: `fecha_entrega=${fechaValue}`
+    });
+    
+    console.log('Respuesta recibida:', response.status);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Datos recibidos:', data);
+    
+    if (data.success) {
+      console.log('Fecha actualizada correctamente, recargando página...');
+      // Mostrar mensaje de éxito antes de recargar
+      alert('✅ Fecha de entrega actualizada correctamente');
+      window.location.reload();
+    } else {
+      throw new Error(data.error || 'Error desconocido al actualizar la fecha');
+    }
+  } catch (error) {
+    console.error('Error al guardar:', error);
+    alert('❌ Error al guardar la fecha: ' + error.message);
+    
+    // Rehabilitar el botón
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="bi bi-check-circle"></i> Guardar Fecha';
+    }
+  }
+}
+
+// Cerrar modal al hacer clic fuera
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM cargado, inicializando modal');
+  
+  const modal = document.getElementById('modalFechaEntrega');
+  if (modal) {
+    console.log('Modal encontrado');
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        cerrarModalFecha();
+      }
+    });
+  } else {
+    console.error('Modal no encontrado en el DOM');
+  }
+  
+  // Cerrar modal con tecla ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      cerrarModalFecha();
+      cerrarModalEvidencia();
+    }
+  });
+});
+
+// Funciones para modal de evidencias
+function abrirModal(url, tipo) {
+  const modal = document.getElementById('modalEvidencia');
+  const img = document.getElementById('modalEvidenciaImg');
+  
+  img.src = url;
+  modal.classList.add('active');
+  
+  // Prevenir scroll del body
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModalEvidencia() {
+  const modal = document.getElementById('modalEvidencia');
+  modal.classList.remove('active');
+  
+  // Restaurar scroll del body
+  document.body.style.overflow = '';
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="detalle-header">
+  <a href="{% url 'fichas_inmuebles' %}" class="btn-back mb-3">
+    <i class="bi bi-arrow-left"></i>
+    Volver a Fichas
+  </a>
+  
+  <div class="detalle-breadcrumb mb-3">
+    <a href="{% url 'fichas_inmuebles' %}">Fichas de Inmuebles</a>
+    <i class="bi bi-chevron-right"></i>
+    <span>{{ ficha.vivienda.direccion|default:"Sin dirección" }}</span>
+  </div>
+  
+  <h1>
+    <i class="bi bi-house-door-fill me-3"></i>{{ ficha.vivienda.direccion|default:"Sin dirección" }}
+  </h1>
+  <p class="mb-0" style="font-size: 1.1rem; opacity: 0.95;">
+    <i class="bi bi-geo-alt me-2"></i>{{ ficha.vivienda.comuna|default:"Sin comuna" }}, {{ ficha.vivienda.region|default:"Sin región" }}
+  </p>
+</div>
+
+<!-- Estado DS49 y Fecha de Entrega -->
+{% if rol == "Admin" or rol == "Trabajador" %}
+<div class="ds49-section" id="ds49-section">
+  <div class="ds49-header">
+    <h2>
+      <i class="bi bi-calendar-check me-2"></i>
+      Estado DS 49 - 120 Días Post-Entrega
+    </h2>
+    <p class="ds49-subtitle">Monitoreo del período legal de garantía</p>
+  </div>
+  
+  <div class="ds49-content">
+    {% if ficha.fecha_entrega %}
+      <div class="ds49-info-row">
+        <div class="ds49-date-display">
+          <i class="bi bi-calendar2-event"></i>
+          <div>
+            <span class="label">Fecha de Entrega</span>
+            <span class="value">{{ ficha.fecha_entrega|date:"d/m/Y" }}</span>
+          </div>
+          <button class="btn-edit-date" onclick="editarFechaEntrega()">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+        </div>
+        
+        <div class="ds49-stats">
+          <div class="ds49-stat">
+            <i class="bi bi-hourglass-split"></i>
+            <div>
+              <span class="label">Días Transcurridos</span>
+              <span class="value">{{ dias_postventa }}</span>
+            </div>
+          </div>
+          <div class="ds49-stat">
+            <i class="bi bi-clock-history"></i>
+            <div>
+              <span class="label">Días Restantes</span>
+              <span class="value">{{ dias_restantes_ds49 }}</span>
+            </div>
+          </div>
+          <div class="ds49-stat">
+            <i class="bi bi-speedometer2"></i>
+            <div>
+              <span class="label">Progreso</span>
+              <span class="value">{{ porcentaje_ds49 }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ds49-progress-bar">
+        <div class="progress-fill estado-{{ estado_ds49|lower }}" style="width: {{ porcentaje_ds49 }}%;">
+          <span>{{ porcentaje_ds49 }}% completado</span>
+        </div>
+      </div>
+      
+      <div class="ds49-status-badge estado-{{ estado_ds49|lower }}">
+        {% if estado_ds49 == "NORMAL" %}
+          <i class="bi bi-check-circle-fill"></i> Estado Normal
+        {% elif estado_ds49 == "ADVERTENCIA" %}
+          <i class="bi bi-exclamation-circle-fill"></i> Advertencia - Menos de 30 días
+        {% elif estado_ds49 == "CRITICO" %}
+          <i class="bi bi-exclamation-triangle-fill"></i> Crítico - Menos de 15 días
+        {% elif estado_ds49 == "VENCIDO" %}
+          <i class="bi bi-x-circle-fill"></i> Período Vencido
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="ds49-no-date">
+        <i class="bi bi-calendar-x"></i>
+        <h3>No hay fecha de entrega asignada</h3>
+        <p>Configure la fecha de entrega para iniciar el monitoreo DS 49</p>
+        <button class="btn-add-date" onclick="editarFechaEntrega()">
+          <i class="bi bi-calendar-plus"></i> Establecer Fecha de Entrega
+        </button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Modal para editar fecha de entrega -->
+<div class="modal-overlay" id="modalFechaEntrega" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="bi bi-calendar-edit"></i> Establecer Fecha de Entrega</h3>
+      <button class="modal-close" onclick="cerrarModalFecha()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form id="formFechaEntrega" onsubmit="guardarFechaEntrega(event)">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="fecha_entrega">Fecha de Entrega de la Vivienda</label>
+          <input 
+            type="date" 
+            id="fecha_entrega" 
+            name="fecha_entrega" 
+            class="form-control" 
+            value="{{ ficha.fecha_entrega|date:'Y-m-d' }}"
+            max="{{ 'now'|date:'Y-m-d' }}"
+            required>
+          <small class="form-text">La fecha no puede ser futura</small>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="cerrarModalFecha()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary">
+            <i class="bi bi-check-circle"></i> Guardar Fecha
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Estadísticas -->
+<div class="stats-grid">
+  <div class="stat-card" style="--stat-color: #3b82f6;">
+    <div class="stat-label">
+      <i class="bi bi-clipboard-data me-2"></i>Total Observaciones
+    </div>
+    <div class="stat-value">{{ total_observaciones }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #f59e0b;">
+    <div class="stat-label">
+      <i class="bi bi-clock me-2"></i>Pendientes
+    </div>
+    <div class="stat-value">{{ observaciones_pendientes }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #ef4444;">
+    <div class="stat-label">
+      <i class="bi bi-exclamation-triangle me-2"></i>Urgentes
+    </div>
+    <div class="stat-value">{{ observaciones_urgentes }}</div>
+  </div>
+  
+  <div class="stat-card" style="--stat-color: #10b981;">
+    <div class="stat-label">
+      <i class="bi bi-calendar-event me-2"></i>Días en Postventa
+    </div>
+    <div class="stat-value">
+      {% if ficha.fecha_entrega %}
+        {{ dias_postventa }}
+      {% else %}
+        N/A
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Información Detallada -->
+<div class="info-sections">
+  <!-- Información del Inmueble -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon">
+        <i class="bi bi-house-door"></i>
+      </div>
+      <span>Inmueble</span>
+    </h2>
+    
+    <div class="info-row">
+      <span class="info-label">Dirección</span>
+      <span class="info-value">{{ ficha.vivienda.direccion|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Número</span>
+      <span class="info-value">{{ ficha.vivienda.numero|default:"N/A" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Comuna</span>
+      <span class="info-value">{{ ficha.vivienda.comuna|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Región</span>
+      <span class="info-value">{{ ficha.vivienda.region|default:"No especificada" }}</span>
+    </div>
+  </div>
+  
+  <!-- Información del Beneficiario/Propietario -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <i class="bi bi-person-circle"></i>
+      </div>
+      <span>Beneficiario</span>
+    </h2>
+    
+    {% if ficha.vivienda.nombre_propietario or ficha.vivienda.rut_propietario or propietario %}
+      <div class="info-row">
+        <span class="info-label">
+          <i class="bi bi-person-badge me-2"></i>Nombre Completo
+        </span>
+        <span class="info-value">
+          {% if propietario %}
+            {{ propietario.get_nombre_completo }}
+          {% elif ficha.vivienda.nombre_propietario %}
+            {{ ficha.vivienda.nombre_propietario }}
+          {% else %}
+            No especificado
+          {% endif %}
+        </span>
+      </div>
+      
+      <div class="info-row">
+        <span class="info-label">
+          <i class="bi bi-card-text me-2"></i>RUT
+        </span>
+        <span class="info-value">
+          {% if propietario and propietario.rut %}
+            {{ propietario.get_rut_formateado }}
+          {% elif ficha.vivienda.rut_propietario %}
+            {{ ficha.vivienda.rut_propietario }}
+          {% else %}
+            No especificado
+          {% endif %}
+        </span>
+      </div>
+      
+      <div class="info-row">
+        <span class="info-label">
+          <i class="bi bi-telephone me-2"></i>Teléfono
+        </span>
+        <span class="info-value">
+          {% if propietario and propietario.telefono %}
+            {{ propietario.telefono }}
+          {% elif ficha.vivienda.telefono_propietario %}
+            {{ ficha.vivienda.telefono_propietario }}
+          {% else %}
+            No especificado
+          {% endif %}
+        </span>
+      </div>
+      
+      <div class="info-row">
+        <span class="info-label">
+          <i class="bi bi-envelope me-2"></i>Correo
+        </span>
+        <span class="info-value">
+          {% if propietario and propietario.user.email %}
+            {{ propietario.user.email }}
+          {% elif ficha.vivienda.email_propietario %}
+            {{ ficha.vivienda.email_propietario }}
+          {% else %}
+            No especificado
+          {% endif %}
+        </span>
+      </div>
+      
+      {% if propietario %}
+        {% if propietario.ciudad %}
+          <div class="info-row">
+            <span class="info-label">
+              <i class="bi bi-geo-alt me-2"></i>Ciudad
+            </span>
+            <span class="info-value">{{ propietario.ciudad }}</span>
+          </div>
+        {% endif %}
+        
+        {% if propietario.contacto_emergencia_nombre %}
+          <div class="info-row">
+            <span class="info-label">
+              <i class="bi bi-person-lines-fill me-2"></i>Contacto de Emergencia
+            </span>
+            <span class="info-value">
+              {{ propietario.contacto_emergencia_nombre }}
+              {% if propietario.contacto_emergencia_telefono %}
+                ({{ propietario.contacto_emergencia_telefono }})
+              {% endif %}
+            </span>
+          </div>
+        {% endif %}
+      {% endif %}
+      
+      {% if propietario and propietario.user %}
+        <div class="beneficiario-badge" style="margin-top: 1rem;">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <span style="font-weight: 700; color: #059669;">Usuario Registrado en Sistema</span>
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="no-beneficiario-info">
+        <i class="bi bi-person-x" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <p style="color: #64748b; margin: 0;">No hay información del beneficiario disponible</p>
+        <small style="color: #94a3b8;">Configure los datos del propietario en la gestión de viviendas</small>
+      </div>
+    {% endif %}
+  </div>
+  
+  <!-- Información del Proyecto -->
+  <div class="info-section">
+    <h2 class="section-title">
+      <div class="section-icon">
+        <i class="bi bi-building"></i>
+      </div>
+      <span>Proyecto</span>
+    </h2>
+    
+    <div class="info-row">
+      <span class="info-label">Nombre</span>
+      <span class="info-value">{{ ficha.proyecto.nombre }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Código</span>
+      <span class="info-value">{{ ficha.proyecto.codigo }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Fecha Entrega</span>
+      <span class="info-value">{{ ficha.proyecto.fecha_entrega|date:"d/m/Y"|default:"No especificada" }}</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">Ubicación</span>
+      <span class="info-value">{{ ficha.proyecto.ubicacion|default:"No especificada" }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de Observaciones -->
+<div class="observaciones-list">
+  <h2 class="section-title mb-4">
+    <div class="section-icon">
+      <i class="bi bi-list-check"></i>
+    </div>
+    <span>Observaciones Registradas</span>
+  </h2>
+  
+  {% if observaciones %}
+    {% for obs in observaciones %}
+      <div class="observacion-item" style="--urgencia-color: 
+        {% if obs.urgencia == 'ALTA' %}#ef4444
+        {% elif obs.urgencia == 'MEDIA' %}#f59e0b
+        {% else %}#10b981{% endif %}">
+        
+        <div class="observacion-header">
+          <div class="observacion-recinto">
+            <i class="bi bi-tools me-2"></i>{{ obs.recinto }}
+          </div>
+          <span class="badge badge-{{ obs.estado|lower|cut:' '|cut:'_' }}">
+            {{ obs.get_estado_display|default:obs.estado }}
+          </span>
+        </div>
+        
+        <p class="observacion-text">{{ obs.observacion }}</p>
+        
+        <div class="observacion-meta">
+          <div class="meta-item">
+            <i class="bi bi-{% if obs.urgencia == 'ALTA' %}exclamation-triangle-fill{% elif obs.urgencia == 'MEDIA' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+            <span>{{ obs.get_urgencia_display|default:obs.urgencia }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="bi bi-clock"></i>
+            <span>{{ obs.creado_en|timesince }} atrás</span>
+          </div>
+          {% if obs.reportante %}
+            <div class="meta-item">
+              <i class="bi bi-person"></i>
+              <span>{{ obs.reportante.get_full_name|default:obs.reportante.username }}</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        {% if obs.evidencias.all %}
+          <div class="evidencias-section" style="margin-top: 1.5rem;">
+            <h4 style="font-weight: 700; color: var(--fg); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="bi bi-paperclip"></i>
+              Evidencias Adjuntas ({{ obs.evidencias.count }})
+            </h4>
+            <div class="evidencias-grid">
+              {% for ev in obs.evidencias.all %}
+                {% if ev.archivo %}
+                  {% with archivo_url=ev.archivo.url archivo_name=ev.archivo.name %}
+                    {% if '.mp4' in archivo_name|lower or '.mov' in archivo_name|lower or '.avi' in archivo_name|lower or '.webm' in archivo_name|lower or '.mkv' in archivo_name|lower %}
+                      <!-- Es un video -->
+                      <div class="evidencia-item evidencia-video">
+                        <video controls class="evidencia-video-player">
+                          <source src="{{ archivo_url }}" type="video/mp4">
+                          Tu navegador no soporta la reproducción de videos.
+                        </video>
+                        <div class="evidencia-overlay">
+                          <i class="bi bi-camera-video"></i>
+                          <span>Video</span>
+                        </div>
+                        <a href="{{ archivo_url }}" target="_blank" class="btn-ver-completo">
+                          <i class="bi bi-arrows-fullscreen"></i>
+                        </a>
+                      </div>
+                    {% else %}
+                      <!-- Es una imagen -->
+                      <div class="evidencia-item evidencia-foto" onclick="abrirModal('{{ archivo_url }}', 'imagen')">
+                        <img src="{{ archivo_url }}" class="evidencia-img" alt="Evidencia" loading="lazy">
+                        <div class="evidencia-overlay">
+                          <i class="bi bi-zoom-in"></i>
+                          <span>Ver imagen</span>
+                        </div>
+                      </div>
+                    {% endif %}
+                    {% if ev.comentario %}
+                      <p class="evidencia-comentario">
+                        <i class="bi bi-chat-left-text me-1"></i>{{ ev.comentario }}
+                      </p>
+                    {% endif %}
+                    <p class="evidencia-meta">
+                      <i class="bi bi-calendar me-1"></i>{{ ev.creado_en|date:"d/m/Y H:i" }}
+                      {% if ev.subido_por %}
+                        · <i class="bi bi-person me-1"></i>{{ ev.subido_por.username }}
+                      {% endif %}
+                    </p>
+                  {% endwith %}
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty-observaciones">
+      <i class="bi bi-inbox"></i>
+      <h3>No hay observaciones registradas</h3>
+      <p>Esta vivienda no tiene observaciones de postventa aún</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Modal para ver imágenes en tamaño completo -->
+<div class="modal-evidencia" id="modalEvidencia" onclick="cerrarModalEvidencia()">
+  <div class="modal-evidencia-content" onclick="event.stopPropagation()">
+    <button class="modal-close-btn" onclick="cerrarModalEvidencia()">
+      <i class="bi bi-x-lg me-2"></i>Cerrar
+    </button>
+    <img id="modalEvidenciaImg" src="" alt="Evidencia">
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,280 @@
+/**
+ * TECHO Chile - Estilos Globales Unificados
+ * Sistema de diseño consistente para toda la aplicación
+ */
+
+/* ============================================================================
+   TIPOGRAFÍA BASE
+============================================================================ */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body, html {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+    letter-spacing: -0.011em;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+h1, .h1 { font-size: 2.25rem; font-weight: 800; }
+h2, .h2 { font-size: 1.875rem; font-weight: 700; }
+h3, .h3 { font-size: 1.5rem; font-weight: 700; }
+h4, .h4 { font-size: 1.25rem; font-weight: 600; }
+h5, .h5 { font-size: 1.125rem; font-weight: 600; }
+h6, .h6 { font-size: 1rem; font-weight: 600; }
+
+/* Body Text */
+p, span, div, td, th, li, a {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Font Sizes Utilities */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+
+/* Font Weights */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.font-extrabold { font-weight: 800; }
+
+/* ============================================================================
+   FORMS & INPUTS - CONSISTENCIA
+============================================================================ */
+.form-control,
+.form-select,
+.form-check-input,
+textarea.form-control {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-size: 0.9375rem;
+    border-radius: 10px;
+    border: 2px solid var(--border, #e2e8f0);
+    padding: 0.625rem 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--accent, #0ea5e9);
+    box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25);
+}
+
+.form-label {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--fg, #0f172a);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+/* ============================================================================
+   BOTONES - CONSISTENCIA
+============================================================================ */
+.btn, button {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+    letter-spacing: -0.01em;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================================================
+   CARDS & CONTAINERS
+============================================================================ */
+.card {
+    border-radius: var(--radius-lg, 18px);
+    border: 1px solid var(--border, #e2e8f0);
+    box-shadow: var(--shadow-sm, 0 2px 12px rgba(0, 0, 0, 0.08));
+}
+
+.card-title {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* ============================================================================
+   TABLAS
+============================================================================ */
+.table {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+}
+
+.table th {
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.table td {
+    font-size: 0.9375rem;
+}
+
+/* ============================================================================
+   BADGES & ALERTS
+============================================================================ */
+.badge {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 8px;
+    letter-spacing: -0.01em;
+}
+
+.alert {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    border-radius: 12px;
+}
+
+/* ============================================================================
+   DROPDOWNS & MODALS
+============================================================================ */
+.dropdown-menu {
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg, 0 10px 30px rgba(0, 0, 0, 0.15));
+    border: 1px solid var(--border, #e2e8f0);
+}
+
+.dropdown-item {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-size: 0.9375rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.15s ease;
+}
+
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: var(--shadow-xl, 0 20px 50px rgba(0, 0, 0, 0.2));
+}
+
+.modal-title {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* ============================================================================
+   NAVEGACIÓN
+============================================================================ */
+.navbar,
+.nav {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+}
+
+.nav-link {
+    font-weight: 500;
+    letter-spacing: -0.01em;
+}
+
+/* ============================================================================
+   UTILIDADES DE SPACING
+============================================================================ */
+.section-spacing { padding: 2rem 0; }
+.card-spacing { padding: 1.5rem; }
+
+/* ============================================================================
+   ANIMACIONES SUAVES
+============================================================================ */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================================
+   RESPONSIVE - AJUSTES DE TIPOGRAFÍA
+============================================================================ */
+@media (max-width: 768px) {
+    h1, .h1 { font-size: 1.75rem; }
+    h2, .h2 { font-size: 1.5rem; }
+    h3, .h3 { font-size: 1.25rem; }
+    h4, .h4 { font-size: 1.125rem; }
+    
+    .form-control,
+    .form-select,
+    .btn {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    h1, .h1 { font-size: 1.5rem; }
+    h2, .h2 { font-size: 1.375rem; }
+    
+    body {
+        font-size: 0.9375rem;
+    }
+}
+
+/* ============================================================================
+   DARK MODE - AJUSTES
+============================================================================ */
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background: var(--card);
+    color: var(--fg);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .form-control::placeholder,
+[data-theme="dark"] .form-select::placeholder {
+    color: var(--muted);
+}
+
+/* ============================================================================
+   ACCESIBILIDAD
+============================================================================ */
+:focus-visible {
+    outline: 2px solid var(--accent, #0ea5e9);
+    outline-offset: 2px;
+}
+
+/* Mejorar legibilidad en modo oscuro */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+/* ============================================================================
+   FIX: SOBRESCRIBIR ESTILOS INCONSISTENTES
+============================================================================ */
+.admin-hero *,
+.trabajador-hero *,
+.familia-hero *,
+.page-header *,
+.dashboard-header * {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Asegurar consistencia en tour y modales */
+.tour-popup *,
+.modal * {
+    font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif !important;
+}
+

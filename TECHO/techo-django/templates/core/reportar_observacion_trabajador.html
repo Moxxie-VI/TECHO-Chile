@@ -1,0 +1,467 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Reportar Observación · Trabajador · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+.trabajador-hero {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(16, 185, 129, 0.3);
+}
+
+.hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  opacity: 0.95;
+  font-size: 1.05rem;
+}
+
+.form-container {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 24px;
+  padding: 2.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.75rem;
+}
+
+.form-label {
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.05rem;
+}
+
+.form-label i {
+  color: #10b981;
+}
+
+.form-label .required {
+  color: #ef4444;
+  font-weight: 800;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: var(--card);
+  color: var(--fg);
+}
+
+.form-control-custom:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-control-custom:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+textarea.form-control-custom {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-help-text {
+  font-size: 0.875rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.proyecto-info-card {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border: 2px solid #10b981;
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.proyecto-info-card h3 {
+  color: #065f46;
+  font-weight: 800;
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.proyecto-info-card p {
+  color: #047857;
+  margin: 0;
+}
+
+.file-upload-area {
+  border: 3px dashed var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: var(--card);
+}
+
+.file-upload-area:hover {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.file-upload-area i {
+  font-size: 3rem;
+  color: #10b981;
+  margin-bottom: 1rem;
+}
+
+.file-upload-area p {
+  color: var(--muted);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-upload-area small {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.urgencia-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.urgencia-option {
+  position: relative;
+}
+
+.urgencia-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.urgencia-label {
+  display: block;
+  padding: 1rem;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 700;
+}
+
+.urgencia-option input[type="radio"]:checked + .urgencia-label {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.urgencia-option input[type="radio"]:checked + .urgencia-label.baja {
+  background: #d1fae5;
+  border-color: #10b981;
+  color: #065f46;
+}
+
+.urgencia-option input[type="radio"]:checked + .urgencia-label.media {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.urgencia-option input[type="radio"]:checked + .urgencia-label.alta {
+  background: #fee2e2;
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 2px solid var(--border);
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+}
+
+.btn-cancel {
+  background: #e2e8f0;
+  color: #475569;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-cancel:hover {
+  background: #cbd5e1;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: 1.5rem;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn-submit, .btn-cancel {
+    width: 100%;
+    justify-content: center;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="trabajador-hero">
+  <h1 class="hero-title">
+    <i class="bi bi-clipboard-plus me-3"></i>
+    Reportar Nueva Observación
+  </h1>
+  <p class="hero-subtitle">
+    Registra problemas o incidencias encontradas en terreno
+  </p>
+</div>
+
+<!-- Form Container -->
+<div class="form-container">
+  <!-- Proyecto Asignado Info -->
+  <div class="proyecto-info-card">
+    <h3>
+      <i class="bi bi-building me-2"></i>
+      Tu Proyecto Asignado
+    </h3>
+    <p style="font-weight: 600; font-size: 1.1rem;">
+      {{ proyecto.codigo }} - {{ proyecto.nombre }}
+    </p>
+    {% if proyecto.ubicacion %}
+      <p style="margin-top: 0.5rem;">
+        <i class="bi bi-geo-alt me-1"></i>{{ proyecto.ubicacion }}
+      </p>
+    {% endif %}
+  </div>
+
+  <!-- Form -->
+  <form method="POST" enctype="multipart/form-data" id="observacionForm">
+    {% csrf_token %}
+    
+    <!-- Seleccionar Vivienda -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="bi bi-house-door"></i>
+        Seleccionar Vivienda
+        <span class="required">*</span>
+      </label>
+      <select name="vivienda_id" class="form-control-custom" required>
+        <option value="">-- Selecciona la vivienda --</option>
+        {% for vivienda in viviendas %}
+          <option value="{{ vivienda.id }}">
+            {% if vivienda.direccion %}
+              {{ vivienda.direccion }} 
+              {% if vivienda.numero %}#{{ vivienda.numero }}{% endif %}
+            {% else %}
+              Vivienda {{ vivienda.id }} 
+              {% if vivienda.nombre_propietario %}
+                - {{ vivienda.nombre_propietario }}
+              {% endif %}
+            {% endif %}
+          </option>
+        {% endfor %}
+      </select>
+      <small class="form-help-text">
+        Selecciona la vivienda donde se encuentra el problema
+      </small>
+    </div>
+
+    <!-- Recinto/Ubicación -->
+    <div class="form-group">
+      <label for="id_recinto" class="form-label">
+        <i class="bi bi-geo"></i>
+        Recinto o Ubicación
+        <span class="required">*</span>
+      </label>
+      {{ form.recinto }}
+      <small class="form-help-text">
+        Ejemplo: Baño principal, Cocina, Dormitorio 1, Fachada, Techo, etc.
+      </small>
+    </div>
+
+    <!-- Descripción de la Observación -->
+    <div class="form-group">
+      <label for="id_observacion" class="form-label">
+        <i class="bi bi-chat-text"></i>
+        Descripción Detallada
+        <span class="required">*</span>
+      </label>
+      {{ form.observacion }}
+      <small class="form-help-text">
+        Describe el problema de forma clara y detallada. Incluye información sobre qué encontraste y la magnitud del problema.
+      </small>
+    </div>
+
+    <!-- Urgencia -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="bi bi-exclamation-triangle"></i>
+        Nivel de Urgencia
+        <span class="required">*</span>
+      </label>
+      <div class="urgencia-options">
+        <div class="urgencia-option">
+          <input type="radio" id="urgencia_baja" name="urgencia" value="BAJA" required>
+          <label for="urgencia_baja" class="urgencia-label baja">
+            <i class="bi bi-info-circle d-block mb-2" style="font-size: 1.5rem;"></i>
+            Baja
+          </label>
+        </div>
+        <div class="urgencia-option">
+          <input type="radio" id="urgencia_media" name="urgencia" value="MEDIA" checked>
+          <label for="urgencia_media" class="urgencia-label media">
+            <i class="bi bi-exclamation-circle d-block mb-2" style="font-size: 1.5rem;"></i>
+            Media
+          </label>
+        </div>
+        <div class="urgencia-option">
+          <input type="radio" id="urgencia_alta" name="urgencia" value="ALTA">
+          <label for="urgencia_alta" class="urgencia-label alta">
+            <i class="bi bi-exclamation-triangle d-block mb-2" style="font-size: 1.5rem;"></i>
+            Alta
+          </label>
+        </div>
+      </div>
+      <small class="form-help-text">
+        • Baja: Problema menor, no afecta la habitabilidad<br>
+        • Media: Requiere atención pero no es urgente<br>
+        • Alta: Problema grave que afecta la seguridad o habitabilidad
+      </small>
+    </div>
+
+    <!-- Evidencias (Fotos/Videos) -->
+    <div class="form-group">
+      <label class="form-label">
+        <i class="bi bi-camera"></i>
+        Evidencias (Fotos/Videos)
+      </label>
+      <div class="file-upload-area" onclick="document.getElementById('id_evidencias').click()">
+        <i class="bi bi-cloud-upload"></i>
+        <p style="font-weight: 700; color: var(--fg);">
+          Haz clic para subir archivos
+        </p>
+        <p>o arrastra y suelta aquí</p>
+        <small>
+          <i class="bi bi-image me-1"></i>Fotos (JPG, PNG) 
+          <i class="bi bi-camera-video ms-2 me-1"></i>Videos (MP4, MOV, AVI)<br>
+          Máximo 10 archivos · Hasta 50 MB cada uno
+        </small>
+      </div>
+      <input 
+        type="file" 
+        id="id_evidencias" 
+        name="evidencias" 
+        multiple 
+        accept="image/*,video/*"
+        style="display: none;"
+        onchange="mostrarArchivosSeleccionados(this)">
+      <div id="archivos-seleccionados" style="margin-top: 1rem;"></div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <a href="{% url 'dashboard' %}" class="btn-cancel">
+        <i class="bi bi-x-circle"></i>
+        Cancelar
+      </a>
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-check-circle"></i>
+        Registrar Observación
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+function mostrarArchivosSeleccionados(input) {
+  const container = document.getElementById('archivos-seleccionados');
+  container.innerHTML = '';
+  
+  if (input.files.length > 0) {
+    const div = document.createElement('div');
+    div.style.cssText = 'background: var(--card); border: 2px solid var(--border); border-radius: 12px; padding: 1rem;';
+    
+    let html = '<div style="font-weight: 700; margin-bottom: 0.75rem; color: var(--fg);">';
+    html += '<i class="bi bi-files me-2"></i>Archivos seleccionados (' + input.files.length + '):';
+    html += '</div><ul style="margin: 0; padding-left: 1.5rem;">';
+    
+    for (let i = 0; i < input.files.length; i++) {
+      const file = input.files[i];
+      const size = (file.size / 1024 / 1024).toFixed(2);
+      const isVideo = file.type.startsWith('video/');
+      const icon = isVideo ? 'camera-video' : 'image';
+      html += `<li style="color: var(--muted); margin-bottom: 0.25rem;">
+        <i class="bi bi-${icon} me-2"></i>${file.name} (${size} MB)
+      </li>`;
+    }
+    
+    html += '</ul>';
+    div.innerHTML = html;
+    container.appendChild(div);
+  }
+}
+
+// Prevenir submit múltiple
+document.getElementById('observacionForm').addEventListener('submit', function(e) {
+  const submitBtn = this.querySelector('.btn-submit');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Registrando...';
+});
+</script>
+
+{% endblock %}
+

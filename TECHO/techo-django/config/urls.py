@@ -10,7 +10,9 @@ from core.views import (
     monitoreo_ds49, actualizar_fecha_entrega,
     admin_viviendas, crear_vivienda, editar_vivienda, eliminar_vivienda,
     admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora,
-    reportar_observacion_familia, buscar_familia_por_rut
+    reportar_observacion_familia, reportar_observacion_trabajador, buscar_familia_por_rut,
+    fichas_inmuebles, detalle_ficha_inmueble, buscar_usuario_por_rut,
+    asignar_trabajadores_proyecto
 )
 from accounts.views import (
     login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
@@ -59,8 +61,18 @@ urlpatterns = [
     path("panel/admin/constructoras/eliminar/<int:constructora_id>/", eliminar_constructora, name="eliminar_constructora"),
     # Familias - Reportar observaciones
     path("familia/reportar-observacion/", reportar_observacion_familia, name="reportar_observacion_familia"),
+    # Trabajador - Reportar observaciones
+    path("trabajador/reportar-observacion/", reportar_observacion_trabajador, name="reportar_observacion_trabajador"),
     # Admin - Asignación de viviendas por RUT
     path("panel/admin/asignar-vivienda-rut/", buscar_familia_por_rut, name="buscar_familia_por_rut"),
+    # Admin - Asignación de trabajadores a proyectos
+    path("panel/admin/asignar-trabajadores/", asignar_trabajadores_proyecto, name="asignar_trabajadores_proyecto"),
+    # Fichas de Inmuebles - Ver observaciones
+    path("fichas-inmuebles/", fichas_inmuebles, name="fichas_inmuebles"),
+    path("fichas-inmuebles/<int:ficha_id>/", detalle_ficha_inmueble, name="detalle_ficha_inmueble"),
+    path("fichas-inmuebles/<int:ficha_id>/actualizar-fecha-entrega/", actualizar_fecha_entrega, name="actualizar_fecha_entrega"),
+    # API - Buscar usuario por RUT
+    path("api/buscar-usuario-rut/", buscar_usuario_por_rut, name="buscar_usuario_por_rut"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

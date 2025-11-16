@@ -1,0 +1,390 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Asignar Trabajadores · Admin · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+.admin-hero {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 60px rgba(14, 165, 233, 0.3);
+}
+
+.hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  opacity: 0.95;
+  font-size: 1.05rem;
+}
+
+.trabajadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.trabajador-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  padding: 1.75rem;
+  transition: all 0.3s ease;
+}
+
+.trabajador-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.trabajador-card.con-proyecto {
+  border-left: 5px solid #10b981;
+}
+
+.trabajador-card.sin-proyecto {
+  border-left: 5px solid #ef4444;
+}
+
+.trabajador-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.trabajador-avatar {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.75rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.trabajador-info h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 0.25rem;
+}
+
+.trabajador-email {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.proyecto-actual {
+  background: #d1fae5;
+  border: 2px solid #10b981;
+  padding: 1rem;
+  border-radius: 12px;
+  margin: 1rem 0;
+}
+
+.proyecto-actual-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.sin-proyecto-badge {
+  background: #fee2e2;
+  border: 2px solid #ef4444;
+  padding: 1rem;
+  border-radius: 12px;
+  text-align: center;
+  color: #991b1b;
+  font-weight: 600;
+  margin: 1rem 0;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-asignar {
+  flex: 1;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-asignar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.btn-desasignar {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-desasignar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.select-proyecto {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-top: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.select-proyecto:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--fg);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-title i {
+  color: #0ea5e9;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #0ea5e9;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .trabajadores-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<div class="admin-hero">
+  <h1 class="hero-title">
+    <i class="bi bi-people-fill me-3"></i>
+    Asignar Trabajadores a Proyectos
+  </h1>
+  <p class="hero-subtitle">
+    Gestiona las asignaciones de trabajadores a los proyectos activos
+  </p>
+</div>
+
+<!-- Estadísticas -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-number">{{ trabajadores.count }}</div>
+    <div class="stat-label">
+      <i class="bi bi-people me-2"></i>Total Trabajadores
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #10b981;">{{ trabajadores_con_proyecto.count }}</div>
+    <div class="stat-label">
+      <i class="bi bi-check-circle me-2"></i>Asignados
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number" style="color: #ef4444;">{{ trabajadores_sin_proyecto.count }}</div>
+    <div class="stat-label">
+      <i class="bi bi-x-circle me-2"></i>Sin Asignar
+    </div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-number">{{ proyectos.count }}</div>
+    <div class="stat-label">
+      <i class="bi bi-building me-2"></i>Proyectos
+    </div>
+  </div>
+</div>
+
+<!-- Trabajadores Con Proyecto -->
+{% if trabajadores_con_proyecto %}
+<div class="section-title">
+  <i class="bi bi-check-circle-fill" style="color: #10b981;"></i>
+  <span>Trabajadores Asignados ({{ trabajadores_con_proyecto.count }})</span>
+</div>
+
+<div class="trabajadores-grid">
+  {% for trabajador in trabajadores_con_proyecto %}
+    <div class="trabajador-card con-proyecto">
+      <div class="trabajador-header">
+        <div class="trabajador-avatar">
+          {{ trabajador.nombre|slice:":1"|upper|default:trabajador.user.username|slice:":1"|upper }}
+        </div>
+        <div class="trabajador-info">
+          <h3>{{ trabajador.get_nombre_completo }}</h3>
+          <div class="trabajador-email">
+            <i class="bi bi-envelope me-1"></i>{{ trabajador.user.email }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="proyecto-actual">
+        <span class="proyecto-actual-badge">
+          <i class="bi bi-building me-1"></i>{{ trabajador.proyecto_asignado.codigo }}
+        </span>
+        <div style="color: #065f46; font-weight: 600; margin-top: 0.5rem;">
+          {{ trabajador.proyecto_asignado.nombre }}
+        </div>
+        {% if trabajador.proyecto_asignado.ubicacion %}
+          <div style="color: #10b981; font-size: 0.875rem; margin-top: 0.25rem;">
+            <i class="bi bi-geo-alt me-1"></i>{{ trabajador.proyecto_asignado.ubicacion }}
+          </div>
+        {% endif %}
+      </div>
+      
+      <form method="POST" class="form-actions">
+        {% csrf_token %}
+        <input type="hidden" name="trabajador_id" value="{{ trabajador.id }}">
+        <input type="hidden" name="accion" value="desasignar">
+        <button type="submit" class="btn-desasignar" onclick="return confirm('¿Desasignar a {{ trabajador.get_nombre_completo }} de este proyecto?')">
+          <i class="bi bi-x-circle me-2"></i>Desasignar
+        </button>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Trabajadores Sin Proyecto -->
+{% if trabajadores_sin_proyecto %}
+<div class="section-title mt-5">
+  <i class="bi bi-exclamation-circle-fill" style="color: #ef4444;"></i>
+  <span>Trabajadores Sin Asignar ({{ trabajadores_sin_proyecto.count }})</span>
+</div>
+
+<div class="trabajadores-grid">
+  {% for trabajador in trabajadores_sin_proyecto %}
+    <div class="trabajador-card sin-proyecto">
+      <div class="trabajador-header">
+        <div class="trabajador-avatar">
+          {{ trabajador.nombre|slice:":1"|upper|default:trabajador.user.username|slice:":1"|upper }}
+        </div>
+        <div class="trabajador-info">
+          <h3>{{ trabajador.get_nombre_completo }}</h3>
+          <div class="trabajador-email">
+            <i class="bi bi-envelope me-1"></i>{{ trabajador.user.email }}
+          </div>
+        </div>
+      </div>
+      
+      <div class="sin-proyecto-badge">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        Sin proyecto asignado
+      </div>
+      
+      <form method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="trabajador_id" value="{{ trabajador.id }}">
+        <input type="hidden" name="accion" value="asignar">
+        
+        <label for="proyecto_{{ trabajador.id }}" style="font-weight: 600; color: var(--fg); display: block; margin-top: 0.75rem;">
+          <i class="bi bi-building me-2"></i>Seleccionar Proyecto:
+        </label>
+        <select name="proyecto_id" id="proyecto_{{ trabajador.id }}" class="select-proyecto" required>
+          <option value="">-- Selecciona un proyecto --</option>
+          {% for proyecto in proyectos %}
+            <option value="{{ proyecto.id }}">{{ proyecto.codigo }} - {{ proyecto.nombre }}</option>
+          {% endfor %}
+        </select>
+        
+        <div class="form-actions">
+          <button type="submit" class="btn-asignar">
+            <i class="bi bi-check-circle me-2"></i>Asignar Proyecto
+          </button>
+        </div>
+      </form>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if not trabajadores_con_proyecto and not trabajadores_sin_proyecto %}
+<div style="text-align: center; padding: 4rem 2rem;">
+  <i class="bi bi-people" style="font-size: 5rem; color: #cbd5e1;"></i>
+  <h3 style="font-size: 1.75rem; font-weight: 700; color: var(--fg); margin-top: 1.5rem;">
+    No hay trabajadores registrados
+  </h3>
+  <p style="color: var(--muted); margin-top: 0.75rem; font-size: 1.05rem;">
+    Crea usuarios con rol "Trabajador" para poder asignarlos a proyectos
+  </p>
+  <a href="{% url 'crear_usuario' %}" class="btn btn-primary btn-lg mt-3">
+    <i class="bi bi-person-plus me-2"></i>Crear Trabajador
+  </a>
+</div>
+{% endif %}
+
+<div style="margin-top: 2rem; text-align: center;">
+  <a href="{% url 'dashboard' %}" class="btn btn-outline-primary">
+    <i class="bi bi-arrow-left me-2"></i>Volver al Dashboard
+  </a>
+</div>
+
+{% endblock %}
+

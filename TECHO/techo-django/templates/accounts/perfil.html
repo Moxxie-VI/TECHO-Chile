@@ -297,8 +297,8 @@
     <div class="profile-card">
       <div class="profile-avatar-section">
         <div class="avatar-container">
-          {% if request.user.perfil.avatar %}
-            <img src="{{ request.user.perfil.avatar.url }}" alt="Avatar" class="avatar-image" id="avatarPreview">
+          {% if perfil and perfil.avatar %}
+            <img src="{{ perfil.avatar.url }}" alt="Avatar" class="avatar-image" id="avatarPreview">
           {% else %}
             <div class="avatar-placeholder" id="avatarPlaceholder">
               <i class="bi bi-person-fill"></i>
@@ -310,8 +310,15 @@
         </div>
         
         <h2 class="user-display-name">
-          {{ request.user.perfil.nombre|default:request.user.username }} 
-          {{ request.user.perfil.apellido|default:"" }}
+          {% if perfil and perfil.nombre %}
+            {{ perfil.nombre }} {{ perfil.apellido|default:"" }}
+          {% elif nombre_usuario %}
+            {{ nombre_usuario }}
+          {% elif usuario %}
+            {{ usuario.username }}
+          {% else %}
+            Usuario
+          {% endif %}
         </h2>
         
         <div class="user-info-badge">
@@ -321,7 +328,13 @@
         
         <div class="user-email-display">
           <i class="bi bi-envelope-fill"></i>
-          {{ request.user.email|default:request.user.username }}
+          {% if usuario and usuario.email %}
+            {{ usuario.email }}
+          {% elif nombre_usuario %}
+            {{ nombre_usuario }}
+          {% else %}
+            Sin email
+          {% endif %}
         </div>
       </div>
     </div>
