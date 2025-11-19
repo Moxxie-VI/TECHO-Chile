@@ -5,25 +5,25 @@
 
 {% block extra_css %}
 <style>
-/* Variables */
+/* Variables - Colores TECHO (Celeste y Blanco) */
 :root {
-  --familia-primary: #f97316;
-  --familia-secondary: #ea580c;
-  --familia-accent: #dc2626;
-  --familia-light: #ffedd5;
+  --familia-primary: #00B4D8;
+  --familia-secondary: #0096C7;
+  --familia-accent: #0077B6;
+  --familia-light: #E0F7FA;
   --success: #10b981;
   --warning: #f59e0b;
-  --info: #3b82f6;
+  --info: #00B4D8;
 }
 
 /* Hero Familia - Super Amigable */
 .familia-hero {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #dc2626 100%);
+  background: linear-gradient(135deg, #00B4D8 0%, #0096C7 50%, #0077B6 100%);
   color: white;
   padding: 3rem 2rem;
   border-radius: 30px;
   margin-bottom: 2.5rem;
-  box-shadow: 0 20px 60px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 180, 216, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -178,15 +178,15 @@
 
 /* Quick Tips Section */
 .quick-tips {
-  background: linear-gradient(135deg, #dbeafe 0%, #e0f2fe 100%);
-  border: 3px solid #3b82f6;
+  background: linear-gradient(135deg, #E0F7FA 0%, #B0E0E6 100%);
+  border: 3px solid #00B4D8;
   border-radius: 24px;
   padding: 2.5rem;
   margin-bottom: 2.5rem;
 }
 
 [data-theme="dark"] .quick-tips {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(0, 180, 216, 0.2) 0%, rgba(0, 180, 216, 0.1) 100%);
 }
 
 .tips-header {
@@ -199,7 +199,7 @@
 .tips-icon {
   width: 64px;
   height: 64px;
-  background: #3b82f6;
+  background: #00B4D8;
   color: white;
   border-radius: 16px;
   display: flex;
@@ -211,12 +211,12 @@
 .tips-title {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #1e40af;
+  color: #0077B6;
   margin: 0;
 }
 
 [data-theme="dark"] .tips-title {
-  color: #60a5fa;
+  color: #4DD0E1;
 }
 
 .tips-list {
@@ -237,19 +237,19 @@
 
 [data-theme="dark"] .tip-item {
   background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(0, 180, 216, 0.2);
 }
 
 .tip-item:hover {
   transform: translateX(8px);
-  border-color: #3b82f6;
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+  border-color: #00B4D8;
+  box-shadow: 0 8px 20px rgba(0, 180, 216, 0.2);
 }
 
 .tip-number {
   width: 40px;
   height: 40px;
-  background: #3b82f6;
+  background: #00B4D8;
   color: white;
   border-radius: 12px;
   display: flex;
@@ -265,7 +265,7 @@
 }
 
 .tip-text {
-  color: #1e40af;
+  color: #0077B6;
   font-weight: 600;
   font-size: 1.05rem;
   line-height: 1.6;
@@ -273,7 +273,7 @@
 }
 
 [data-theme="dark"] .tip-text {
-  color: #93c5fd;
+  color: #4DD0E1;
 }
 
 /* Mis Observaciones */
@@ -357,7 +357,7 @@
 }
 
 .estado-pendiente { background: #fef3c7; color: #92400e; }
-.estado-en-progreso { background: #dbeafe; color: #1e40af; }
+.estado-en-progreso { background: #E0F7FA; color: #0077B6; }
 .estado-resuelto { background: #d1fae5; color: #065f46; }
 
 .observacion-text {
@@ -475,7 +475,7 @@
 .tour-popup-icon {
   width: 90px;
   height: 90px;
-  background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
   border-radius: 24px;
   display: flex;
   align-items: center;
@@ -544,13 +544,13 @@
 }
 
 .tour-btn-primary {
-  background: linear-gradient(135deg, #f97316 0%, #dc2626 100%);
+  background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
   color: white;
 }
 
 .tour-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 180, 216, 0.3);
 }
 
 .tour-btn-secondary {
@@ -627,7 +627,7 @@
 <!-- Info Cards -->
 <div class="info-cards">
   <!-- Mi Vivienda -->
-  <div class="info-card" style="--card-color: #f97316; --card-bg: #ffedd5;">
+  <div class="info-card" style="--card-color: #00B4D8; --card-bg: #E0F7FA;">
     <div class="info-card-icon">
       <i class="bi bi-house-door-fill"></i>
     </div>
@@ -644,7 +644,7 @@
   </div>
   
   <!-- Mis Observaciones -->
-  <div class="info-card" style="--card-color: #3b82f6; --card-bg: #dbeafe;">
+  <div class="info-card" style="--card-color: #0096C7; --card-bg: #B0E0E6;">
     <div class="info-card-icon">
       <i class="bi bi-clipboard-check"></i>
     </div>
@@ -660,7 +660,7 @@
   </div>
   
   <!-- Mi Proyecto -->
-  <div class="info-card" style="--card-color: #10b981; --card-bg: #d1fae5;">
+  <div class="info-card" style="--card-color: #0077B6; --card-bg: #E0F7FA;">
     <div class="info-card-icon">
       <i class="bi bi-building"></i>
     </div>
@@ -732,7 +732,7 @@
       <i class="bi bi-list-check"></i>
       Mis Reportes
     </h2>
-    <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); color: white; border-radius: 16px; font-weight: 700;">
+    <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%); color: white; border-radius: 16px; font-weight: 700;">
       <i class="bi bi-plus-circle me-2"></i>Nuevo Reporte
     </a>
   </div>
@@ -789,7 +789,7 @@
       <i class="bi bi-inbox"></i>
       <h3>No tienes reportes aún</h3>
       <p>Cuando encuentres algún problema en tu vivienda, repórtalo aquí</p>
-      <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); color: white; border-radius: 16px; font-weight: 700; padding: 1rem 2rem;">
+      <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg" style="background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%); color: white; border-radius: 16px; font-weight: 700; padding: 1rem 2rem;">
         <i class="bi bi-plus-circle me-2"></i>Crear mi primer reporte
       </a>
     </div>

@@ -5,12 +5,12 @@
 {% block content %}
 <style>
     .tutorial-header {
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
         color: white;
         padding: 3rem 2rem;
         border-radius: 20px;
         margin-bottom: 2rem;
-        box-shadow: 0 10px 40px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 10px 40px rgba(0, 180, 216, 0.3);
         text-align: center;
     }
     
@@ -46,15 +46,32 @@
     }
     
     .role-btn:hover {
-        border-color: #8b5cf6;
+        border-color: #00B4D8;
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        box-shadow: 0 10px 30px rgba(0, 180, 216, 0.2);
     }
     
     .role-btn.active {
-        border-color: #8b5cf6;
-        background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
-        box-shadow: 0 5px 20px rgba(139, 92, 246, 0.3);
+        border-color: #00B4D8;
+        background: linear-gradient(135deg, #E0F7FA 0%, #B0E0E6 100%);
+        box-shadow: 0 5px 20px rgba(0, 180, 216, 0.3);
+    }
+    
+    .role-btn.familia-only {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .familia-only-selector {
+        justify-content: center;
+    }
+    
+    .always-hidden {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        overflow: hidden !important;
     }
     
     .role-btn-icon {
@@ -98,7 +115,11 @@
     }
     
     .section-title i {
-        color: #8b5cf6;
+        color: #00B4D8;
+    }
+    
+    .tutorial-header.familia-header {
+        background: linear-gradient(135deg, #00B4D8 0%, #0096C7 50%, #0077B6 100%);
     }
     
     .tutorial-step {
@@ -114,7 +135,7 @@
         top: 0;
         width: 40px;
         height: 40px;
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
         color: white;
         border-radius: 50%;
         display: flex;
@@ -122,7 +143,11 @@
         justify-content: center;
         font-weight: 700;
         font-size: 1.1rem;
-        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        box-shadow: 0 4px 15px rgba(0, 180, 216, 0.3);
+    }
+    
+    #tutorial-familia .tutorial-step::before {
+        background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%);
     }
     
     .tutorial-step h4 {
@@ -225,15 +250,19 @@
     }
     
     .feature-card:hover {
-        border-color: #8b5cf6;
+        border-color: #00B4D8;
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+        box-shadow: 0 10px 30px rgba(0, 180, 216, 0.15);
     }
     
     .feature-card-icon {
         font-size: 2rem;
-        color: #8b5cf6;
+        color: #00B4D8;
         margin-bottom: 1rem;
+    }
+    
+    #tutorial-familia .feature-card-icon {
+        color: #00B4D8;
     }
     
     .feature-card-title {
@@ -251,25 +280,31 @@
 
 <div class="container-fluid">
     <!-- Header -->
-    <div class="tutorial-header">
+    <div class="tutorial-header {% if rol == 'Familia' %}familia-header{% endif %}">
         <i class="bi bi-mortarboard-fill" style="font-size: 4rem;"></i>
         <h1>Tutorial de Uso</h1>
-        <p>Aprende a usar la plataforma paso a paso según tu rol</p>
+        {% if rol == 'Familia' %}
+            <p>Guía completa para usar tu panel de vivienda TECHO</p>
+        {% else %}
+            <p>Aprende a usar la plataforma paso a paso según tu rol</p>
+        {% endif %}
     </div>
 
     <!-- Selector de Rol -->
-    <div class="role-selector">
-        <div class="role-btn active" data-role="admin" onclick="showTutorial('admin')">
+    <div class="role-selector {% if rol == 'Familia' %}familia-only-selector{% endif %}">
+        {% if rol != 'Familia' %}
+        <div class="role-btn {% if rol == 'Admin' %}active{% endif %}" data-role="admin" onclick="showTutorial('admin')">
             <div class="role-btn-icon">🛠️</div>
             <div class="role-btn-title">Administrador</div>
             <div class="role-btn-desc">Gestión completa del sistema</div>
         </div>
-        <div class="role-btn" data-role="trabajador" onclick="showTutorial('trabajador')">
+        <div class="role-btn {% if rol == 'Trabajador' %}active{% endif %}" data-role="trabajador" onclick="showTutorial('trabajador')">
             <div class="role-btn-icon">👷</div>
             <div class="role-btn-title">Trabajador</div>
             <div class="role-btn-desc">Gestión de proyectos y viviendas</div>
         </div>
-        <div class="role-btn" data-role="familia" onclick="showTutorial('familia')">
+        {% endif %}
+        <div class="role-btn {% if rol == 'Familia' %}active familia-only{% endif %}" data-role="familia" onclick="showTutorial('familia')">
             <div class="role-btn-icon">🏠</div>
             <div class="role-btn-title">Familia</div>
             <div class="role-btn-desc">Seguimiento de tu vivienda</div>
@@ -277,7 +312,7 @@
     </div>
 
     <!-- ============ TUTORIAL ADMIN ============ -->
-    <div id="tutorial-admin" class="tutorial-content">
+    <div id="tutorial-admin" class="tutorial-content {% if rol == 'Familia' %}hidden always-hidden{% else %}{% if rol != 'Admin' %}hidden{% endif %}{% endif %}">
         <!-- Introducción -->
         <div class="tutorial-section">
             <h3 class="section-title">
@@ -455,7 +490,7 @@
     </div>
 
     <!-- ============ TUTORIAL TRABAJADOR ============ -->
-    <div id="tutorial-trabajador" class="tutorial-content hidden">
+    <div id="tutorial-trabajador" class="tutorial-content {% if rol == 'Familia' %}hidden always-hidden{% else %}hidden{% endif %}">
         <!-- Introducción -->
         <div class="tutorial-section">
             <h3 class="section-title">
@@ -589,145 +624,399 @@
     </div>
 
     <!-- ============ TUTORIAL FAMILIA ============ -->
-    <div id="tutorial-familia" class="tutorial-content hidden">
+    <div id="tutorial-familia" class="tutorial-content {% if rol == 'Familia' %}{% else %}hidden{% endif %}">
         <!-- Introducción -->
         <div class="tutorial-section">
             <h3 class="section-title">
-                <i class="bi bi-stars"></i>
-                Bienvenido a tu Hogar
+                <i class="bi bi-house-heart-fill"></i>
+                ¡Bienvenido a tu Hogar TECHO!
             </h3>
-            <p class="lead" style="font-size: 1.2rem;">Como familia beneficiaria, esta plataforma te permite hacer seguimiento de tu vivienda y las reparaciones necesarias.</p>
+            <p class="lead" style="font-size: 1.3rem; line-height: 1.8;">Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento de tu vivienda TECHO. Esta plataforma está diseñada especialmente para ti, para que puedas gestionar todo lo relacionado con tu hogar de manera fácil y sencilla.</p>
             
             <div class="tutorial-success">
-                <strong>💡 Esta plataforma es para ti:</strong>
-                <p>Puedes ver el estado de tu vivienda, las observaciones reportadas y el progreso de las reparaciones.</p>
+                <strong>💡 ¿Qué puedes hacer aquí?</strong>
+                <p>Puedes ver la información de tu vivienda, reportar problemas que encuentres, hacer seguimiento de las reparaciones y estar siempre informado sobre el estado de tu hogar.</p>
             </div>
         </div>
 
-        <!-- Paso 1 -->
+        <!-- Paso 1: Tu Dashboard -->
         <div class="tutorial-section">
             <h3 class="section-title">
                 <i class="bi bi-1-circle-fill"></i>
-                Primeros Pasos (Para Adultos Mayores)
+                Conoce tu Pantalla Principal
             </h3>
             
             <div class="tutorial-step" data-step="1">
-                <h4>Iniciar Sesión (Entrar al Sistema)</h4>
-                <p style="font-size: 1.1rem;">1. Abre tu navegador (Chrome, Firefox, Edge)</p>
-                <p style="font-size: 1.1rem;">2. Escribe la dirección web que te dieron</p>
-                <p style="font-size: 1.1rem;">3. Ingresa tu correo electrónico</p>
-                <p style="font-size: 1.1rem;">4. Ingresa tu contraseña</p>
-                <p style="font-size: 1.1rem;">5. Haz clic en el botón <strong>"Ingresar"</strong></p>
+                <h4>El Saludo de Bienvenida</h4>
+                <p style="font-size: 1.1rem;">Cuando ingreses a tu panel, verás un saludo personalizado con tu nombre. En esta sección encontrarás:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>👋 <strong>Mensaje de bienvenida:</strong> Un saludo amigable con tu nombre</li>
+                    <li>🚨 <strong>Botón "Reportar un Problema":</strong> El acceso rápido más importante para notificar cualquier problema</li>
+                    <li>❓ <strong>Botón "¿Cómo funciona?":</strong> Un tutorial interactivo que te guía paso a paso</li>
+                </ul>
                 <div class="tutorial-tip">
-                    <strong>💡 ¿Olvidaste tu contraseña?</strong>
-                    <p>Haz clic en "¿Olvidaste tu contraseña?" y sigue las instrucciones. Te llegará un código a tu correo.</p>
+                    <strong>💡 Consejo:</strong>
+                    <p>Si es tu primera vez, haz clic en "¿Cómo funciona?" para ver un recorrido rápido de todas las funciones.</p>
                 </div>
             </div>
             
             <div class="tutorial-step" data-step="2">
-                <h4>Tu Pantalla Principal</h4>
-                <p style="font-size: 1.1rem;">Después de ingresar, verás información sobre:</p>
+                <h4>Las Tarjetas de Información</h4>
+                <p style="font-size: 1.1rem;">Justo debajo del saludo, verás tres tarjetas coloridas con información importante:</p>
                 <ul style="font-size: 1.1rem;">
-                    <li>Tu vivienda</li>
-                    <li>El proyecto donde está ubicada</li>
-                    <li>Observaciones o reparaciones pendientes</li>
+                    <li>🏠 <strong>Mi Vivienda:</strong> 
+                        <ul>
+                            <li>Dirección completa de tu casa</li>
+                            <li>Comuna donde está ubicada</li>
+                            <li>Región</li>
+                        </ul>
+                    </li>
+                    <li>📋 <strong>Mis Reportes:</strong> 
+                        <ul>
+                            <li>Número total de problemas que has reportado</li>
+                            <li>Un resumen rápido de tus reportes</li>
+                        </ul>
+                    </li>
+                    <li>🏗️ <strong>Mi Proyecto:</strong> 
+                        <ul>
+                            <li>Nombre del proyecto TECHO</li>
+                            <li>Código del proyecto</li>
+                            <li>Ubicación general</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="tutorial-tip">
+                    <strong>💡 Información Actualizada:</strong>
+                    <p>Estas tarjetas se actualizan automáticamente. Siempre verás la información más reciente de tu vivienda.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="3">
+                <h4>Consejos para el Cuidado de tu Hogar</h4>
+                <p style="font-size: 1.1rem;">En tu pantalla principal también encontrarás una sección especial con consejos útiles:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>🔍 <strong>Revisa regularmente:</strong> Inspecciona puertas, ventanas y techos cada mes para detectar problemas temprano</li>
+                    <li>⚡ <strong>Reporta rápido:</strong> Si encuentras algún problema, repórtalo inmediatamente para una solución más rápida</li>
+                    <li>📸 <strong>Toma fotos:</strong> Siempre adjunta fotografías claras cuando reportes un problema. ¡Nos ayuda mucho!</li>
+                    <li>📞 <strong>Mantén contacto:</strong> Revisa regularmente el estado de tus reportes y mantente en comunicación</li>
                 </ul>
             </div>
         </div>
 
-        <!-- Paso 2 -->
+        <!-- Paso 2: Reportar Problemas -->
         <div class="tutorial-section">
             <h3 class="section-title">
                 <i class="bi bi-2-circle-fill"></i>
-                Ver el Estado de tu Vivienda
+                Reporta Problemas Fácilmente
             </h3>
             
             <div class="tutorial-step" data-step="1">
-                <h4>Información de tu Vivienda</h4>
-                <p style="font-size: 1.1rem;">En la pantalla principal podrás ver:</p>
+                <h4>¿Cuándo Debo Reportar un Problema?</h4>
+                <p style="font-size: 1.1rem;">Debes reportar un problema cuando encuentres cualquier situación que afecte tu vivienda, como:</p>
                 <ul style="font-size: 1.1rem;">
-                    <li>📍 <strong>Ubicación:</strong> Dónde está tu casa</li>
-                    <li>🏠 <strong>Tipo:</strong> Casa o departamento</li>
-                    <li>🛏️ <strong>Cuartos:</strong> Cantidad de habitaciones</li>
-                    <li>🚿 <strong>Baños:</strong> Cantidad de baños</li>
+                    <li>💧 <strong>Goteras o filtraciones:</strong> Agua que entra por el techo, paredes o ventanas</li>
+                    <li>🚪 <strong>Puertas dañadas:</strong> Que no cierran bien, están rotas o tienen problemas</li>
+                    <li>🪟 <strong>Ventanas con problemas:</strong> Rotas, que no abren/cierran, o con vidrios dañados</li>
+                    <li>🏠 <strong>Problemas estructurales:</strong> Grietas en paredes, problemas en el techo, etc.</li>
+                    <li>🚿 <strong>Problemas en baños:</strong> Grifos que gotean, problemas de drenaje, etc.</li>
+                    <li>⚡ <strong>Problemas eléctricos:</strong> Enchufes que no funcionan, cortes de luz, etc.</li>
+                    <li>🔧 <strong>Cualquier otro problema:</strong> Si algo no funciona bien en tu vivienda</li>
+                </ul>
+                <div class="tutorial-warning">
+                    <strong>⚠️ Importante:</strong>
+                    <p>No esperes a que el problema empeore. Reporta cualquier situación tan pronto como la detectes. Esto ayuda a solucionarlo más rápido y evita daños mayores.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>¿Cómo Reportar un Problema? (Paso a Paso)</h4>
+                <p style="font-size: 1.1rem;">Reportar un problema es muy fácil. Sigue estos pasos:</p>
+                <ol style="font-size: 1.1rem; line-height: 1.8;">
+                    <li><strong>Encuentra el botón:</strong> En la parte superior de tu pantalla, busca el botón grande que dice <strong>"Reportar un Problema"</strong> o <strong>"Nuevo Reporte"</strong></li>
+                    <li><strong>Selecciona el recinto:</strong> Elige dónde está el problema:
+                        <ul>
+                            <li>Puerta</li>
+                            <li>Ventana</li>
+                            <li>Techo</li>
+                            <li>Baño</li>
+                            <li>Cocina</li>
+                            <li>Pared</li>
+                            <li>Piso</li>
+                            <li>Otro (puedes especificar)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Describe el problema:</strong> Escribe con detalles qué está pasando. Sé específico:
+                        <ul>
+                            <li>¿Dónde exactamente está el problema?</li>
+                            <li>¿Cuándo comenzó?</li>
+                            <li>¿Qué tan grave es?</li>
+                            <li>¿Afecta tu vida diaria?</li>
+                        </ul>
+                    </li>
+                    <li><strong>Selecciona la urgencia:</strong>
+                        <ul>
+                            <li>🔴 <strong>Alta:</strong> Problemas graves que afectan la seguridad o habitabilidad (ej: goteras grandes, puertas que no cierran y dejan entrar frío/lluvia)</li>
+                            <li>🟡 <strong>Media:</strong> Problemas importantes pero no urgentes (ej: ventana que no abre bien, grifo que gotea)</li>
+                            <li>🟢 <strong>Baja:</strong> Problemas menores o estéticos (ej: pintura descascarada, pequeño detalle estético)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Adjunta fotos (MUY IMPORTANTE):</strong>
+                        <ul>
+                            <li>Toma varias fotos desde diferentes ángulos</li>
+                            <li>Asegúrate de que las fotos estén claras y con buena iluminación</li>
+                            <li>Muestra el problema completo y también detalles específicos</li>
+                            <li>Puedes subir múltiples imágenes</li>
+                        </ul>
+                    </li>
+                    <li><strong>Revisa y envía:</strong> Antes de enviar, revisa que toda la información esté correcta. Luego haz clic en <strong>"Enviar Reporte"</strong> o <strong>"Guardar"</strong></li>
+                </ol>
+                <div class="tutorial-success">
+                    <strong>✅ ¡Listo!</strong>
+                    <p>Una vez que envíes el reporte, recibirás una confirmación y el equipo de TECHO comenzará a trabajar en solucionarlo.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="3">
+                <h4>¿Por Qué las Fotos son Tan Importantes?</h4>
+                <p style="font-size: 1.1rem;">Las fotos son fundamentales porque:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>📸 <strong>Ayudan a entender mejor el problema:</strong> Una imagen vale más que mil palabras</li>
+                    <li>🔍 <strong>Permiten evaluar la urgencia:</strong> El equipo puede ver qué tan grave es realmente</li>
+                    <li>⚡ <strong>Facilitan la solución rápida:</strong> Con fotos claras, el equipo sabe exactamente qué materiales y herramientas necesita</li>
+                    <li>📋 <strong>Sirven como evidencia:</strong> Documentan el estado del problema antes de la reparación</li>
+                </ul>
+                <div class="tutorial-tip">
+                    <strong>💡 Consejos para buenas fotos:</strong>
+                    <ul style="margin-top: 0.5rem;">
+                        <li>Usa buena iluminación (preferiblemente luz natural)</li>
+                        <li>Acércate lo suficiente para ver el problema claramente</li>
+                        <li>Toma fotos desde diferentes ángulos</li>
+                        <li>Si es una gotera, muestra el agua cayendo</li>
+                        <li>Si es una puerta, muestra qué parte no funciona</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 3: Adjuntar Fotos y Videos -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-3-circle-fill"></i>
+                Adjunta Fotos y Videos
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>¿Cómo Subir Fotos?</h4>
+                <p style="font-size: 1.1rem;">Cuando estés reportando un problema, verás una sección para adjuntar archivos:</p>
+                <ol style="font-size: 1.1rem;">
+                    <li><strong>Haz clic en "Seleccionar archivos"</strong> o <strong>"Subir fotos"</strong></li>
+                    <li><strong>Elige las fotos</strong> desde tu computadora o celular</li>
+                    <li><strong>Puedes seleccionar múltiples fotos</strong> a la vez (mantén presionada la tecla Ctrl en computadora o selecciona varias en el celular)</li>
+                    <li><strong>Espera a que se suban</strong> (verás una barra de progreso)</li>
+                    <li><strong>Verifica que las fotos se hayan subido correctamente</strong> antes de enviar el reporte</li>
+                </ol>
+                <div class="tutorial-tip">
+                    <strong>💡 Tip:</strong>
+                    <p>Puedes tomar fotos directamente desde tu celular si estás usando la plataforma en el móvil. Esto es muy útil cuando encuentras un problema y quieres reportarlo inmediatamente.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>¿Puedo Subir Videos?</h4>
+                <p style="font-size: 1.1rem;">Sí, también puedes subir videos. Los videos son especialmente útiles para:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>🎥 <strong>Mostrar movimiento:</strong> Por ejemplo, una puerta que no cierra, agua goteando, etc.</li>
+                    <li>🔊 <strong>Capturar sonidos:</strong> Ruidos extraños, crujidos, etc.</li>
+                    <li>📹 <strong>Mostrar el contexto completo:</strong> Un recorrido del problema</li>
+                </ul>
+                <div class="tutorial-warning">
+                    <strong>⚠️ Tamaño de archivos:</strong>
+                    <p>Los videos deben ser relativamente cortos (menos de 2 minutos) para que se suban más rápido. Si el video es muy largo, intenta grabar solo la parte más importante del problema.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 4: Trabajo en Equipo -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-4-circle-fill"></i>
+                Trabajo en Equipo
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>El Equipo de TECHO También Reporta</h4>
+                <p style="font-size: 1.1rem;">Es importante que sepas que <strong>no solo tú puedes reportar problemas</strong>. El equipo técnico de TECHO también realiza inspecciones y reporta observaciones sobre tu vivienda. Esto significa que:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>👷 <strong>Inspecciones profesionales:</strong> El equipo de TECHO visita tu vivienda periódicamente para revisar su estado</li>
+                    <li>🔍 <strong>Detección temprana:</strong> Pueden encontrar problemas que quizás no hayas notado aún</li>
+                    <li>📋 <strong>Reportes técnicos:</strong> Documentan problemas con información técnica detallada</li>
+                    <li>🤝 <strong>Trabajo conjunto:</strong> Tú y el equipo trabajan juntos para mantener tu vivienda en perfecto estado</li>
+                </ul>
+                <div class="tutorial-success">
+                    <strong>✅ Beneficio para ti:</strong>
+                    <p>Esto significa que tu vivienda está siendo cuidada tanto por ti como por profesionales. Es una ventaja porque se detectan y solucionan problemas más rápido.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="2">
+                <h4>Ver Todas las Observaciones</h4>
+                <p style="font-size: 1.1rem;">En la sección <strong>"Mis Reportes"</strong> verás <strong>TODAS</strong> las observaciones de tu vivienda:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>📝 <strong>Las que tú reportaste:</strong> Tus propios reportes aparecen con toda la información que proporcionaste</li>
+                    <li>👷 <strong>Las que reportó el equipo:</strong> Observaciones hechas por trabajadores de TECHO durante sus visitas</li>
+                    <li>🔄 <strong>Actualizaciones en tiempo real:</strong> Verás cuando el estado de cualquier observación cambie</li>
+                    <li>📸 <strong>Evidencias de ambos:</strong> Fotos y videos tanto tuyos como del equipo técnico</li>
+                </ul>
+                <div class="tutorial-tip">
+                    <strong>💡 Transparencia Total:</strong>
+                    <p>Puedes ver todo lo que está pasando con tu vivienda. No hay información oculta. Siempre estarás informado sobre el estado de todas las observaciones y reparaciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paso 5: Hacer Seguimiento -->
+        <div class="tutorial-section">
+            <h3 class="section-title">
+                <i class="bi bi-5-circle-fill"></i>
+                Haz Seguimiento de tus Reportes
+            </h3>
+            
+            <div class="tutorial-step" data-step="1">
+                <h4>La Sección "Mis Reportes"</h4>
+                <p style="font-size: 1.1rem;">Esta es una de las secciones más importantes de tu panel. Aquí puedes:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>👀 <strong>Ver todos tus reportes:</strong> Tanto los que hiciste tú como los del equipo</li>
+                    <li>📊 <strong>Ver el estado actual:</strong> Cada reporte muestra su estado actualizado</li>
+                    <li>📅 <strong>Ver cuándo fue reportado:</strong> Hace cuánto tiempo se hizo el reporte</li>
+                    <li>🚨 <strong>Ver la urgencia:</strong> Alta, Media o Baja</li>
+                    <li>📸 <strong>Ver las fotos:</strong> Puedes hacer clic en las fotos para verlas en tamaño completo</li>
                 </ul>
             </div>
             
             <div class="tutorial-step" data-step="2">
-                <h4>Ver Observaciones (Problemas Reportados)</h4>
-                <p style="font-size: 1.1rem;">Si hay algo que reparar en tu casa, lo verás aquí. Cada observación muestra:</p>
+                <h4>Entender los Estados</h4>
+                <p style="font-size: 1.1rem;">Cada reporte tiene un estado que te indica en qué fase está:</p>
                 <ul style="font-size: 1.1rem;">
-                    <li>🔧 <strong>Qué hay que reparar</strong></li>
-                    <li>📅 <strong>Cuándo fue reportado</strong></li>
-                    <li>✅ <strong>Estado:</strong> Si está pendiente, en proceso o resuelto</li>
+                    <li>🟡 <strong>Pendiente:</strong> 
+                        <ul>
+                            <li>Tu reporte fue recibido correctamente</li>
+                            <li>Está en la lista de espera para ser atendido</li>
+                            <li>El equipo de TECHO lo revisará pronto</li>
+                        </ul>
+                    </li>
+                    <li>🔵 <strong>En Progreso:</strong> 
+                        <ul>
+                            <li>El equipo de TECHO está trabajando activamente en solucionarlo</li>
+                            <li>Puede que ya hayan visitado tu vivienda</li>
+                            <li>Están en proceso de reparación</li>
+                        </ul>
+                    </li>
+                    <li>🟢 <strong>Resuelto:</strong> 
+                        <ul>
+                            <li>El problema ya fue solucionado completamente</li>
+                            <li>La reparación está terminada</li>
+                            <li>Puedes verificar que todo esté bien</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="tutorial-tip">
+                    <strong>💡 Revisa Regularmente:</strong>
+                    <p>Te recomendamos revisar tus reportes al menos una vez por semana para estar al tanto de las actualizaciones. El estado puede cambiar en cualquier momento.</p>
+                </div>
+            </div>
+            
+            <div class="tutorial-step" data-step="3">
+                <h4>Información Detallada de Cada Reporte</h4>
+                <p style="font-size: 1.1rem;">Cuando haces clic en un reporte o lo ves en la lista, encontrarás:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>🏠 <strong>Recinto afectado:</strong> Dónde está el problema (puerta, ventana, techo, etc.)</li>
+                    <li>📝 <strong>Descripción completa:</strong> Todos los detalles del problema</li>
+                    <li>🚨 <strong>Nivel de urgencia:</strong> Con un icono de color que indica la importancia</li>
+                    <li>📅 <strong>Fecha y hora:</strong> Cuándo fue reportado</li>
+                    <li>⏱️ <strong>Tiempo transcurrido:</strong> Hace cuánto tiempo (ej: "hace 3 días")</li>
+                    <li>📸 <strong>Galería de fotos:</strong> Todas las imágenes adjuntas (puedes hacer clic para ampliarlas)</li>
+                    <li>👤 <strong>Quién lo reportó:</strong> Si fuiste tú o el equipo de TECHO</li>
+                </ul>
+            </div>
+            
+            <div class="tutorial-step" data-step="4">
+                <h4>El Plazo de 120 Días</h4>
+                <p style="font-size: 1.1rem;">Es importante que sepas que TECHO tiene un compromiso legal contigo:</p>
+                <ul style="font-size: 1.1rem;">
+                    <li>📅 <strong>120 días de garantía:</strong> Desde la entrega de tu vivienda, TECHO tiene 120 días para solucionar cualquier problema</li>
+                    <li>⚖️ <strong>Compromiso legal:</strong> Este plazo está establecido por ley (Decreto Supremo 49)</li>
+                    <li>✅ <strong>Tu tranquilidad:</strong> Todos los problemas reportados dentro de este plazo serán atendidos</li>
                 </ul>
                 <div class="tutorial-success">
-                    <strong>✅ Tranquilidad:</strong>
-                    <p>El equipo de TECHO está trabajando para solucionar todos los problemas dentro del plazo legal de 120 días.</p>
+                    <strong>✅ Garantía TECHO:</strong>
+                    <p>El equipo de TECHO está trabajando activamente para solucionar todos los problemas dentro de este plazo. Tu vivienda es nuestra prioridad.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Paso 3 -->
+        <!-- Paso 6: Consejos Finales -->
         <div class="tutorial-section">
             <h3 class="section-title">
-                <i class="bi bi-3-circle-fill"></i>
-                Pedir Ayuda
+                <i class="bi bi-lightbulb-fill"></i>
+                Consejos Finales
             </h3>
             
-            <div class="tutorial-step" data-step="1">
-                <h4>Si necesitas ayuda con la plataforma</h4>
-                <p style="font-size: 1.1rem;">1. Haz clic en <strong>"Recursos"</strong> en la barra superior</p>
-                <p style="font-size: 1.1rem;">2. Selecciona <strong>"Ayuda"</strong></p>
-                <p style="font-size: 1.1rem;">3. Escribe tu consulta o problema</p>
-                <p style="font-size: 1.1rem;">4. Haz clic en <strong>"Enviar"</strong></p>
-                <div class="tutorial-tip">
-                    <strong>💡 Respuesta Rápida:</strong>
-                    <p>El equipo de TECHO responderá tu consulta a tu correo en menos de 24 horas.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Paso 4 -->
-        <div class="tutorial-section">
-            <h3 class="section-title">
-                <i class="bi bi-4-circle-fill"></i>
-                Consejos para Usar la Plataforma
-            </h3>
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-card-icon">🖥️</div>
-                    <div class="feature-card-title">Pantalla Grande</div>
-                    <p class="feature-card-desc">Si puedes, usa una computadora o tablet. Verás mejor la información.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-card-icon">🔒</div>
-                    <div class="feature-card-title">Guarda tu Contraseña</div>
-                    <p class="feature-card-desc">Anota tu contraseña en un lugar seguro. No la compartas con nadie.</p>
+                    <div class="feature-card-title">Usa una Pantalla Grande</div>
+                    <p class="feature-card-desc">Si puedes, usa una computadora o tablet. Verás mejor la información y será más fácil navegar por todas las secciones.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-card-icon">📱</div>
-                    <div class="feature-card-title">También en el Celular</div>
-                    <p class="feature-card-desc">Puedes usar la plataforma desde tu teléfono móvil.</p>
+                    <div class="feature-card-title">También Funciona en el Celular</div>
+                    <p class="feature-card-desc">Puedes usar la plataforma desde tu teléfono móvil. Es muy útil para reportar problemas cuando los encuentras, ya que puedes tomar fotos directamente.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">🔒</div>
+                    <div class="feature-card-title">Protege tu Contraseña</div>
+                    <p class="feature-card-desc">Anota tu contraseña en un lugar seguro. No la compartas con nadie para proteger tu cuenta y tu información personal.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">📸</div>
+                    <div class="feature-card-title">Fotos Claras y Múltiples</div>
+                    <p class="feature-card-desc">Cuando reportes un problema, toma varias fotos desde diferentes ángulos con buena iluminación. Esto ayuda mucho al equipo técnico.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-card-icon">⏰</div>
+                    <div class="feature-card-title">Revisa Regularmente</div>
+                    <p class="feature-card-desc">Revisa tus reportes cada semana para ver las actualizaciones y el progreso de las reparaciones. Mantente informado.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-card-icon">🆘</div>
-                    <div class="feature-card-title">Pide Ayuda</div>
-                    <p class="feature-card-desc">Si algo no te queda claro, no dudes en preguntar. Estamos para ayudarte.</p>
+                    <div class="feature-card-title">Pide Ayuda Cuando la Necesites</div>
+                    <p class="feature-card-desc">Si algo no te queda claro o tienes problemas usando la plataforma, no dudes en pedir ayuda. Estamos para ayudarte.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Paso 5 -->
+        <!-- Paso 7: Contacto y Ayuda -->
         <div class="tutorial-section">
             <h3 class="section-title">
-                <i class="bi bi-5-circle-fill"></i>
-                Video Tutorial (Próximamente)
+                <i class="bi bi-heart-fill"></i>
+                ¿Necesitas Más Ayuda?
             </h3>
-            <div style="background: #f3f4f6; padding: 3rem; text-align: center; border-radius: 12px;">
-                <i class="bi bi-play-circle" style="font-size: 4rem; color: #8b5cf6;"></i>
-                <h4 style="margin-top: 1rem;">Video Explicativo</h4>
-                <p class="text-muted">Pronto agregaremos un video paso a paso para que sea aún más fácil.</p>
+            <div style="background: linear-gradient(135deg, #E0F7FA 0%, #B0E0E6 100%); padding: 3rem; text-align: center; border-radius: 12px; border: 3px solid #00B4D8;">
+                <i class="bi bi-telephone-fill" style="font-size: 4rem; color: #0077B6;"></i>
+                <h4 style="margin-top: 1rem; color: #0077B6; font-weight: 700;">Contacta al Equipo TECHO</h4>
+                <p style="font-size: 1.1rem; color: #0077B6; margin-top: 1rem;">
+                    Si tienes dudas sobre cómo usar la plataforma o necesitas ayuda adicional:
+                </p>
+                <ul style="text-align: left; display: inline-block; font-size: 1.1rem; color: #0077B6; margin-top: 1rem;">
+                    <li>📧 Usa el formulario de <strong>"Ayuda"</strong> en el menú Recursos</li>
+                    <li>📞 Contacta directamente al equipo de TECHO</li>
+                    <li>📖 Revisa este tutorial cuando lo necesites (siempre estará disponible)</li>
+                    <li>🔄 Vuelve a ver el tutorial interactivo desde tu dashboard (botón "¿Cómo funciona?")</li>
+                </ul>
+                <div class="tutorial-success" style="margin-top: 2rem; text-align: left;">
+                    <strong>✅ Recuerda:</strong>
+                    <p>El equipo de TECHO está comprometido con tu bienestar y el de tu familia. No dudes en contactarnos si necesitas ayuda con tu vivienda o con el uso de esta plataforma. Estamos aquí para ayudarte.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -761,7 +1050,34 @@ function showTutorial(role) {
 // Detectar rol actual y mostrar tutorial correspondiente
 document.addEventListener('DOMContentLoaded', () => {
     const userRole = '{{ rol|lower }}'; // Admin, Trabajador, Familia
-    if (userRole && ['admin', 'trabajador', 'familia'].includes(userRole)) {
+    
+    // Si es familia, ocultar completamente los tutoriales de admin y trabajador
+    if (userRole === 'familia') {
+        // Ocultar selectores de otros roles
+        document.querySelectorAll('[data-role="admin"], [data-role="trabajador"]').forEach(btn => {
+            btn.style.display = 'none';
+            btn.style.visibility = 'hidden';
+        });
+        
+        // Ocultar completamente los divs de tutorial admin y trabajador
+        const adminTutorial = document.getElementById('tutorial-admin');
+        const trabajadorTutorial = document.getElementById('tutorial-trabajador');
+        if (adminTutorial) {
+            adminTutorial.style.display = 'none';
+            adminTutorial.style.visibility = 'hidden';
+            adminTutorial.style.height = '0';
+            adminTutorial.style.overflow = 'hidden';
+        }
+        if (trabajadorTutorial) {
+            trabajadorTutorial.style.display = 'none';
+            trabajadorTutorial.style.visibility = 'hidden';
+            trabajadorTutorial.style.height = '0';
+            trabajadorTutorial.style.overflow = 'hidden';
+        }
+        
+        // Mostrar solo el tutorial de familia
+        showTutorial('familia');
+    } else if (userRole && ['admin', 'trabajador', 'familia'].includes(userRole)) {
         showTutorial(userRole);
     }
 });

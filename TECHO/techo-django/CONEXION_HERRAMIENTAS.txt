@@ -1,0 +1,352 @@
+╔═══════════════════════════════════════════════════════════════╗
+║        CONEXIÓN DE HERRAMIENTAS - TECHO CHILE                 ║
+╚═══════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 FLUJO DE CONEXIÓN COMPLETO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+┌─────────────────────────────────────────────────────────────┐
+│                    1. FRONTEND (Cliente)                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   HTML5      │  │    CSS3      │  │ JavaScript   │      │
+│  │  Templates   │  │  Bootstrap 5 │  │  (Vanilla)   │      │
+│  │   Django     │  │  Custom CSS  │  │    HTMX      │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                                                              │
+│         ↓ HTTP Request (GET/POST)                           │
+│         ↓ Datos del formulario                              │
+│         ↓ Archivos (imágenes/videos)                        │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│                2. SERVidor WEB (Render.com)                  │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         Render.com (Hosting Cloud)               │       │
+│  │  - Recibe peticiones HTTP/HTTPS                  │       │
+│  │  - Enruta a Gunicorn (WSGI Server)               │       │
+│  └──────────────────────────────────────────────────┘       │
+│                           ↓                                  │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         Gunicorn (WSGI Server)                   │       │
+│  │  - Servidor de aplicaciones Python               │       │
+│  │  - Ejecuta Django (Backend)                      │       │
+│  │  - Maneja múltiples workers                      │       │
+│  └──────────────────────────────────────────────────┘       │
+│                           ↓                                  │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         WhiteNoise (Static Files)                │       │
+│  │  - Sirve archivos estáticos (CSS, JS)            │       │
+│  │  - Optimiza carga de recursos                    │       │
+│  └──────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  3. BACKEND (Django)                         │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         Django Framework 5.2.7                   │       │
+│  │                                                   │       │
+│  │  ┌──────────────┐  ┌──────────────┐             │       │
+│  │  │  URL Router  │→ │    Views     │             │       │
+│  │  │  (urls.py)   │  │  (views.py)  │             │       │
+│  │  └──────────────┘  └──────────────┘             │       │
+│  │         ↑                  ↓                     │       │
+│  │         │                  │                     │       │
+│  │  ┌──────────────┐  ┌──────────────┐             │       │
+│  │  │  Templates   │  │    Models    │             │       │
+│  │  │  (HTML/DTL)  │  │   (ORM)      │             │       │
+│  │  └──────────────┘  └──────────────┘             │       │
+│  │         │                  ↓                     │       │
+│  │         │          ┌──────────────┐             │       │
+│  │         │          │   Forms      │             │       │
+│  │         │          │ (validación) │             │       │
+│  │         │          └──────────────┘             │       │
+│  │         │                                         │       │
+│  │         └──────────────┘                         │       │
+│  │                  │                                │       │
+│  │                  ↓ HTTP Response                  │       │
+│  │          (HTML renderizado + datos)               │       │
+│  └──────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                           ↓
+                           ↓
+┌─────────────────────────────────────────────────────────────┐
+│              4. BASE DE DATOS (PostgreSQL)                   │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         PostgreSQL (Cloud - Render.com)          │       │
+│  │                                                   │       │
+│  │  ┌────────────────────────────────────────┐      │       │
+│  │  │  ORM de Django (psycopg2-binary)       │      │       │
+│  │  │  - Convierte Python → SQL              │      │       │
+│  │  │  - Ejecuta consultas SQL               │      │       │
+│  │  │  - Retorna resultados → Python         │      │       │
+│  │  └────────────────────────────────────────┘      │       │
+│  │                                                   │       │
+│  │  Tablas:                                          │       │
+│  │  • users (autenticación)                         │       │
+│  │  • core_perfilusuario                            │       │
+│  │  • core_vivienda                                 │       │
+│  │  • core_proyecto                                 │       │
+│  │  • core_fichainmueble                            │       │
+│  │  • core_registropostventa                        │       │
+│  │  • core_evidencia                                │       │
+│  │  • core_constructora                             │       │
+│  └──────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+                           ↑
+                           │
+                           │ (Operaciones CRUD)
+                           │
+┌─────────────────────────────────────────────────────────────┐
+│                  5. GENERACIÓN DE PDFs                       │
+│  ┌──────────────────────────────────────────────────┐       │
+│  │         ReportLab + xhtml2pdf                    │       │
+│  │                                                   │       │
+│  │  Django View → ReportLab → PDF                   │       │
+│  │                                                   │       │
+│  │  Flujo:                                          │       │
+│  │  1. Usuario solicita reporte                     │       │
+│  │  2. View obtiene datos de PostgreSQL             │       │
+│  │  3. ReportLab procesa datos                      │       │
+│  │  4. xhtml2pdf convierte HTML → PDF               │       │
+│  │  5. PDF se genera en memoria                     │       │
+│  │  6. Django responde con PDF descargable          │       │
+│  └──────────────────────────────────────────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 CONEXIÓN DETALLADA POR COMPONENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  FRONTEND → BACKEND
+───────────────────────────────────────────────────────────────
+Conexión: HTTP/HTTPS Requests
+
+HTML Templates (Django DTL):
+  • {% extends "layout/base.html" %}
+  • {% url 'nombre_url' %} → Django URL Router
+  • {{ variable }} → Datos del contexto (View → Template)
+  • {% csrf_token %} → Seguridad Django
+
+JavaScript/HTMX:
+  • fetch('/api/endpoint') → AJAX a Django View
+  • htmx.get('/url') → Carga dinámica sin recargar página
+  • FormData → Envío de archivos (multipart/form-data)
+
+Formularios:
+  • <form method="POST" action="{% url 'vista' %}">
+  • Django Forms → Validación en Frontend y Backend
+  • File Upload → <input type="file" name="archivo">
+
+
+2️⃣  BACKEND → BASE DE DATOS
+───────────────────────────────────────────────────────────────
+Conexión: Django ORM + psycopg2-binary
+
+Configuración (settings.py):
+  DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.postgresql',
+      'NAME': 'nombre_db',
+      'USER': 'usuario',
+      'PASSWORD': 'contraseña',
+      'HOST': 'postgresql.render.com',
+      'PORT': '5432',
+    }
+  }
+
+ORM (Object-Relational Mapping):
+  • Model.objects.filter() → SELECT * FROM tabla WHERE...
+  • Model.objects.create() → INSERT INTO tabla...
+  • instance.save() → UPDATE tabla...
+  • instance.delete() → DELETE FROM tabla...
+
+Ejemplo:
+  # Python (Django)
+  viviendas = Vivienda.objects.filter(proyecto=proyecto)
+  
+  # Se convierte automáticamente a SQL
+  # SELECT * FROM core_vivienda WHERE proyecto_id = 1;
+
+
+3️⃣  BACKEND → SERVidor
+───────────────────────────────────────────────────────────────
+Conexión: Gunicorn (WSGI Server)
+
+Gunicorn ejecuta Django:
+  gunicorn config.wsgi:application
+
+Flujo:
+  1. Gunicorn recibe request HTTP
+  2. Pasa request a Django (WSGI interface)
+  3. Django procesa (URL Router → View → Model)
+  4. Django retorna response HTTP
+  5. Gunicorn envía response al cliente
+
+Archivos estáticos:
+  • WhiteNoise intercepta requests a /static/
+  • Sirve CSS, JS, imágenes desde disco
+  • Cache para optimización
+
+
+4️⃣  BACKEND → HOSTING (Render.com)
+───────────────────────────────────────────────────────────────
+Conexión: Git + Build Commands
+
+Render.com recibe:
+  1. Git Push → Trigger build
+  2. Instala dependencias: pip install -r requirements.txt
+  3. Ejecuta migraciones: python manage.py migrate
+  4. Colecta estáticos: python manage.py collectstatic
+  5. Inicia servidor: gunicorn config.wsgi:application
+
+Variables de entorno (Render Dashboard):
+  • DATABASE_URL → Conexión PostgreSQL
+  • SECRET_KEY → Clave secreta Django
+  • DEBUG → False (producción)
+  • ALLOWED_HOSTS → dominio permitido
+
+Base de datos PostgreSQL:
+  • Render crea instancia PostgreSQL separada
+  • Django se conecta vía DATABASE_URL
+  • psycopg2-binary maneja la conexión
+
+
+5️⃣  BACKEND → GENERACIÓN DE PDFs
+───────────────────────────────────────────────────────────────
+Conexión: ReportLab + xhtml2pdf (Python Libraries)
+
+Flujo completo:
+  1. Usuario hace click en "Generar PDF"
+  2. Django View se ejecuta:
+     def generar_pdf(request):
+       # Obtener datos de PostgreSQL
+       viviendas = Vivienda.objects.all()
+       
+       # Renderizar template HTML
+       html = render_to_string('reporte.html', {
+           'viviendas': viviendas
+       })
+       
+       # Convertir HTML → PDF
+       pdf = HTML(string=html).write_pdf()
+       
+       # Retornar PDF como respuesta HTTP
+       response = HttpResponse(pdf, content_type='application/pdf')
+       response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+       return response
+
+Bibliotecas:
+  • ReportLab: Genera PDFs desde código Python
+  • xhtml2pdf: Convierte HTML/CSS a PDF
+  • Django: Renderiza template HTML con datos
+
+
+6️⃣  FRONTEND → ARCHIVOS (Media Files)
+───────────────────────────────────────────────────────────────
+Conexión: Django Media Files + Storage
+
+Subida de archivos:
+  • <form enctype="multipart/form-data">
+  • Django recibe archivo en request.FILES
+  • FileField/ImageField guarda en MEDIA_ROOT
+  • URLs servidas desde MEDIA_URL
+
+Ejemplo:
+  # models.py
+  class Evidencia(models.Model):
+      archivo = models.FileField(upload_to='evidencias/')
+  
+  # views.py
+  if request.method == 'POST':
+      archivo = request.FILES['archivo']
+      evidencia = Evidencia(archivo=archivo)
+      evidencia.save()
+  
+  # En template
+  <img src="{{ evidencia.archivo.url }}">
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔄 FLUJO COMPLETO: EJEMPLO REAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CASO: Usuario (Familia) reporta una observación con foto
+
+1. FRONTEND (Browser)
+   └─> Usuario completa formulario en dashboard_familia.html
+   └─> Sube foto: <input type="file" name="evidencias" multiple>
+   └─> Click en "Enviar" → POST request a /trabajador/reportar-observacion/
+
+2. SERVIDOR (Render.com)
+   └─> Render recibe request HTTPS
+   └─> Gunicorn procesa request
+   └─> WhiteNoise verifica si es archivo estático (no lo es)
+
+3. BACKEND (Django)
+   └─> URL Router (urls.py) → reportar_observacion_trabajador()
+   └─> View (views.py):
+       ├─> Valida formulario (forms.py)
+       ├─> Verifica autenticación (@login_required)
+       ├─> Crea RegistroPostventa (model)
+       └─> Para cada archivo en request.FILES:
+           ├─> Valida tipo y tamaño
+           ├─> Usa Pillow para procesar imagen
+           ├─> Guarda en media/evidencias/ (FileStorage)
+           └─> Crea Evidencia vinculada a RegistroPostventa
+
+4. BASE DE DATOS (PostgreSQL)
+   └─> Django ORM ejecuta:
+       ├─> INSERT INTO core_registropostventa (...)
+       └─> INSERT INTO core_evidencia (archivo='evidencias/foto.jpg', ...)
+
+5. BACKEND (Django - Response)
+   └─> Renderiza template con mensaje de éxito
+   └─> Retorna HTML con nueva observación visible
+
+6. FRONTEND (Browser)
+   └─> Recibe HTML actualizado
+   └─> Muestra mensaje: "Observación reportada exitosamente"
+   └─> Actualiza lista de observaciones (sin recargar si usa HTMX)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 CONEXIONES SEGURAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+HTTPS (Frontend ↔ Servidor):
+  • Render.com proporciona SSL/TLS automático
+  • Certificado Let's Encrypt
+  • Conexión cifrada
+
+Autenticación (Frontend ↔ Backend):
+  • Django Session Authentication
+  • Cookie: sessionid
+  • CSRF Token en formularios
+
+Base de Datos (Backend ↔ PostgreSQL):
+  • Conexión SSL/TLS
+  • Credenciales en variables de entorno
+  • No expuestas en código
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 RESUMEN DE CONEXIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Frontend      → Backend:      HTTP/HTTPS (Requests/Responses)
+Backend       → Base Datos:   Django ORM + psycopg2-binary (SQL)
+Backend       → Servidor:     Gunicorn (WSGI)
+Backend       → PDFs:         ReportLab + xhtml2pdf (Python)
+Backend       → Archivos:     FileStorage (Media Files)
+Frontend      → Archivos:     MEDIA_URL (servir imágenes/videos)
+Hosting       → Backend:      Git Push → Build → Deploy
+Hosting       → Base Datos:   PostgreSQL Cloud Instance
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fecha: Noviembre 2025
+Proyecto: TECHO Chile - Gestión Postventa
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
