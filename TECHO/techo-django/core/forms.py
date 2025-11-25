@@ -1,5 +1,14 @@
 from django import forms
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, Constructora, PerfilUsuario
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, Constructora, PerfilUsuario, Comentario
+
+class ComentarioForm(forms.ModelForm):
+    class Meta:
+        model = Comentario
+        fields = ["texto", "archivo"]
+        widgets = {
+            'texto': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Escribe un comentario...'}),
+            'archivo': forms.FileInput(attrs={'class': 'form-control'}),
+        }
 
 class PerfilForm(forms.ModelForm):
     class Meta:

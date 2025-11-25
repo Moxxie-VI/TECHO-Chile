@@ -1,0 +1,222 @@
+﻿{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Observación #{{ registro.id }} · TECHO{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detalle-header {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+    }
+
+    .detalle-breadcrumb a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+    }
+
+    .detalle-breadcrumb a:hover {
+        color: white;
+    }
+
+    .timeline-item {
+        border-left: 2px solid #e9ecef;
+        padding-left: 20px;
+        padding-bottom: 20px;
+        position: relative;
+    }
+
+    .timeline-item::before {
+        content: '';
+        width: 12px;
+        height: 12px;
+        background: #fff;
+        border: 2px solid #0d6efd;
+        border-radius: 50%;
+        position: absolute;
+        left: -7px;
+        top: 0;
+    }
+
+    .evidencia-img,
+    .evidencia-video-player {
+        max-width: 100%;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="detalle-header">
+        <div class="detalle-breadcrumb mb-2">
+            <a href="{% url 'dashboard' %}">Inicio</a> /
+            <a href="{% url 'fichas_inmuebles' %}">Fichas</a> /
+            <a href="{% url 'detalle_ficha_inmueble' registro.ficha.id %}">Ficha {{ registro.ficha.vivienda.direccion
+                }}</a> /
+            <span>Observación #{{ registro.id }}</span>
+        </div>
+        <h1 class="mb-2">{{ registro.recinto }}</h1>
+        <div class="d-flex gap-3 align-items-center flex-wrap">
+            <span class="badge bg-warning text-dark">{{ registro.urgencia }}</span>
+            <span class="badge bg-info text-dark">{{ registro.get_estado_display }}</span>
+            <span><i class="fas fa-calendar me-1"></i> {{ registro.creado_en|date:"d/m/Y" }}</span>
+            <span><i class="fas fa-user me-1"></i> {{
+                registro.reportante.perfil.get_nombre_completo|default:registro.reportante.username }}</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Detalle Observación -->
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h3 class="h5 mb-3 text-primary fw-bold">Descripción del Problema</h3>
+                    <p class="lead fs-6">{{ registro.observacion }}</p>
+
+                    {% if registro.evidencias.all %}
+                    <h4 class="h6 mt-4 mb-3 text-muted fw-bold">Evidencias Iniciales</h4>
+                    <div class="row g-3">
+                        {% for evidencia in registro.evidencias.all %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                {% if ".jpg" in evidencia.archivo.url|lower or ".png" in evidencia.archivo.url|lower or ".jpeg" in evidencia.archivo.url|lower %}
+                                <a href="{{ evidencia.archivo.url }}" target="_blank">
+                                    <img src="{{ evidencia.archivo.url }}" class="card-img-top" alt="Evidencia"
+                                        style="height: 150px; object-fit: cover;">
+                                </a>
+                                {% else %}
+                                <video src="{{ evidencia.archivo.url }}" controls class="w-100"
+                                    style="height: 150px; object-fit: cover;"></video>
+                                {% endif %}
+                                {% if evidencia.comentario %}
+                                <div class="card-footer bg-white border-0 p-2">
+                                    <small class="text-muted">{{ evidencia.comentario }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comentarios -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h3 class="h5 text-primary fw-bold mb-0">Comentarios y Seguimiento</h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if comentarios %}
+                    <div class="timeline mb-4">
+                        {% for comentario in comentarios %}
+                        <div class="timeline-item mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <strong class="text-dark">{{
+                                    comentario.autor.perfil.get_nombre_completo|default:comentario.autor.username
+                                    }}</strong>
+                                <small class="text-muted">{{ comentario.creado_en|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <div class="bg-light p-3 rounded">
+                                <p class="mb-1">{{ comentario.texto }}</p>
+                                {% if comentario.archivo %}
+                                <div class="mt-2">
+                                    <a href="{{ comentario.archivo.url }}" target="_blank"
+                                        class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-paperclip me-1"></i> Ver archivo adjunto
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">
+                        <i class="fas fa-comments fa-2x mb-2"></i>
+                        <p>No hay comentarios aún.</p>
+                    </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <!-- Formulario Nuevo Comentario -->
+                    <h4 class="h6 mb-3 fw-bold">Agregar Comentario</h4>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.texto }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Adjuntar archivo (opcional)</label>
+                            {{ form.archivo }}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i> Enviar Comentario
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Información de Cierre (Visible para todos) -->
+            {% if registro.estado == "RESUELTA" or registro.estado == "CERRADO" %}
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-success text-white border-bottom-0 pt-3 px-3">
+                    <h4 class="h6 mb-0 fw-bold"><i class="fas fa-check-circle me-2"></i> Observación Cerrada</h4>
+                </div>
+                <div class="card-body p-3 bg-light">
+                    <p class="mb-2"><strong>Fecha de Cierre:</strong> {{ registro.fecha_cierre|date:"d/m/Y H:i" }}</p>
+                    <p class="mb-0"><strong>Comentario Final:</strong> {{ registro.comentario_cierre }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Acciones Admin -->
+            {% if rol == "Admin" and registro.estado != "RESUELTA" and registro.estado != "CERRADO" %}
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-header bg-light border-bottom-0 pt-3 px-3">
+                    <h4 class="h6 mb-0 fw-bold text-dark">Administración</h4>
+                </div>
+                <div class="card-body p-3">
+                    <form action="{% url 'cerrar_registro' registro.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Comentario de Cierre</label>
+                            <textarea name="comentario_cierre" class="form-control" rows="3" required
+                                placeholder="Explica la solución o motivo de cierre..."></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check-circle me-2"></i> Cerrar Observación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Info Adicional -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-3">
+                    <h5 class="h6 fw-bold mb-3">Detalles Adicionales</h5>
+                    <ul class="list-unstyled small mb-0">
+                        <li class="mb-2"><strong>Proyecto:</strong> {{ registro.proyecto.nombre }}</li>
+                        <li class="mb-2"><strong>Vivienda:</strong> {{ registro.ficha.vivienda.direccion }} #{{
+                            registro.ficha.vivienda.numero }}</li>
+                        <li class="mb-2"><strong>Tipo:</strong> {{ registro.ficha.vivienda.tipo }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

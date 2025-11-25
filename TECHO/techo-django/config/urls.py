@@ -12,7 +12,7 @@ from core.views import (
     admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora,
     reportar_observacion_familia, reportar_observacion_trabajador, buscar_familia_por_rut,
     fichas_inmuebles, detalle_ficha_inmueble, buscar_usuario_por_rut,
-    asignar_trabajadores_proyecto
+    asignar_trabajadores_proyecto, registro_detalle, cerrar_registro
 )
 from accounts.views import (
     login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
@@ -46,6 +46,8 @@ urlpatterns = [
     path("usuarios/eliminar/<int:user_id>/", eliminar_usuario, name="eliminar_usuario"),
     path("trabajo/registro/<int:reg_id>/evidencia/", subir_evidencia, name="subir_evidencia"),
     path("trabajo/registro/<int:reg_id>/estado/", cambiar_estado_registro, name="cambiar_estado_registro"),
+    path("trabajo/registro/<int:reg_id>/detalle/", registro_detalle, name="registro_detalle"),
+    path("trabajo/registro/<int:reg_id>/cerrar/", cerrar_registro, name="cerrar_registro"),
     # Sistema DS 49
     path("ds49/monitoreo/", monitoreo_ds49, name="monitoreo_ds49"),
     path("ds49/actualizar-fecha/<int:ficha_id>/", actualizar_fecha_entrega, name="actualizar_fecha_entrega"),

@@ -7,8 +7,8 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.db.models import Count, Q
-from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario
+from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm, ComentarioForm
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario, Comentario
 from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
@@ -1157,3 +1157,68 @@ def reportar_observacion_trabajador(request):
     }
     
     return render(request, "core/reportar_observacion_trabajador.html", context)
+
+
+# =============================================================================
+# GESTIÓN DE OBSERVACIONES Y COMENTARIOS
+# =============================================================================
+
+@login_required
+@require_role("Admin", "Trabajador", "Familia")
+def registro_detalle(request, reg_id):
+    """Vista detallada de una observación con comentarios"""
+    registro = get_object_or_404(RegistroPostventa, pk=reg_id)
+    perfil = request.user.perfil
+    
+    # Verificar permisos
+    if perfil.rol == "Trabajador" and registro.proyecto != perfil.proyecto_asignado:
+        messages.error(request, "No tienes permisos para ver este registro")
+        return redirect('dashboard')
+    
+    if perfil.rol == "Familia":
+        if not perfil.vivienda_asignada or registro.ficha.vivienda != perfil.vivienda_asignada:
+            messages.error(request, "No tienes permisos para ver este registro")
+            return redirect('dashboard')
+        
+    comentarios = registro.comentarios.all().order_by('creado_en')
+    
+    if request.method == "POST":
+        form = ComentarioForm(request.POST, request.FILES)
+        if form.is_valid():
+            comentario = form.save(commit=False)
+            comentario.registro = registro
+            comentario.autor = request.user
+            comentario.save()
+            messages.success(request, "Comentario agregado exitosamente")
+            return redirect('registro_detalle', reg_id=reg_id)
+    else:
+        form = ComentarioForm()
+        
+    context = {
+        'registro': registro,
+        'comentarios': comentarios,
+        'form': form,
+        'rol': perfil.rol,
+        'estados': ESTADOS,
+    }
+    return render(request, 'core/registro_detalle.html', context)
+
+@login_required
+@require_role("Admin")
+@require_POST
+def cerrar_registro(request, reg_id):
+    """Cierra una observación con comentario y fecha"""
+    registro = get_object_or_404(RegistroPostventa, pk=reg_id)
+    
+    comentario = request.POST.get('comentario_cierre')
+    if not comentario:
+        messages.error(request, "Debes ingresar un comentario de cierre")
+        return redirect('registro_detalle', reg_id=reg_id)
+        
+    registro.estado = "RESUELTA"
+    registro.comentario_cierre = comentario
+    registro.fecha_cierre = timezone.now()
+    registro.save()
+    
+    messages.success(request, "Observación cerrada exitosamente")
+    return redirect('registro_detalle', reg_id=reg_id)

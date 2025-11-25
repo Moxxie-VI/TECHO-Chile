@@ -3,8 +3,10 @@ from django.contrib.auth.models import User
 
 ESTADOS = (
     ("ABIERTA", "Abierta"),
+    ("EN_REVISION", "En revisión"),
     ("EN_GESTION", "En gestión"),
     ("RESUELTA", "Resuelta"),
+    ("CERRADO", "Cerrado"),
 )
 class Privilegio(models.Model):
     nombre = models.CharField(max_length=50, unique=True)  # Admin, Trabajador, Familia
@@ -189,7 +191,22 @@ class RegistroPostventa(models.Model):
     urgencia = models.CharField(max_length=20, default="MEDIA")
     vence_en = models.DateField(null=True, blank=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default="ABIERTA")
+    
+    # Cierre
+    comentario_cierre = models.TextField(blank=True, verbose_name="Comentario de Cierre")
+    fecha_cierre = models.DateTimeField(null=True, blank=True)
+    
     creado_en = models.DateTimeField(auto_now_add=True)
+
+class Comentario(models.Model):
+    registro = models.ForeignKey(RegistroPostventa, on_delete=models.CASCADE, related_name="comentarios")
+    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    texto = models.TextField()
+    archivo = models.FileField(upload_to="comentarios/", blank=True, null=True)
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comentario {self.id} por {self.autor}"
 
 class Evidencia(models.Model):
     registro = models.ForeignKey("RegistroPostventa", on_delete=models.CASCADE, related_name="evidencias")

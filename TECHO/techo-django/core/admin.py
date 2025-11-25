@@ -13,6 +13,7 @@ admin.site.register(Vivienda)
 admin.site.register(FichaInmueble)
 admin.site.register(EstadoInmueble)
 admin.site.register(RegistroPostventa)
+admin.site.register(Comentario)
 admin.site.register(Evidencia)
 admin.site.register(Reporte)
 
