@@ -814,144 +814,144 @@
         <i class="bi bi-clock"></i>
         <span>{{ obs.creado_en|timesince }} atrás</span>
       </div>
-      {% if obs.evidencias.count > 0 %}
       <div class="meta-item">
-        <i class="bi bi-paperclip"></i>
-        <a href="{% url 'reportar_observacion_familia' %}" class="btn btn-lg"
-          style="background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%); color: white; border-radius: 16px; font-weight: 700; padding: 1rem 2rem;">
-          <i class="bi bi-plus-circle me-2"></i>Crear mi primer reporte
+        <a href="{% url 'registro_detalle' obs.id %}" class="btn btn-lg"
+          style="background: linear-gradient(135deg, #00B4D8 0%, #0077B6 100%); color: white; border-radius: 16px; font-weight: 700; padding: 0.5rem 1.5rem; font-size: 0.9rem;">
+          <i class="bi bi-eye me-2"></i>Ver detalle
         </a>
       </div>
-      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <!-- Tour Overlay -->
+  <div class="tour-overlay" id="tourOverlay"></div>
+
+  <!-- Tour Popup -->
+  <div class="tour-popup" id="tourPopup">
+    <div class="tour-popup-icon" id="tourIcon">
+      👋
+    </div>
+    <h3 id="tourTitle">¡Bienvenido a tu hogar!</h3>
+    <p id="tourText">Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento.</p>
+
+    <div class="tour-progress">
+      <!-- Los dots se generan dinámicamente -->
     </div>
 
-    <!-- Tour Overlay -->
-    <div class="tour-overlay" id="tourOverlay"></div>
-
-    <!-- Tour Popup -->
-    <div class="tour-popup" id="tourPopup">
-      <div class="tour-popup-icon" id="tourIcon">
-        👋
-      </div>
-      <h3 id="tourTitle">¡Bienvenido a tu hogar!</h3>
-      <p id="tourText">Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento.</p>
-
-      <div class="tour-progress">
-        <!-- Los dots se generan dinámicamente -->
-      </div>
-
-      <div class="tour-actions">
-        <button class="tour-btn tour-btn-secondary" onclick="closeTour()">Saltar</button>
-        <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">Siguiente</button>
-      </div>
+    <div class="tour-actions">
+      <button class="tour-btn tour-btn-secondary" onclick="closeTour()">Saltar</button>
+      <button class="tour-btn tour-btn-primary" onclick="nextTourStep()">Siguiente</button>
     </div>
+  </div>
 
-    <script>
-      let currentTourStep = 0;
+  <script>
+    let currentTourStep = 0;
 
-      const tourSteps = [
-        {
-          icon: '👋',
-          title: '¡Bienvenido a tu hogar!',
-          text: 'Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento de tu vivienda TECHO.'
-        },
-        {
-          icon: '📝',
-          title: 'Reporta Problemas Fácilmente',
-          text: 'Si encuentras algún problema en tu casa (goteras, puertas, ventanas), usa el botón "Reportar un Problema" para notificarnos. ¡Es súper fácil!'
-        },
-        {
-          icon: '📸',
-          title: 'Adjunta Fotos y Videos',
-          text: 'Cuando reportes un problema, puedes subir fotos y videos. Esto nos ayuda a entender mejor la situación y resolverla más rápido.'
-        },
-        {
-          icon: '👥',
-          title: 'Trabajo en Equipo',
-          text: 'Nuestro equipo de TECHO también reporta observaciones sobre tu vivienda. Podrás ver todas las actualizaciones y seguimiento en tiempo real.'
-        },
-        {
-          icon: '✅',
-          title: 'Haz Seguimiento',
-          text: 'En la sección "Mis Reportes" puedes ver el estado de TODAS las observaciones de tu vivienda: las tuyas y las de nuestro equipo. ¡Siempre estarás informado!'
-        }
-      ];
+    const tourSteps = [
+      {
+        icon: '👋',
+        title: '¡Bienvenido a tu hogar!',
+        text: 'Te vamos a mostrar cómo usar tu panel para reportar problemas y hacer seguimiento de tu vivienda TECHO.'
+      },
+      {
+        icon: '📝',
+        title: 'Reporta Problemas Fácilmente',
+        text: 'Si encuentras algún problema en tu casa (goteras, puertas, ventanas), usa el botón "Reportar un Problema" para notificarnos. ¡Es súper fácil!'
+      },
+      {
+        icon: '📸',
+        title: 'Adjunta Fotos y Videos',
+        text: 'Cuando reportes un problema, puedes subir fotos y videos. Esto nos ayuda a entender mejor la situación y resolverla más rápido.'
+      },
+      {
+        icon: '👥',
+        title: 'Trabajo en Equipo',
+        text: 'Nuestro equipo de TECHO también reporta observaciones sobre tu vivienda. Podrás ver todas las actualizaciones y seguimiento en tiempo real.'
+      },
+      {
+        icon: '✅',
+        title: 'Haz Seguimiento',
+        text: 'En la sección "Mis Reportes" puedes ver el estado de TODAS las observaciones de tu vivienda: las tuyas y las de nuestro equipo. ¡Siempre estarás informado!'
+      }
+    ];
 
-      function startTour() {
-        currentTourStep = 0;
-        document.getElementById('tourOverlay').classList.add('active');
-        document.getElementById('tourPopup').classList.add('active');
+    function startTour() {
+      currentTourStep = 0;
+      document.getElementById('tourOverlay').classList.add('active');
+      document.getElementById('tourPopup').classList.add('active');
+      updateTourStep();
+    }
+
+    function closeTour() {
+      document.getElementById('tourOverlay').classList.remove('active');
+      document.getElementById('tourPopup').classList.remove('active');
+      // Guardar en localStorage que el usuario ya vio el tour
+      localStorage.setItem('familia_tour_completed', 'true');
+    }
+
+    function nextTourStep() {
+      if (currentTourStep < tourSteps.length - 1) {
+        currentTourStep++;
         updateTourStep();
+      } else {
+        closeTour();
+      }
+    }
+
+    function updateTourStep() {
+      const step = tourSteps[currentTourStep];
+      document.getElementById('tourIcon').textContent = step.icon;
+      document.getElementById('tourTitle').textContent = step.title;
+      document.getElementById('tourText').textContent = step.text;
+
+      // Update progress dots - ahora son 5 en lugar de 4
+      const totalDots = tourSteps.length;
+      const progressContainer = document.querySelector('.tour-progress');
+      progressContainer.innerHTML = '';
+
+      for (let i = 0; i < totalDots; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        if (i === currentTourStep) {
+          dot.classList.add('active');
+        }
+        progressContainer.appendChild(dot);
       }
 
-      function closeTour() {
-        document.getElementById('tourOverlay').classList.remove('active');
-        document.getElementById('tourPopup').classList.remove('active');
-        // Guardar en localStorage que el usuario ya vio el tour
-        localStorage.setItem('familia_tour_completed', 'true');
+      // Update button text on last step
+      const nextBtn = document.querySelector('.tour-btn-primary');
+      if (currentTourStep === tourSteps.length - 1) {
+        nextBtn.textContent = '¡Entendido!';
+      } else {
+        nextBtn.textContent = 'Siguiente';
       }
+    }
 
-      function nextTourStep() {
-        if (currentTourStep < tourSteps.length - 1) {
-          currentTourStep++;
-          updateTourStep();
-        } else {
+    // Close tour on overlay click
+    document.getElementById('tourOverlay').addEventListener('click', closeTour);
+
+    // Mostrar el tour solo si es la primera vez
+    document.addEventListener('DOMContentLoaded', function () {
+      const tourCompleted = localStorage.getItem('familia_tour_completed');
+      if (!tourCompleted) {
+        // Esperar 1 segundo antes de mostrar el tour para mejor UX
+        setTimeout(() => {
+          startTour();
+        }, 1000);
+      }
+    });
+
+    // Permitir cerrar el tour con la tecla ESC
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        const overlay = document.getElementById('tourOverlay');
+        if (overlay.classList.contains('active')) {
           closeTour();
         }
       }
+    });
+  </script>
 
-      function updateTourStep() {
-        const step = tourSteps[currentTourStep];
-        document.getElementById('tourIcon').textContent = step.icon;
-        document.getElementById('tourTitle').textContent = step.title;
-        document.getElementById('tourText').textContent = step.text;
-
-        // Update progress dots - ahora son 5 en lugar de 4
-        const totalDots = tourSteps.length;
-        const progressContainer = document.querySelector('.tour-progress');
-        progressContainer.innerHTML = '';
-
-        for (let i = 0; i < totalDots; i++) {
-          const dot = document.createElement('div');
-          dot.className = 'progress-dot';
-          if (i === currentTourStep) {
-            dot.classList.add('active');
-          }
-          progressContainer.appendChild(dot);
-        }
-
-        // Update button text on last step
-        const nextBtn = document.querySelector('.tour-btn-primary');
-        if (currentTourStep === tourSteps.length - 1) {
-          nextBtn.textContent = '¡Entendido!';
-        } else {
-          nextBtn.textContent = 'Siguiente';
-        }
-      }
-
-      // Close tour on overlay click
-      document.getElementById('tourOverlay').addEventListener('click', closeTour);
-
-      // Mostrar el tour solo si es la primera vez
-      document.addEventListener('DOMContentLoaded', function () {
-        const tourCompleted = localStorage.getItem('familia_tour_completed');
-        if (!tourCompleted) {
-          // Esperar 1 segundo antes de mostrar el tour para mejor UX
-          setTimeout(() => {
-            startTour();
-          }, 1000);
-        }
-      });
-
-      // Permitir cerrar el tour con la tecla ESC
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-          const overlay = document.getElementById('tourOverlay');
-          if (overlay.classList.contains('active')) {
-            closeTour();
-          }
-        }
-      });
-    </script>
-
-    {% endblock %}
+  {% endif %}
+  {% endblock %}
