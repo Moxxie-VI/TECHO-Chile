@@ -1,20 +1,117 @@
 {% extends 'layout/base.html' %}
 {% load static %}
 
-{% block title %}Gestión de Constructoras - TECHO Chile{% endblock %}
+{% block title %}Ranking de Constructoras - TECHO Chile{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kpi-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .best-performer {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 2px solid #fbbf24;
+    }
+
+    .ranking-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .ranking-row {
+        transition: all 0.3s ease;
+    }
+
+    .ranking-row:hover {
+        background-color: #f8fafc !important;
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .rank-position {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #64748b;
+    }
+
+    .ranking-medal {
+        animation: shine 2s infinite;
+    }
+
+    @keyframes shine {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.7;
+        }
+    }
+
+    .score-container {
+        min-width: 120px;
+    }
+
+    .pulse-badge {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    .ranking-row.oro {
+        border-left: 4px solid #fbbf24;
+    }
+
+    .ranking-row.plata {
+        border-left: 4px solid #9ca3af;
+    }
+
+    .ranking-row.bronce {
+        border-left: 4px solid #cd7f32;
+    }
+
+    .ranking-row.critico {
+        border-left: 4px solid #ef4444;
+        background-color: #fef2f2;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
-            <!-- Header -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="mb-1">
-                        <i class="bi bi-building text-primary me-2"></i>
-                        Gestión de Constructoras
+                        <i class="bi bi-trophy text-warning me-2"></i>
+                        Ranking de Constructoras
                     </h2>
-                    <p class="text-muted mb-0">Administra todas las empresas constructoras del sistema</p>
+                    <p class="text-muted mb-0">Evaluación basada en calidad de resolución y eficiencia</p>
                 </div>
                 <a href="{% url 'crear_constructora' %}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i>
@@ -22,84 +119,223 @@
                 </a>
             </div>
 
-            <!-- Mensajes -->
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        <i class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}-fill me-2"></i>
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i
+                    class="bi bi-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}-fill me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
             {% endif %}
 
-            <!-- Estadística Rápida -->
             <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="card text-center">
-                        <div class="card-body">
+                    <div class="card kpi-card">
+                        <div class="card-body text-center">
                             <i class="bi bi-building fs-2 text-primary mb-2"></i>
-                            <h3 class="mb-0">{{ constructoras.count }}</h3>
+                            <h3 class="mb-0">{{ total_constructoras }}</h3>
                             <p class="text-muted small mb-0">Total Constructoras</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card kpi-card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-data fs-2 text-info mb-2"></i>
+                            <h3 class="mb-0">{{ total_observaciones_sistema }}</h3>
+                            <p class="text-muted small mb-0">Observaciones Totales</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card kpi-card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle fs-2 text-success mb-2"></i>
+                            <h3 class="mb-0">{{ promedio_tasa_resolucion }}%</h3>
+                            <p class="text-muted small mb-0">Promedio Resolución</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card kpi-card best-performer">
+                        <div class="card-body text-center">
+                            {% if mejor_constructora %}
+                            <i class="bi bi-trophy-fill fs-2 text-warning mb-2"></i>
+                            <h5 class="mb-0"><strong>{{ mejor_constructora.constructora.nombre }}</strong></h5>
+                            <p class="text-muted small mb-0">
+                                {{ mejor_constructora.ranking_icon }} {{ mejor_constructora.ranking }}
+                                ({{ mejor_constructora.score_total }} pts)
+                            </p>
+                            {% else %}
+                            <i class="bi bi-trophy fs-2 text-muted mb-2"></i>
+                            <p class="text-muted mb-0">Sin constructoras</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tabla de Constructoras -->
+            {% if recintos_labels %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart-fill me-2"></i>
+                        Distribución de Fallas por Tipo de Recinto
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="distribucionGeneralChart" height="60"></canvas>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="card shadow-sm">
                 <div class="card-header bg-white py-3">
                     <h5 class="mb-0">
-                        <i class="bi bi-list-ul me-2"></i>
-                        Listado de Constructoras
+                        <i class="bi bi-list-ol me-2"></i>
+                        Ranking por Calidad de Resolución
+                        <span class="badge bg-info ms-2">Actualización en Tiempo Real</span>
                     </h5>
                 </div>
                 <div class="card-body p-0">
-                    {% if constructoras %}
+                    {% if constructoras_data %}
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0 ranking-table">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 15%;">RUT</th>
-                                    <th style="width: 30%;">Nombre</th>
-                                    <th style="width: 25%;">Dirección</th>
-                                    <th style="width: 20%;">Correo</th>
-                                    <th class="text-center" style="width: 10%;">Acciones</th>
+                                    <th class="text-center" style="width: 5%;">#</th>
+                                    <th style="width: 25%;">Constructora</th>
+                                    <th class="text-center" style="width: 15%;">Score Total</th>
+                                    <th class="text-center" style="width: 12%;">Resolución</th>
+                                    <th class="text-center" style="width: 10%;">Total Obs</th>
+                                    <th class="text-center" style="width: 10%;">Pendientes</th>
+                                    <th class="text-center" style="width: 10%;">Alta ⚠️</th>
+                                    <th class="text-center" style="width: 13%;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for constructora in constructoras %}
-                                <tr>
-                                    <td>
-                                        <span class="badge bg-secondary">{{ constructora.rut }}</span>
+                                {% for data in constructoras_data %}
+                                <tr class="ranking-row {{ data.ranking|lower }}">
+                                    <td class="text-center rank-position">
+                                        <strong>{{ data.posicion }}</strong>
                                     </td>
                                     <td>
-                                        <strong>{{ constructora.nombre }}</strong>
+                                        <div class="d-flex align-items-center">
+                                            <span class="ranking-medal me-2" style="font-size: 1.5rem;">
+                                                {{ data.ranking_icon }}
+                                            </span>
+                                            <div>
+                                                <strong>{{ data.constructora.nombre }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ data.constructora.rut }}</small>
+                                            </div>
+                                        </div>
                                     </td>
-                                    <td>
-                                        {{ constructora.direccion|default:"Sin dirección" }}
+                                    <td class="text-center">
+                                        <div class="score-container">
+                                            <div class="score-number mb-1">
+                                                <strong style="font-size: 1.2rem; color: {{ data.ranking_color }};">
+                                                    {{ data.score_total }}
+                                                </strong>
+                                                <small class="text-muted">/100</small>
+                                            </div>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar" role="progressbar"
+                                                    style="width: {{ data.score_total }}%; background-color: {{ data.ranking_color }};"
+                                                    aria-valuenow="{{ data.score_total }}" aria-valuemin="0"
+                                                    aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <small class="badge bg-{{ data.ranking_badge }} mt-1">
+                                                {{ data.ranking }}
+                                            </small>
+                                        </div>
                                     </td>
-                                    <td>
-                                        {% if constructora.correo %}
-                                        <a href="mailto:{{ constructora.correo }}" class="text-decoration-none">
-                                            <i class="bi bi-envelope me-1"></i>{{ constructora.correo }}
-                                        </a>
+                                    <td class="text-center">
+                                        <span
+                                            class="badge {% if data.tasa_resolucion >= 80 %}bg-success{% elif data.tasa_resolucion >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                            {{ data.tasa_resolucion }}%
+                                        </span>
+                                        <br>
+                                        <small class="text-muted">
+                                            {{ data.obs_resueltas }}/{{ data.total_observaciones }}
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <strong>{{ data.total_observaciones }}</strong>
+                                        <br>
+                                        <small class="text-muted">
+                                            {{ data.total_proyectos }} proyecto{{ data.total_proyectos|pluralize }}
+                                        </small>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">
+                                            {{ data.obs_pendientes }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        {% if data.obs_alta_pendientes > 0 %}
+                                        <span class="badge bg-danger pulse-badge">
+                                            <i class="bi bi-exclamation-triangle"></i> {{ data.obs_alta_pendientes }}
+                                        </span>
                                         {% else %}
-                                        <span class="text-muted">Sin correo</span>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check"></i> 0
+                                        </span>
                                         {% endif %}
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm" role="group">
-                                            <a href="{% url 'editar_constructora' constructora.id %}" 
-                                               class="btn btn-outline-primary" 
-                                               title="Editar">
+                                            <button class="btn btn-outline-info" data-bs-toggle="collapse"
+                                                data-bs-target="#charts-{{ data.constructora.id }}"
+                                                title="Ver Gráficos">
+                                                <i class="bi bi-bar-chart-line"></i>
+                                            </button>
+                                            <a href="{% url 'editar_constructora' data.constructora.id %}"
+                                                class="btn btn-outline-primary" title="Editar">
                                                 <i class="bi bi-pencil"></i>
                                             </a>
-                                            <a href="{% url 'eliminar_constructora' constructora.id %}" 
-                                               class="btn btn-outline-danger" 
-                                               title="Eliminar">
+                                            <a href="{% url 'eliminar_constructora' data.constructora.id %}"
+                                                class="btn btn-outline-danger" title="Eliminar">
                                                 <i class="bi bi-trash"></i>
                                             </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="charts-{{ data.constructora.id }}">
+                                    <td colspan="8" class="bg-light">
+                                        <div class="p-3">
+                                            <h6 class="mb-3">
+                                                <i class="bi bi-graph-up me-2"></i>
+                                                Análisis Detallado - {{ data.constructora.nombre }}
+                                            </h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-header bg-white py-2">
+                                                            <h6 class="mb-0 small">Distribución de Fallas por Recinto
+                                                            </h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="recinto-chart-{{ data.constructora.id }}"
+                                                                height="150"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card">
+                                                        <div class="card-header bg-white py-2">
+                                                            <h6 class="mb-0 small">Estado de Observaciones</h6>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <canvas id="estado-chart-{{ data.constructora.id }}"
+                                                                height="150"></canvas>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -122,12 +358,111 @@
     </div>
 </div>
 
-<style>
-.hover-lift:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
-    transition: all 0.3s ease;
-}
-</style>
-{% endblock %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+{% if recintos_labels %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('distribucionGeneralChart');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for label in recintos_labels %}'{{ label }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Cantidad de Fallas',
+            data: [{% for count in recintos_counts %}{{ count }}{% if not forloop.last %}, {% endif %} {% endfor %}],
+    backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#06b6d4', '#6366f1'],
+        borderWidth: 0,
+            borderRadius: 6
+            }]
+        },
+    options: {
+        indexAxis: 'y',
+            responsive: true,
+                maintainAspectRatio: true,
+                    plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const value = context.parsed.x || 0;
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = ((value / total) * 100).toFixed(1);
+                        return value + ' fallas (' + percentage + '%)';
+                    }
+                }
+            }
+        },
+        scales: {
+            x: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#e5e7eb' } },
+            y: { grid: { display: false } }
+        }
+    }
+    });
+
+    {% for data in constructoras_data %}
+    (function () {
+        const collapseEl = document.getElementById('charts-{{ data.constructora.id }}');
+        let chartsCreated = false;
+
+        collapseEl.addEventListener('shown.bs.collapse', function () {
+            if (chartsCreated) return;
+
+            const recintoCtx = document.getElementById('recinto-chart-{{ data.constructora.id }}');
+            const estadoCtx = document.getElementById('estado-chart-{{ data.constructora.id }}');
+
+            if (recintoCtx) {
+                new Chart(recintoCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [{% for item in data.distribucion_recintos %}'{{ item.recinto }}'{% if not forloop.last %}, {% endif %} {% endfor %}],
+            datasets: [{
+                data: [{% for item in data.distribucion_recintos %}{{ item.cantidad }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+    backgroundColor: ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'],
+        borderWidth: 2,
+            borderColor: '#fff'
+                        }]
+                    },
+    options: {
+        responsive: true,
+            maintainAspectRatio: true,
+                plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 }, padding: 10 } }
+        }
+    }
+                });
+            }
+
+    if (estadoCtx) {
+        new Chart(estadoCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Resueltas', 'Pendientes', 'Alta Urgencia'],
+                datasets: [{
+                    label: 'Observaciones',
+                    data: [{{ data.obs_resueltas }}, {{ data.obs_pendientes }}, {{ data.obs_alta_pendientes }}],
+    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+        borderWidth: 0,
+            borderRadius: 6
+                        }]
+                    },
+    options: {
+        responsive: true,
+            maintainAspectRatio: true,
+                plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+    }
+                });
+            }
+
+    chartsCreated = true;
+        });
+    }) ();
+    {% endfor %}
+});
+</script>
+{% endif %}
+{% endblock %}

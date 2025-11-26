@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import *
+from .models import Privilegio, Constructora, Proyecto, Vivienda, FichaInmueble, EstadoInmueble, RegistroPostventa, RegistroComentario, Evidencia, Reporte, PerfilUsuario
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import PerfilUsuario
@@ -13,7 +13,7 @@ admin.site.register(Vivienda)
 admin.site.register(FichaInmueble)
 admin.site.register(EstadoInmueble)
 admin.site.register(RegistroPostventa)
-admin.site.register(Comentario)
+admin.site.register(RegistroComentario)
 admin.site.register(Evidencia)
 admin.site.register(Reporte)
 

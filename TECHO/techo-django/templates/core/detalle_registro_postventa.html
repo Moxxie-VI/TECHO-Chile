@@ -1,0 +1,361 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block title %}Detalle reporte · TECHO{% endblock %}
+
+{% block content %}
+<style>
+  .registro-hero {
+    background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    color: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    margin-bottom: 2rem;
+    box-shadow: 0 15px 40px rgba(14, 165, 233, 0.25);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .registro-hero h1 {
+    font-size: 2.25rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+  .urgencia-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: rgba(255,255,255,0.15);
+  }
+  .urgencia-pill.alta { background: rgba(239, 68, 68, 0.2); color: #fee2e2; }
+  .urgencia-pill.media { background: rgba(251, 191, 36, 0.25); color: #fef3c7; }
+  .urgencia-pill.baja { background: rgba(34, 197, 94, 0.2); color: #dcfce7; }
+
+  .registro-estado-card {
+    background: white;
+    color: #0f172a;
+    border-radius: 20px;
+    padding: 1.5rem;
+    min-width: 260px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  }
+  .registro-estado-card span {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: #64748b;
+  }
+  .registro-estado-card h2 {
+    margin: 0.75rem 0 0.5rem;
+    font-weight: 800;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .info-card {
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: var(--card);
+    padding: 1.75rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .info-card h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .observacion-box {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid #e2e8f0;
+    min-height: 160px;
+  }
+  [data-theme="dark"] .observacion-box {
+    background: rgba(148, 163, 184, 0.08);
+    border-color: rgba(148, 163, 184, 0.25);
+  }
+  .meta-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .meta-list li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    color: var(--muted);
+  }
+  .meta-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg);
+    font-size: 0.95rem;
+  }
+
+  .evidencias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+  .evidencia-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-xs);
+  }
+  .evidencia-card img,
+  .evidencia-card video {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+  }
+  .evidencia-body {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .estado-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .comentarios-wrapper {
+    display: grid;
+    gap: 1rem;
+  }
+  .comentario-item {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem;
+    background: var(--card);
+  }
+  .comentario-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .comentario-autor {
+    font-weight: 600;
+    color: var(--fg);
+  }
+  .comentario-texto {
+    margin: 0;
+    line-height: 1.6;
+  }
+</style>
+
+<div class="container-fluid pt-4">
+  <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm mb-3">
+    <i class="bi bi-arrow-left"></i> Volver
+  </a>
+
+  <div class="registro-hero">
+    <div>
+      <span class="urgencia-pill {% if registro.urgencia == 'ALTA' %}alta{% elif registro.urgencia == 'MEDIA' %}media{% else %}baja{% endif %}">
+        <i class="bi bi-lightning-charge-fill"></i>
+        Urgencia {{ registro.get_urgencia_display|default:registro.urgencia }}
+      </span>
+      <h1>{{ registro.recinto }}</h1>
+      <p class="mb-2">
+        <i class="bi bi-building me-2"></i>{{ registro.proyecto.nombre }}
+        {% if vivienda %}
+          <span class="mx-2">•</span>
+          <i class="bi bi-house-door me-2"></i>{{ vivienda.direccion|default:"Sin dirección" }}
+        {% endif %}
+      </p>
+      <p class="mb-0 text-white-75">
+        Reportado {{ registro.creado_en|timesince }} atrás
+        {% if registro.reportante %}
+          <span class="mx-2">•</span>
+          Por {{ registro.reportante.get_full_name|default:registro.reportante.username }}
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="registro-estado-card">
+      <span>Estado actual</span>
+      <h2>{{ registro.get_estado_display }}</h2>
+      {% if puede_gestionar %}
+        <p class="mb-0 text-muted">Puedes actualizar este estado desde el formulario inferior.</p>
+      {% else %}
+        <p class="mb-0 text-muted">El equipo de TECHO actualizará el estado cuando haya novedades.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3><i class="bi bi-chat-dots-fill"></i> Observación</h3>
+      <div class="observacion-box">
+        <p class="mb-0">{{ registro.observacion|linebreaksbr }}</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <h3><i class="bi bi-info-circle-fill"></i> Detalles del reporte</h3>
+      <ul class="meta-list">
+        <li>
+          <div class="meta-icon"><i class="bi bi-calendar-event"></i></div>
+          <div>
+            <strong>Fecha de creación</strong><br>
+            {{ registro.creado_en|date:"d/m/Y H:i" }}
+          </div>
+        </li>
+        <li>
+          <div class="meta-icon"><i class="bi bi-exclamation-circle"></i></div>
+          <div>
+            <strong>Nivel de urgencia</strong><br>
+            {{ registro.get_urgencia_display|default:registro.urgencia }}
+          </div>
+        </li>
+        {% if vivienda %}
+        <li>
+          <div class="meta-icon"><i class="bi bi-geo-alt"></i></div>
+          <div>
+            <strong>Vivienda</strong><br>
+            {{ vivienda.direccion|default:"Dirección no especificada" }}<br>
+            {{ vivienda.comuna|default:"" }} {{ vivienda.region|default:"" }}
+          </div>
+        </li>
+        {% endif %}
+        {% if propietario %}
+        <li>
+          <div class="meta-icon"><i class="bi bi-person-badge"></i></div>
+          <div>
+            <strong>Familia asignada</strong><br>
+            {{ propietario.user.get_full_name|default:propietario.user.username }}<br>
+            {{ propietario.user.email|default:"Sin correo" }}
+          </div>
+        </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-card">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+      <h3 class="mb-0"><i class="bi bi-paperclip"></i> Evidencias adjuntas</h3>
+      {% if puede_gestionar %}
+        <span class="text-muted small">Las nuevas evidencias se agregan desde el panel de trabajo.</span>
+      {% endif %}
+    </div>
+    {% if evidencias %}
+    <div class="evidencias-grid">
+      {% for ev in evidencias %}
+      <div class="evidencia-card">
+        {% if ev.is_video %}
+          <video controls src="{{ ev.archivo.url }}"></video>
+        {% else %}
+          <a href="{{ ev.archivo.url }}" target="_blank" rel="noopener">
+            <img src="{{ ev.archivo.url }}" alt="Evidencia {{ forloop.counter }}" loading="lazy">
+          </a>
+        {% endif %}
+        <div class="evidencia-body">
+          <div class="small text-muted">{{ ev.creado_en|date:"d/m/Y H:i" }}</div>
+          <div>{{ ev.comentario|default:"Archivo adjunto" }}</div>
+          {% if ev.subido_por %}
+            <div class="small text-muted">Por {{ ev.subido_por.get_full_name|default:ev.subido_por.username }}</div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">No hay evidencias adjuntas para este reporte.</p>
+    {% endif %}
+  </div>
+
+  {% if puede_gestionar %}
+  <div class="info-card">
+    <h3><i class="bi bi-sliders"></i> Actualizar estado</h3>
+    <form method="post" action="{% url 'cambiar_estado_registro' registro.id %}" class="estado-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'detalle_registro_postventa' registro.id %}">
+      <select name="estado" class="form-select form-select-lg" style="min-width:220px;">
+        {% for value,label in estados %}
+          <option value="{{ value }}" {% if registro.estado == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-lg">
+        <i class="bi bi-check-circle me-1"></i> Guardar
+      </button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="info-card">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+      <h3 class="mb-0"><i class="bi bi-chat-dots"></i> Comentarios del seguimiento</h3>
+      <span class="text-muted small">Visible para Admin, Trabajador y Familia</span>
+    </div>
+
+    {% if comentario_form %}
+    <form method="post" action="{% url 'agregar_comentario_registro' registro.id %}" class="mb-4">
+      {% csrf_token %}
+      {{ comentario_form.texto }}
+      <div class="d-flex justify-content-end mt-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-send"></i> Publicar comentario
+        </button>
+      </div>
+    </form>
+    {% endif %}
+
+    {% if comentarios %}
+    <div class="comentarios-wrapper">
+      {% for c in comentarios %}
+      <div class="comentario-item">
+        <div class="comentario-header">
+          <div>
+            <span class="comentario-autor">
+              {% if c.autor %}
+                {{ c.autor.get_full_name|default:c.autor.username }}
+              {% else %}
+                Usuario eliminado
+              {% endif %}
+            </span>
+            <span class="d-block text-muted small">
+              {% if c.autor %}{{ c.autor.email|default:"Sin correo" }} · {% endif %}
+              {{ c.creado_en|date:"d/m/Y H:i" }}
+            </span>
+          </div>
+        </div>
+        <p class="comentario-texto">{{ c.texto|linebreaksbr }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-muted mb-0">Aún no hay comentarios para este reporte.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+

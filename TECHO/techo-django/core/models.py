@@ -3,10 +3,8 @@ from django.contrib.auth.models import User
 
 ESTADOS = (
     ("ABIERTA", "Abierta"),
-    ("EN_REVISION", "En revisión"),
     ("EN_GESTION", "En gestión"),
     ("RESUELTA", "Resuelta"),
-    ("CERRADO", "Cerrado"),
 )
 class Privilegio(models.Model):
     nombre = models.CharField(max_length=50, unique=True)  # Admin, Trabajador, Familia
@@ -146,18 +144,26 @@ class FichaInmueble(models.Model):
         return 120 - dias
     
     def estado_ds49(self):
-        """Retorna el estado del DS 49"""
-        dias_restantes = self.dias_restantes_ds49()
-        if dias_restantes is None:
+        """
+        Retorna el estado del DS 49 según los días TRANSCURRIDOS desde la entrega.
+        
+        - NORMAL:      0–30 días
+        - ADVERTENCIA: 31–60 días
+        - CRITICO:     61–120 días
+        - VENCIDO:     >120 días
+        """
+        dias = self.dias_desde_entrega()
+        if dias is None:
             return "SIN_FECHA"
-        elif dias_restantes > 30:
-            return "NORMAL"  # Verde
-        elif dias_restantes > 15:
-            return "ADVERTENCIA"  # Amarillo
-        elif dias_restantes > 0:
-            return "CRITICO"  # Rojo
-        else:
-            return "VENCIDO"  # Rojo oscuro
+        if dias < 0:
+            return "SIN_FECHA"
+        if dias <= 30:
+            return "NORMAL"
+        if dias <= 60:
+            return "ADVERTENCIA"
+        if dias <= 120:
+            return "CRITICO"
+        return "VENCIDO"
     
     def porcentaje_ds49(self):
         """Retorna el porcentaje del período DS 49 consumido"""
@@ -191,22 +197,7 @@ class RegistroPostventa(models.Model):
     urgencia = models.CharField(max_length=20, default="MEDIA")
     vence_en = models.DateField(null=True, blank=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default="ABIERTA")
-    
-    # Cierre
-    comentario_cierre = models.TextField(blank=True, verbose_name="Comentario de Cierre")
-    fecha_cierre = models.DateTimeField(null=True, blank=True)
-    
     creado_en = models.DateTimeField(auto_now_add=True)
-
-class Comentario(models.Model):
-    registro = models.ForeignKey(RegistroPostventa, on_delete=models.CASCADE, related_name="comentarios")
-    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    texto = models.TextField()
-    archivo = models.FileField(upload_to="comentarios/", blank=True, null=True)
-    creado_en = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Comentario {self.id} por {self.autor}"
 
 class Evidencia(models.Model):
     registro = models.ForeignKey("RegistroPostventa", on_delete=models.CASCADE, related_name="evidencias")
@@ -216,6 +207,19 @@ class Evidencia(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"Evidencia {self.id} - {self.registro_id}"
+
+
+class RegistroComentario(models.Model):
+    registro = models.ForeignKey("RegistroPostventa", on_delete=models.CASCADE, related_name="comentarios")
+    autor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    texto = models.TextField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-creado_en",)
+
+    def __str__(self):
+        return f"Comentario {self.id} - Registro {self.registro_id}"
 
 class Reporte(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)

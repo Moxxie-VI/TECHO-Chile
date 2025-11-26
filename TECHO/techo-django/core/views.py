@@ -7,8 +7,8 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.db.models import Count, Q
-from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm, ComentarioForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario, Comentario
+from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm, RegistroComentarioForm
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario, RegistroComentario
 from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
@@ -279,7 +279,46 @@ def cambiar_estado_registro(request, reg_id):
         return HttpResponseBadRequest("Estado inválido")
     reg.estado = nuevo
     reg.save()
-    return HttpResponse("OK")
+
+    next_url = request.POST.get("next")
+    if next_url:
+        messages.success(request, "Estado actualizado correctamente.")
+        return redirect(next_url)
+
+    if request.headers.get("HX-Request"):
+        return HttpResponse("OK")
+
+    messages.success(request, "Estado actualizado correctamente.")
+    return redirect("dashboard")
+
+
+@login_required
+@require_role("Admin", "Trabajador")
+@require_POST
+def agregar_comentario_registro(request, reg_id):
+    registro = get_object_or_404(
+        RegistroPostventa.objects.select_related("proyecto"),
+        id=reg_id
+    )
+
+    perfil = getattr(request.user, "perfil", None)
+    if perfil and perfil.rol == "Trabajador":
+        proyecto_asignado = getattr(perfil, "proyecto_asignado", None)
+        if not proyecto_asignado or proyecto_asignado.id != registro.proyecto_id:
+            messages.error(request, "Este registro no pertenece a tu proyecto asignado.")
+            return redirect("detalle_registro_postventa", registro_id=reg_id)
+
+    form = RegistroComentarioForm(request.POST)
+    if form.is_valid():
+        comentario = form.save(commit=False)
+        comentario.registro = registro
+        comentario.autor = request.user
+        comentario.save()
+        messages.success(request, "Comentario agregado correctamente.")
+    else:
+        messages.error(request, "No pudimos guardar tu comentario. Revisa el formulario.")
+
+    return redirect("detalle_registro_postventa", registro_id=reg_id)
 
 
 # =============================================================================
@@ -540,14 +579,140 @@ def eliminar_vivienda(request, vivienda_id):
 @login_required
 @require_role("Admin")
 def admin_constructoras(request):
-    """Vista para listar todas las constructoras"""
+    """Vista para listar todas las constructoras con KPIs y ranking dinámico"""
     from .models import Constructora
+    from django.db.models import Count, Q
     
     constructoras = Constructora.objects.all().order_by('nombre')
     
+    # Calcular KPIs y Score para cada constructora
+    constructoras_data = []
+    for constructora in constructoras:
+        # Obtener proyectos y observaciones de esta constructora
+        proyectos = Proyecto.objects.filter(constructora=constructora)
+        observaciones = RegistroPostventa.objects.filter(proyecto__in=proyectos)
+        
+        total_obs = observaciones.count()
+        obs_resueltas = observaciones.filter(estado='RESUELTA').count()
+        obs_pendientes = observaciones.filter(estado__in=['ABIERTA', 'EN_GESTION']).count()
+        obs_alta_pendientes = observaciones.filter(
+            urgencia='ALTA', 
+            estado__in=['ABIERTA', 'EN_GESTION']
+        ).count()
+        
+        # SCORE COMPONENT 1: Tasa de Resolución (40 puntos)
+        tasa_resolucion = (obs_resueltas / total_obs * 100) if total_obs > 0 else 100
+        score_resolucion = (tasa_resolucion / 100) * 40
+        
+        # SCORE COMPONENT 2: Calidad - Penalización por urgencias altas sin resolver (30 puntos)
+        if total_obs > 0:
+            ratio_alta_pendiente = obs_alta_pendientes / total_obs
+            score_calidad = 30 - (ratio_alta_pendiente * 30)
+        else:
+            score_calidad = 30  # Sin observaciones = perfecto
+        
+        # SCORE COMPONENT 3: Eficiencia - Menos problemas = mejor (30 puntos)
+        if total_obs == 0:
+            score_eficiencia = 30
+        elif total_obs <= 5:
+            score_eficiencia = 30
+        elif total_obs >= 50:
+            score_eficiencia = 0
+        else:
+            score_eficiencia = 30 - ((total_obs - 5) / 45 * 30)
+        
+        # SCORE TOTAL
+        score_total = score_resolucion + score_calidad + score_eficiencia
+        
+        # RANKING
+        if score_total >= 80:
+            ranking = 'ORO'
+            ranking_icon = '🥇'
+            ranking_color = '#fbbf24'
+            ranking_badge = 'warning'  # Bootstrap color
+        elif score_total >= 60:
+            ranking = 'PLATA'
+            ranking_icon = '🥈'
+            ranking_color = '#9ca3af'
+            ranking_badge = 'secondary'
+        elif score_total >= 40:
+            ranking = 'BRONCE'
+            ranking_icon = '🥉'
+            ranking_color = '#cd7f32'
+            ranking_badge = 'primary'
+        else:
+            ranking = 'CRITICO'
+            ranking_icon = '⚠️'
+            ranking_color = '#ef4444'
+            ranking_badge = 'danger'
+        
+        constructoras_data.append({
+            'constructora': constructora,
+            'total_observaciones': total_obs,
+            'obs_resueltas': obs_resueltas,
+            'obs_pendientes': obs_pendientes,
+            'obs_alta_pendientes': obs_alta_pendientes,
+            'tasa_resolucion': round(tasa_resolucion, 1),
+            'score_total': round(score_total, 1),
+            'score_resolucion': round(score_resolucion, 1),
+            'score_calidad': round(score_calidad, 1),
+            'score_eficiencia': round(score_eficiencia, 1),
+            'ranking': ranking,
+            'ranking_icon': ranking_icon,
+            'ranking_color': ranking_color,
+            'ranking_badge': ranking_badge,
+            'total_proyectos': proyectos.count(),
+        })
+    
+    # Ordenar por score (mayor score = mejor ranking)
+    constructoras_data.sort(key=lambda x: x['score_total'], reverse=True)
+    
+    # Agregar posición en ranking
+    for idx, data in enumerate(constructoras_data, start=1):
+        data['posicion'] = idx
+    
+    # Calcular estadísticas globales
+    total_observaciones_sistema = sum(c['total_observaciones'] for c in constructoras_data)
+    promedio_tasa_resolucion = sum(c['tasa_resolucion'] for c in constructoras_data) / len(constructoras_data) if constructoras_data else 0
+    mejor_constructora = constructoras_data[0] if constructoras_data else None
+    
+    # NUEVO: Calcular distribución de fallas por recinto (GENERAL)
+    from django.db.models import Count
+    distribucion_general = (
+        RegistroPostventa.objects
+        .values('recinto')
+        .annotate(cantidad=Count('id'))
+        .order_by('-cantidad')
+    )
+    
+    # Preparar datos para gráfico de pastel general
+    recintos_labels = [item['recinto'] for item in distribucion_general]
+    recintos_counts = [item['cantidad'] for item in distribucion_general]
+    
+    # NUEVO: Añadir distribución por recinto para cada constructora
+    for data in constructoras_data:
+        constructora = data['constructora']
+        proyectos = Proyecto.objects.filter(constructora=constructora)
+        
+        distribucion_constructora = (
+            RegistroPostventa.objects
+            .filter(proyecto__in=proyectos)
+            .values('recinto')
+            .annotate(cantidad=Count('id'))
+            .order_by('-cantidad')
+        )
+        
+        data['distribucion_recintos'] = list(distribucion_constructora)
+    
     context = {
         'rol': request.user.perfil.rol,
-        'constructoras': constructoras,
+        'constructoras_data': constructoras_data,
+        'total_observaciones_sistema': total_observaciones_sistema,
+        'promedio_tasa_resolucion': round(promedio_tasa_resolucion, 1),
+        'mejor_constructora': mejor_constructora,
+        'total_constructoras': len(constructoras_data),
+        'recintos_labels': recintos_labels,
+        'recintos_counts': recintos_counts,
     }
     
     return render(request, "core/admin_constructoras.html", context)
@@ -948,6 +1113,73 @@ def detalle_ficha_inmueble(request, ficha_id):
 
 
 @login_required
+def detalle_registro_postventa(request, registro_id):
+    """Vista detallada de un registro de postventa accesible según rol."""
+    from django.contrib import messages
+    perfil = getattr(request.user, "perfil", None)
+    rol = (perfil.rol if perfil else None) or ("Admin" if request.user.is_superuser else None)
+
+    registro = get_object_or_404(
+        RegistroPostventa.objects.select_related(
+            "proyecto", "ficha__vivienda", "reportante"
+        ).prefetch_related("evidencias__subido_por"),
+        id=registro_id
+    )
+
+    ficha = registro.ficha
+    vivienda = getattr(ficha, "vivienda", None)
+
+    # Validar permisos por rol
+    if rol == "Familia":
+        vivienda_asignada = getattr(perfil, "vivienda_asignada", None)
+        if not vivienda_asignada or not vivienda or vivienda_asignada.id != vivienda.id:
+            messages.error(request, "No tienes permisos para ver este reporte.")
+            return redirect("dashboard")
+    elif rol == "Trabajador":
+        proyecto_asignado = getattr(perfil, "proyecto_asignado", None)
+        if not proyecto_asignado or proyecto_asignado.id != registro.proyecto_id:
+            messages.error(request, "Este registro no pertenece a tu proyecto asignado.")
+            return redirect("dashboard")
+    elif rol == "Admin":
+        pass
+    else:
+        messages.error(request, "No tienes permisos para ver este reporte.")
+        return redirect("dashboard")
+
+    propietario = None
+    if vivienda:
+        propietario = (
+            PerfilUsuario.objects.select_related("user")
+            .filter(vivienda_asignada=vivienda)
+            .first()
+        )
+
+    evidencias = list(registro.evidencias.all())
+    video_exts = (".mp4", ".mov", ".webm", ".ogg", ".mkv")
+    for ev in evidencias:
+        filename = ev.archivo.name.lower() if ev.archivo else ""
+        ev.is_video = filename.endswith(video_exts)
+
+    comentarios = registro.comentarios.select_related("autor").all()
+    comentario_form = RegistroComentarioForm() if rol in ("Admin", "Trabajador") else None
+
+    context = {
+        "registro": registro,
+        "vivienda": vivienda,
+        "ficha": ficha,
+        "proyecto": registro.proyecto,
+        "evidencias": evidencias,
+        "propietario": propietario,
+        "rol": rol,
+        "puede_gestionar": rol in ("Admin", "Trabajador"),
+        "estados": ESTADOS,
+        "comentarios": comentarios,
+        "comentario_form": comentario_form,
+    }
+    return render(request, "core/detalle_registro_postventa.html", context)
+
+
+@login_required
 @require_POST
 def actualizar_fecha_entrega(request, ficha_id):
     """Actualiza la fecha de entrega de una ficha de inmueble"""
@@ -1157,68 +1389,3 @@ def reportar_observacion_trabajador(request):
     }
     
     return render(request, "core/reportar_observacion_trabajador.html", context)
-
-
-# =============================================================================
-# GESTIÓN DE OBSERVACIONES Y COMENTARIOS
-# =============================================================================
-
-@login_required
-@require_role("Admin", "Trabajador", "Familia")
-def registro_detalle(request, reg_id):
-    """Vista detallada de una observación con comentarios"""
-    registro = get_object_or_404(RegistroPostventa, pk=reg_id)
-    perfil = request.user.perfil
-    
-    # Verificar permisos
-    if perfil.rol == "Trabajador" and registro.proyecto != perfil.proyecto_asignado:
-        messages.error(request, "No tienes permisos para ver este registro")
-        return redirect('dashboard')
-    
-    if perfil.rol == "Familia":
-        if not perfil.vivienda_asignada or registro.ficha.vivienda != perfil.vivienda_asignada:
-            messages.error(request, "No tienes permisos para ver este registro")
-            return redirect('dashboard')
-        
-    comentarios = registro.comentarios.all().order_by('creado_en')
-    
-    if request.method == "POST":
-        form = ComentarioForm(request.POST, request.FILES)
-        if form.is_valid():
-            comentario = form.save(commit=False)
-            comentario.registro = registro
-            comentario.autor = request.user
-            comentario.save()
-            messages.success(request, "Comentario agregado exitosamente")
-            return redirect('registro_detalle', reg_id=reg_id)
-    else:
-        form = ComentarioForm()
-        
-    context = {
-        'registro': registro,
-        'comentarios': comentarios,
-        'form': form,
-        'rol': perfil.rol,
-        'estados': ESTADOS,
-    }
-    return render(request, 'core/registro_detalle.html', context)
-
-@login_required
-@require_role("Admin")
-@require_POST
-def cerrar_registro(request, reg_id):
-    """Cierra una observación con comentario y fecha"""
-    registro = get_object_or_404(RegistroPostventa, pk=reg_id)
-    
-    comentario = request.POST.get('comentario_cierre')
-    if not comentario:
-        messages.error(request, "Debes ingresar un comentario de cierre")
-        return redirect('registro_detalle', reg_id=reg_id)
-        
-    registro.estado = "RESUELTA"
-    registro.comentario_cierre = comentario
-    registro.fecha_cierre = timezone.now()
-    registro.save()
-    
-    messages.success(request, "Observación cerrada exitosamente")
-    return redirect('registro_detalle', reg_id=reg_id)
