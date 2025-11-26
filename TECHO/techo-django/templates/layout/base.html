@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html>
 <html lang="es" data-theme="light" data-font="base">
+
 <head>
   <meta charset="utf-8">
   <title>{% block title %}Panel · TECHO{% endblock %}</title>
@@ -10,634 +11,646 @@
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
-  :root{
-    /* Colores principales */
-    --bg: #f8fafc;
-    --fg: #0f172a;
-    --muted: #64748b;
-    --accent: #0ea5e9;
-    --accent-dark: #0284c7;
-    
-    /* Navbar */
-    --navbar-bg: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
-    --navbar-fg: #ffffff;
-    --navbar-hover: rgba(255, 255, 255, 0.15);
-    
-    /* Componentes */
-    --card: #ffffff;
-    --border: #e2e8f0;
-    --footer-bg: linear-gradient(90deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
-    
-    /* Sombras */
-    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
-    --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
-    
-    /* Dimensiones */
-    --navbar-h: 70px;
-    --foot-h: 60px;
-    
-    /* Radios */
-    --radius-sm: 10px;
-    --radius-md: 14px;
-    --radius-lg: 18px;
-    --radius-xl: 24px;
-  }
-  
-  [data-theme="dark"]{
-    --bg: #0f172a;
-    --fg: #f1f5f9;
-    --muted: #cbd5e1;
-    --accent: #38bdf8;
-    --accent-dark: #0ea5e9;
-    
-    --navbar-bg: linear-gradient(135deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
-    --navbar-hover: rgba(255, 255, 255, 0.12);
-    
-    --card: #1e293b;
-    --border: #475569;
-    --footer-bg: linear-gradient(90deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
-    
-    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.5);
-    --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.6);
-    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.7);
-  }
-  
-  [data-font="base"]{ --fs:16px }
-  [data-font="lg"]{ --fs:18px }
-  [data-font="xl"]{ --fs:20px }
+    :root {
+      /* Colores principales */
+      --bg: #f8fafc;
+      --fg: #0f172a;
+      --muted: #64748b;
+      --accent: #0ea5e9;
+      --accent-dark: #0284c7;
 
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-    display: flex;
-    flex-direction: column;
-    font-size: var(--fs);
-    background: var(--bg);
-    color: var(--fg);
-    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    transition: background 0.3s ease, color 0.3s ease;
-    min-height: 100vh;
-  }
+      /* Navbar */
+      --navbar-bg: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+      --navbar-fg: #ffffff;
+      --navbar-hover: rgba(255, 255, 255, 0.15);
 
-  /* ============ NAVBAR MODERNA ============ */
-  .main-navbar {
-    height: var(--navbar-h);
-    background: var(--navbar-bg);
-    color: var(--navbar-fg);
-    box-shadow: var(--shadow-xl);
-    position: sticky;
-    top: 0;
-    z-index: 1050;
-    backdrop-filter: blur(20px);
-  }
-  
-  .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white !important;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    transition: all 0.3s ease;
-  }
-  
-  .navbar-brand:hover {
-    transform: translateY(-2px);
-    filter: brightness(1.2);
-  }
-  
-  .navbar-brand .brand-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-  }
-  
-  /* Nav Links y Dropdowns */
-  .navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.9) !important;
-    font-weight: 600;
-    padding: 0.75rem 1.25rem !important;
-    border-radius: var(--radius-md);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .navbar-nav .nav-link:hover {
-    background: var(--navbar-hover);
-    color: white !important;
-    transform: translateY(-2px);
-  }
-  
-  .navbar-nav .nav-link.active {
-    background: rgba(255, 255, 255, 0.25);
-    color: white !important;
-  }
-  
-  .navbar-nav .nav-link i {
-    font-size: 1.1rem;
-  }
-  
-  /* Dropdown Menu Mejorado */
-  .dropdown-menu {
-    background: white;
-    border: none;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-xl);
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    min-width: 250px;
-  }
-  
-  [data-theme="dark"] .dropdown-menu {
-    background: var(--card);
-    border: 1px solid var(--border);
-  }
-  
-  .dropdown-item {
-    border-radius: var(--radius-sm);
-    padding: 0.75rem 1rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--fg) !important;
-  }
-  
-  .dropdown-item i {
-    width: 24px;
-    font-size: 1.1rem;
-    color: var(--accent);
-  }
-  
-  .dropdown-item:hover {
-    background: rgba(14, 165, 233, 0.1);
-    color: var(--accent) !important;
-    transform: translateX(5px);
-  }
-  
-  .dropdown-item:active {
-    background: rgba(14, 165, 233, 0.2);
-  }
-  
-  .dropdown-divider {
-    margin: 0.5rem 0;
-    border-color: var(--border);
-  }
-  
-  .dropdown-header {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
-    font-weight: 700;
-    padding: 0.5rem 1rem;
-  }
-  
-  /* User Profile Dropdown */
-  .navbar-user {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .navbar-user:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-  
-  .navbar-user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    object-fit: cover;
-  }
-  
-  .navbar-user-avatar-placeholder {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.25rem;
-  }
-  
-  .navbar-user-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .navbar-user-name {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: white;
-  }
-  
-  .navbar-user-role {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.125rem 0.5rem;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  
-  /* Badges en navbar */
-  .navbar .badge {
-    font-size: 0.875rem;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-  }
-  
-  /* Botones de utilidad */
-  .utility-buttons {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .utility-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .utility-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
-    border-color: rgba(255, 255, 255, 0.4);
-  }
-  
-  .utility-btn i {
-    font-size: 1.1rem;
-  }
-  
-  /* ============ MAIN CONTENT ============ */
-  .content-wrapper {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: calc(100vh - var(--navbar-h) - var(--foot-h));
-  }
-  
-  main {
-    flex: 1;
-    animation: fadeIn 0.5s ease-out;
-    padding: 0 !important;
-  }
-  
-  /* ============ FOOTER MODERNO ============ */
-  footer {
-    min-height: var(--foot-h);
-    background: var(--footer-bg);
-    color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  footer::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      rgba(255, 255, 255, 0.5) 50%, 
-      transparent 100%
-    );
-  }
-  
-  footer .container-fluid {
-    position: relative;
-    z-index: 2;
-    padding: 1.5rem 2rem;
-  }
-  
-  footer a {
-    color: rgba(255, 255, 255, 0.85);
-    text-decoration: none;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    position: relative;
-  }
-  
-  footer a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: white;
-    transition: width 0.3s ease;
-  }
-  
-  footer a:hover {
-    color: white;
-    transform: translateY(-2px);
-  }
-  
-  footer a:hover::after {
-    width: 100%;
-  }
+      /* Componentes */
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --footer-bg: linear-gradient(90deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
 
-  /* ============ COMPONENTES GENERALES ============ */
-  
-  /* Intro banner */
-  .intro {
-    background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s ease;
-  }
-  
-  [data-theme="dark"] .intro {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, var(--card) 100%);
-    border-color: var(--border);
-  }
-  
-  [data-theme="dark"] .intro * {
-    color: var(--fg) !important;
-  }
-  
-  /* Cards mejoradas */
-  .card {
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: var(--card);
-    color: var(--fg);
-  }
-  
-  .card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-4px);
-    border-color: var(--accent);
-  }
-  
-  [data-theme="dark"] .card {
-    background: var(--card);
-    color: var(--fg);
-  }
-  
-  [data-theme="dark"] .card * {
-    color: var(--fg);
-  }
-  
-  [data-theme="dark"] .card .text-muted {
-    color: var(--muted) !important;
-  }
-  
-  /* Botones mejorados */
-  .btn {
-    border-radius: var(--radius-md);
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 0.75rem 1.5rem;
-  }
-  
-  .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  .btn:active {
-    transform: translateY(0);
-  }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    border: none;
-    color: white;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-  }
-  
-  .btn-primary:hover {
-    background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
-    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
-  }
-  
-  .btn-outline-primary {
-    border: 2px solid var(--accent);
-    color: var(--accent);
-    background: transparent;
-  }
-  
-  .btn-outline-primary:hover {
-    background: var(--accent);
-    color: white;
-  }
-  
-  /* Badges mejorados */
-  .badge {
-    border-radius: var(--radius-sm);
-    padding: 0.5rem 0.875rem;
-    font-weight: 600;
-  }
-  
-  /* Tablas en tema oscuro */
-  [data-theme="dark"] .table {
-    color: var(--fg);
-    background: var(--card);
-  }
-  
-  [data-theme="dark"] .table thead {
-    background: rgba(14, 165, 233, 0.1);
-    color: var(--fg);
-  }
-  
-  [data-theme="dark"] .table td,
-  [data-theme="dark"] .table th {
-    color: var(--fg);
-    border-color: var(--border);
-  }
-  
-  [data-theme="dark"] .table-light {
-    background: rgba(14, 165, 233, 0.08);
-  }
-  
-  [data-theme="dark"] .table tbody tr:hover {
-    background: rgba(14, 165, 233, 0.05);
-  }
-  
-  /* Forms en tema oscuro */
-  [data-theme="dark"] .form-control,
-  [data-theme="dark"] .form-select {
-    background: var(--card);
-    color: var(--fg);
-    border-color: var(--border);
-  }
-  
-  [data-theme="dark"] .form-control:focus,
-  [data-theme="dark"] .form-select:focus {
-    background: var(--card);
-    color: var(--fg);
-    border-color: var(--accent);
-    box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
-  }
-  
-  [data-theme="dark"] .form-label {
-    color: var(--fg);
-  }
-  
-  /* Modales en tema oscuro */
-  [data-theme="dark"] .modal-content {
-    background: var(--card);
-    color: var(--fg);
-    border-color: var(--border);
-  }
-  
-  [data-theme="dark"] .modal-header,
-  [data-theme="dark"] .modal-footer {
-    border-color: var(--border);
-  }
-  
-  [data-theme="dark"] .btn-close {
-    filter: invert(1);
-  }
-  
-  /* ============ ANIMACIONES ============ */
-  .fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+      /* Sombras */
+      --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.2);
+
+      /* Dimensiones */
+      --navbar-h: 70px;
+      --foot-h: 60px;
+
+      /* Radios */
+      --radius-sm: 10px;
+      --radius-md: 14px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
     }
-    to {
-      opacity: 1;
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --fg: #f1f5f9;
+      --muted: #cbd5e1;
+      --accent: #38bdf8;
+      --accent-dark: #0ea5e9;
+
+      --navbar-bg: linear-gradient(135deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
+      --navbar-hover: rgba(255, 255, 255, 0.12);
+
+      --card: #1e293b;
+      --border: #475569;
+      --footer-bg: linear-gradient(90deg, #020617 0%, #0c4a6e 50%, #0369a1 100%);
+
+      --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.6);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    [data-font="base"] {
+      --fs: 16px
+    }
+
+    [data-font="lg"] {
+      --fs: 18px
+    }
+
+    [data-font="xl"] {
+      --fs: 20px
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      font-size: var(--fs);
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      transition: background 0.3s ease, color 0.3s ease;
+      min-height: 100vh;
+    }
+
+    /* ============ NAVBAR MODERNA ============ */
+    .main-navbar {
+      height: var(--navbar-h);
+      background: var(--navbar-bg);
+      color: var(--navbar-fg);
+      box-shadow: var(--shadow-xl);
+      position: sticky;
+      top: 0;
+      z-index: 1050;
+      backdrop-filter: blur(20px);
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white !important;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-brand:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.2);
+    }
+
+    .navbar-brand .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    /* Nav Links y Dropdowns */
+    .navbar-nav .nav-link {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 600;
+      padding: 0.75rem 1.25rem !important;
+      border-radius: var(--radius-md);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background: var(--navbar-hover);
+      color: white !important;
+      transform: translateY(-2px);
+    }
+
+    .navbar-nav .nav-link.active {
+      background: rgba(255, 255, 255, 0.25);
+      color: white !important;
+    }
+
+    .navbar-nav .nav-link i {
+      font-size: 1.1rem;
+    }
+
+    /* Dropdown Menu Mejorado */
+    .dropdown-menu {
+      background: white;
+      border: none;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xl);
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      min-width: 250px;
+    }
+
+    [data-theme="dark"] .dropdown-menu {
+      background: var(--card);
+      border: 1px solid var(--border);
+    }
+
+    .dropdown-item {
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--fg) !important;
+    }
+
+    .dropdown-item i {
+      width: 24px;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .dropdown-item:hover {
+      background: rgba(14, 165, 233, 0.1);
+      color: var(--accent) !important;
+      transform: translateX(5px);
+    }
+
+    .dropdown-item:active {
+      background: rgba(14, 165, 233, 0.2);
+    }
+
+    .dropdown-divider {
+      margin: 0.5rem 0;
+      border-color: var(--border);
+    }
+
+    .dropdown-header {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      font-weight: 700;
+      padding: 0.5rem 1rem;
+    }
+
+    /* User Profile Dropdown */
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-user:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .navbar-user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      object-fit: cover;
+    }
+
+    .navbar-user-avatar-placeholder {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    .navbar-user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .navbar-user-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: white;
+    }
+
+    .navbar-user-role {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Badges en navbar */
+    .navbar .badge {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.25);
+      color: white;
+    }
+
+    /* Botones de utilidad */
+    .utility-buttons {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .utility-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .utility-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .utility-btn i {
+      font-size: 1.1rem;
+    }
+
+    /* ============ MAIN CONTENT ============ */
+    .content-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - var(--navbar-h) - var(--foot-h));
+    }
+
+    main {
+      flex: 1;
+      animation: fadeIn 0.5s ease-out;
+      padding: 0 !important;
+    }
+
+    /* ============ FOOTER MODERNO ============ */
+    footer {
+      min-height: var(--foot-h);
+      background: var(--footer-bg);
+      color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.5) 50%,
+          transparent 100%);
+    }
+
+    footer .container-fluid {
+      position: relative;
+      z-index: 2;
+      padding: 1.5rem 2rem;
+    }
+
+    footer a {
+      color: rgba(255, 255, 255, 0.85);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      position: relative;
+    }
+
+    footer a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: white;
+      transition: width 0.3s ease;
+    }
+
+    footer a:hover {
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    footer a:hover::after {
+      width: 100%;
+    }
+
+    /* ============ COMPONENTES GENERALES ============ */
+
+    /* Intro banner */
+    .intro {
+      background: linear-gradient(135deg, #e0f2fe 0%, #f8fafc 100%);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="dark"] .intro {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, var(--card) 100%);
+      border-color: var(--border);
+    }
+
+    [data-theme="dark"] .intro * {
+      color: var(--fg) !important;
+    }
+
+    /* Cards mejoradas */
+    .card {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: var(--card);
+      color: var(--fg);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+      border-color: var(--accent);
+    }
+
+    [data-theme="dark"] .card {
+      background: var(--card);
+      color: var(--fg);
+    }
+
+    [data-theme="dark"] .card * {
+      color: var(--fg);
+    }
+
+    [data-theme="dark"] .card .text-muted {
+      color: var(--muted) !important;
+    }
+
+    /* Botones mejorados */
+    .btn {
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0.75rem 1.5rem;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:active {
       transform: translateY(0);
     }
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateX(-30px);
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      border: none;
+      color: white;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
     }
-    to {
-      opacity: 1;
-      transform: translateX(0);
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
     }
-  }
-  
-  /* ============ SCROLLBAR PERSONALIZADO ============ */
-  ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: var(--bg);
-    border-radius: 6px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-    border-radius: 6px;
-    border: 2px solid var(--bg);
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
-  }
-  
-  /* ============ RESPONSIVE ============ */
-  @media (max-width: 992px) {
-    .navbar-user-info {
-      display: none;
+
+    .btn-outline-primary {
+      border: 2px solid var(--accent);
+      color: var(--accent);
+      background: transparent;
     }
-    
-    .utility-buttons .d-none.d-lg-flex {
-      display: none !important;
+
+    .btn-outline-primary:hover {
+      background: var(--accent);
+      color: white;
     }
-  }
-  
-  @media (max-width: 768px) {
-    :root {
-      --navbar-h: 64px;
+
+    /* Badges mejorados */
+    .badge {
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.875rem;
+      font-weight: 600;
     }
-    
-    .navbar-brand .brand-text {
-      display: none;
+
+    /* Tablas en tema oscuro */
+    [data-theme="dark"] .table {
+      color: var(--fg);
+      background: var(--card);
     }
-    
-    .utility-btn {
-      width: 36px;
-      height: 36px;
+
+    [data-theme="dark"] .table thead {
+      background: rgba(14, 165, 233, 0.1);
+      color: var(--fg);
     }
-    
-    footer .container-fluid {
-      flex-direction: column;
-      gap: 1rem;
-      text-align: center;
+
+    [data-theme="dark"] .table td,
+    [data-theme="dark"] .table th {
+      color: var(--fg);
+      border-color: var(--border);
     }
-  }
-  
-  @media (max-width: 480px) {
-    .navbar .badge {
-      font-size: 0.75rem;
-      padding: 0.375rem 0.75rem;
+
+    [data-theme="dark"] .table-light {
+      background: rgba(14, 165, 233, 0.08);
     }
-  }
-</style>
-{% block extra_css %}{% endblock %}
-<!-- Estilos Globales Unificados - CARGA AL FINAL PARA MÁXIMA PRIORIDAD -->
-<link href="{% static 'css/global-styles.css' %}" rel="stylesheet">
+
+    [data-theme="dark"] .table tbody tr:hover {
+      background: rgba(14, 165, 233, 0.05);
+    }
+
+    /* Forms en tema oscuro */
+    [data-theme="dark"] .form-control,
+    [data-theme="dark"] .form-select {
+      background: var(--card);
+      color: var(--fg);
+      border-color: var(--border);
+    }
+
+    [data-theme="dark"] .form-control:focus,
+    [data-theme="dark"] .form-select:focus {
+      background: var(--card);
+      color: var(--fg);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 0.25rem rgba(56, 189, 248, 0.25);
+    }
+
+    [data-theme="dark"] .form-label {
+      color: var(--fg);
+    }
+
+    /* Modales en tema oscuro */
+    [data-theme="dark"] .modal-content {
+      background: var(--card);
+      color: var(--fg);
+      border-color: var(--border);
+    }
+
+    [data-theme="dark"] .modal-header,
+    [data-theme="dark"] .modal-footer {
+      border-color: var(--border);
+    }
+
+    [data-theme="dark"] .btn-close {
+      filter: invert(1);
+    }
+
+    /* ============ ANIMACIONES ============ */
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ============ SCROLLBAR PERSONALIZADO ============ */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      border-radius: 6px;
+      border: 2px solid var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, var(--accent-dark) 0%, #0369a1 100%);
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 992px) {
+      .navbar-user-info {
+        display: none;
+      }
+
+      .utility-buttons .d-none.d-lg-flex {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --navbar-h: 64px;
+      }
+
+      .navbar-brand .brand-text {
+        display: none;
+      }
+
+      .utility-btn {
+        width: 36px;
+        height: 36px;
+      }
+
+      footer .container-fluid {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+      }
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+  <!-- Estilos Globales Unificados - CARGA AL FINAL PARA MÁXIMA PRIORIDAD -->
+  <link href="{% static 'css/global-styles.css' %}" rel="stylesheet">
 </head>
+
 <body>
   <!-- ============ NAVBAR PRINCIPAL ============ -->
   <nav class="navbar navbar-expand-lg main-navbar">
@@ -649,13 +662,13 @@
         </div>
         <span class="brand-text d-none d-md-inline">TECHO Chile</span>
       </a>
-      
+
       <!-- Toggler para móvil -->
-      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" 
-              style="color: white; background: rgba(255,255,255,0.2);">
+      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarMain" style="color: white; background: rgba(255,255,255,0.2);">
         <i class="bi bi-list" style="font-size: 1.5rem;"></i>
       </button>
-      
+
       <!-- Contenido del navbar -->
       <div class="collapse navbar-collapse" id="navbarMain">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -668,18 +681,19 @@
             </a>
           </li>
           {% endif %}
-          
+
           <!-- FICHAS DE INMUEBLES (Admin y Trabajador) -->
           {% if rol == 'Admin' or rol == 'Trabajador' %}
           <li class="nav-item">
-            <a class="nav-link {% if 'fichas-inmuebles' in request.path %}active{% endif %}" href="{% url 'fichas_inmuebles' %}">
+            <a class="nav-link {% if 'fichas-inmuebles' in request.path %}active{% endif %}"
+              href="{% url 'fichas_inmuebles' %}">
               <i class="bi bi-folder-open"></i>
               Fichas de Inmuebles
               <span class="badge bg-info ms-2" style="font-size: 0.7rem;">NUEVO</span>
             </a>
           </li>
           {% endif %}
-          
+
           <!-- MENU ADMIN -->
           {% if rol == 'Admin' %}
           <li class="nav-item dropdown">
@@ -688,43 +702,55 @@
               Administración
             </a>
             <ul class="dropdown-menu">
-              <li><h6 class="dropdown-header">🎯 Accesos Rápidos</h6></li>
+              <li>
+                <h6 class="dropdown-header">🎯 Accesos Rápidos</h6>
+              </li>
               <li><a class="dropdown-item" href="{% url 'fichas_inmuebles' %}">
-                <i class="bi bi-folder-open"></i> Fichas de Inmuebles
-                <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
-              </a></li>
+                  <i class="bi bi-folder-open"></i> Fichas de Inmuebles
+                  <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'buscar_familia_por_rut' %}">
-                <i class="bi bi-search"></i> Buscar por RUT
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📋 Gestión</h6></li>
+                  <i class="bi bi-search"></i> Buscar por RUT
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <h6 class="dropdown-header">📋 Gestión</h6>
+              </li>
               <li><a class="dropdown-item" href="/panel/admin/proyectos/">
-                <i class="bi bi-diagram-3"></i> Proyectos
-              </a></li>
+                  <i class="bi bi-diagram-3"></i> Proyectos
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'admin_viviendas' %}">
-                <i class="bi bi-houses"></i> Viviendas
-              </a></li>
+                  <i class="bi bi-houses"></i> Viviendas
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'admin_constructoras' %}">
-                <i class="bi bi-building"></i> Constructoras
-              </a></li>
+                  <i class="bi bi-building"></i> Constructoras
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'listar_usuarios' %}">
-                <i class="bi bi-people"></i> Usuarios
-              </a></li>
+                  <i class="bi bi-people"></i> Usuarios
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'asignar_trabajadores_proyecto' %}">
-                <i class="bi bi-person-check"></i> Asignar Trabajadores
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📊 Monitoreo</h6></li>
+                  <i class="bi bi-person-check"></i> Asignar Trabajadores
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <h6 class="dropdown-header">📊 Monitoreo</h6>
+              </li>
               <li><a class="dropdown-item" href="{% url 'monitoreo_ds49' %}">
-                <i class="bi bi-calendar-check"></i> DS 49 (120 días)
-              </a></li>
+                  <i class="bi bi-calendar-check"></i> DS 49 (120 días)
+                </a></li>
               <li><a class="dropdown-item" href="/reportes/">
-                <i class="bi bi-file-earmark-pdf"></i> Reportes PDF
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
+                  <i class="bi bi-file-earmark-pdf"></i> Reportes PDF
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
               <li><a class="dropdown-item" href="/admin/" target="_blank">
-                <i class="bi bi-terminal"></i> Admin Django
-              </a></li>
+                  <i class="bi bi-terminal"></i> Admin Django
+                </a></li>
             </ul>
           </li>
           {% elif rol == 'Trabajador' %}
@@ -735,28 +761,34 @@
               Mi Trabajo
             </a>
             <ul class="dropdown-menu">
-              <li><h6 class="dropdown-header">🏗️ Mi Trabajo</h6></li>
+              <li>
+                <h6 class="dropdown-header">🏗️ Mi Trabajo</h6>
+              </li>
               <li><a class="dropdown-item" href="{% url 'fichas_inmuebles' %}">
-                <i class="bi bi-folder-open"></i> Fichas de Inmuebles
-                <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
-              </a></li>
+                  <i class="bi bi-folder-open"></i> Fichas de Inmuebles
+                  <span class="badge bg-info ms-2" style="font-size: 0.65rem;">NUEVO</span>
+                </a></li>
               <li><a class="dropdown-item" href="/proyectos/">
-                <i class="bi bi-diagram-3"></i> Mi Proyecto
-              </a></li>
+                  <i class="bi bi-diagram-3"></i> Mi Proyecto
+                </a></li>
               <li><a class="dropdown-item" href="/viviendas/">
-                <i class="bi bi-houses"></i> Viviendas
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><h6 class="dropdown-header">📋 Seguimiento</h6></li>
+                  <i class="bi bi-houses"></i> Viviendas
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li>
+                <h6 class="dropdown-header">📋 Seguimiento</h6>
+              </li>
               <li><a class="dropdown-item" href="{% url 'monitoreo_ds49' %}">
-                <i class="bi bi-calendar-check"></i> DS 49 (120 días)
-              </a></li>
+                  <i class="bi bi-calendar-check"></i> DS 49 (120 días)
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'fichas_inmuebles' %}">
-                <i class="bi bi-clipboard-data"></i> Ver Fichas
-              </a></li>
+                  <i class="bi bi-clipboard-data"></i> Ver Fichas
+                </a></li>
               <li><a class="dropdown-item" href="{% url 'reportar_observacion_trabajador' %}">
-                <i class="bi bi-plus-circle"></i> Nueva Observación
-              </a></li>
+                  <i class="bi bi-plus-circle"></i> Nueva Observación
+                </a></li>
             </ul>
           </li>
           {% elif rol == 'Familia' %}
@@ -768,13 +800,14 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link {% if 'reportar' in request.path %}active{% endif %}" href="{% url 'reportar_observacion_familia' %}">
+            <a class="nav-link {% if 'reportar' in request.path %}active{% endif %}"
+              href="{% url 'reportar_observacion_familia' %}">
               <i class="bi bi-exclamation-circle-fill"></i>
               Reportar Problema
             </a>
           </li>
           {% endif %}
-          
+
           <!-- MENU RECURSOS (Todos) -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -783,24 +816,95 @@
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="/tutorial/">
-                <i class="bi bi-mortarboard"></i> Tutorial
-              </a></li>
+                  <i class="bi bi-mortarboard"></i> Tutorial
+                </a></li>
               <li><a class="dropdown-item" href="/ayuda/">
-                <i class="bi bi-life-preserver"></i> Ayuda
-              </a></li>
+                  <i class="bi bi-life-preserver"></i> Ayuda
+                </a></li>
               <li><a class="dropdown-item" href="/perfil/">
-                <i class="bi bi-person-circle"></i> Mi Perfil
-              </a></li>
+                  <i class="bi bi-person-circle"></i> Mi Perfil
+                </a></li>
             </ul>
           </li>
         </ul>
-        
+
         <!-- Utilidades y Usuario -->
         <div class="d-flex align-items-center gap-3">
           <!-- Badge de rol -->
           <span class="badge d-none d-md-inline">{{ rol }}</span>
-          
+
           <!-- Botones de utilidad -->
+          <!-- Campana de Notificaciones -->
+          <div class="dropdown">
+            <button class="utility-btn position-relative" data-bs-toggle="dropdown" aria-expanded="false"
+              title="Notificaciones">
+              <i class="bi bi-bell-fill"></i>
+              {% if notificaciones_no_leidas_count and notificaciones_no_leidas_count > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 0.65rem; padding: 0.25rem 0.4rem;">
+                {{ notificaciones_no_leidas_count }}
+              </span>
+              {% endif %}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" style="min-width: 350px; max-height: 400px; overflow-y: auto;">
+              <li>
+                <h6 class="dropdown-header d-flex justify-content-between align-items-center">
+                  <span>🔔 Notificaciones</span>
+                  {% if notificaciones_no_leidas_count > 0 %}
+                  <span class="badge bg-primary rounded-pill" style="font-size: 0.7rem;">
+                    {{ notificaciones_no_leidas_count }}
+                  </span>
+                  {% endif %}
+                </h6>
+              </li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              {% if notificaciones_recientes %}
+              {% for notif in notificaciones_recientes %}
+              <li>
+                <a class="dropdown-item {% if not notif.leida %}fw-bold{% endif %}" href="{{ notif.url_destino }}"
+                  style="white-space: normal; padding: 0.75rem 1rem;">
+                  <div class="d-flex align-items-start gap-2">
+                    <div>
+                      {% if notif.tipo == 'NUEVA_OBSERVACION' %}
+                      <i class="bi bi-exclamation-circle-fill text-warning"></i>
+                      {% elif notif.tipo == 'OBSERVACION_RESUELTA' %}
+                      <i class="bi bi-check-circle-fill text-success"></i>
+                      {% elif notif.tipo == 'COMENTARIO_AGREGADO' %}
+                      <i class="bi bi-chat-dots-fill text-info"></i>
+                      {% else %}
+                      <i class="bi bi-info-circle-fill text-primary"></i>
+                      {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                      <div style="font-size: 0.9rem;">{{ notif.titulo }}</div>
+                      <small class="text-muted" style="font-size: 0.75rem;">{{ notif.creada_en|timesince }}
+                        atrás</small>
+                    </div>
+                    {% if not notif.leida %}
+                    <span class="badge bg-primary" style="font-size: 0.65rem;">Nueva</span>
+                    {% endif %}
+                  </div>
+                </a>
+              </li>
+              {% endfor %}
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item text-center text-primary fw-bold" href="{% url 'notificaciones_list' %}">Ver
+                  todas las notificaciones</a></li>
+              {% else %}
+              <li>
+                <div class="dropdown-item text-center text-muted" style="padding: 2rem 1rem;">
+                  <i class="bi bi-bell-slash" style="font-size: 2rem; opacity: 0.3;"></i>
+                  <p class="mb-0 mt-2" style="font-size: 0.85rem;">No hay notificaciones</p>
+                </div>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+
           <div class="utility-buttons d-none d-lg-flex">
             <button id="fBase" class="utility-btn" title="Tamaño normal">A</button>
             <button id="fLg" class="utility-btn" title="Letra grande">A+</button>
@@ -809,25 +913,25 @@
               <i class="bi bi-moon-fill"></i>
             </button>
           </div>
-          
+
           <!-- Dropdown de usuario -->
           <div class="dropdown">
             <div class="navbar-user" data-bs-toggle="dropdown" aria-expanded="false">
               {% if perfil and perfil.avatar %}
-                <img src="{{ perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
+              <img src="{{ perfil.avatar.url }}" alt="Avatar" class="navbar-user-avatar">
               {% else %}
-                <div class="navbar-user-avatar-placeholder">
-                  <i class="bi bi-person-fill"></i>
-                </div>
+              <div class="navbar-user-avatar-placeholder">
+                <i class="bi bi-person-fill"></i>
+              </div>
               {% endif %}
               <div class="navbar-user-info">
                 <span class="navbar-user-name">
                   {% if nombre_usuario %}
-                    {{ nombre_usuario }}
+                  {{ nombre_usuario }}
                   {% elif user %}
-                    {{ user.username }}
+                  {{ user.username }}
                   {% else %}
-                    Usuario
+                  Usuario
                   {% endif %}
                 </span>
                 <span class="navbar-user-role">{{ rol|default:"Usuario" }}</span>
@@ -835,17 +939,21 @@
               <i class="bi bi-chevron-down ms-2" style="color: white;"></i>
             </div>
             <ul class="dropdown-menu dropdown-menu-end">
-              <li><h6 class="dropdown-header">Mi Cuenta</h6></li>
+              <li>
+                <h6 class="dropdown-header">Mi Cuenta</h6>
+              </li>
               <li><a class="dropdown-item" href="/perfil/">
-                <i class="bi bi-person-circle"></i> Ver Perfil
-              </a></li>
+                  <i class="bi bi-person-circle"></i> Ver Perfil
+                </a></li>
               <li><a class="dropdown-item d-lg-none" href="#" id="btnThemeMobile">
-                <i class="bi bi-moon-fill"></i> Cambiar Tema
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
+                  <i class="bi bi-moon-fill"></i> Cambiar Tema
+                </a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
               <li><a class="dropdown-item text-danger" href="/logout/">
-                <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
-              </a></li>
+                  <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+                </a></li>
             </ul>
           </div>
         </div>
@@ -875,96 +983,96 @@
   </div>
 
   <script>
-  // ============ CONFIGURACIÓN HTMX ============
-  document.body.addEventListener('htmx:configRequest', (evt) => {
-    const getCookie = (name) => {
-      const v = document.cookie.split('; ').find(row => row.startsWith(name+'='));
-      return v ? decodeURIComponent(v.split('=')[1]) : null;
-    };
-    evt.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
-  });
+    // ============ CONFIGURACIÓN HTMX ============
+    document.body.addEventListener('htmx:configRequest', (evt) => {
+      const getCookie = (name) => {
+        const v = document.cookie.split('; ').find(row => row.startsWith(name + '='));
+        return v ? decodeURIComponent(v.split('=')[1]) : null;
+      };
+      evt.detail.headers['X-CSRFToken'] = getCookie('csrftoken');
+    });
 
-  // ============ SISTEMA DE TEMAS Y PREFERENCIAS ============
-  const root = document.documentElement;
-  const themeBtn = document.getElementById('btnTheme');
-  const themeBtnMobile = document.getElementById('btnThemeMobile');
-  const themeIcon = themeBtn?.querySelector('i');
-  
-  // Cargar preferencias guardadas
-  const loadPreferences = () => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    const savedFont = localStorage.getItem('font') || 'base';
-    
-    root.setAttribute('data-theme', savedTheme);
-    root.setAttribute('data-font', savedFont);
-    
-    // Actualizar icono del tema
-    updateThemeIcon(savedTheme);
-  };
-  
-  // Actualizar icono del botón de tema
-  const updateThemeIcon = (theme) => {
-    if (themeIcon) {
-      themeIcon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
-    }
-    if (themeBtnMobile) {
-      const icon = themeBtnMobile.querySelector('i');
-      if (icon) {
-        icon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
-      }
-    }
-  };
-  
-  // Toggle tema con animación
-  const toggleTheme = () => {
-    const currentTheme = root.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
-    // Añadir clase para animación suave
-    document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
-    
-    root.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-    
-    // Mostrar notificación visual
-    showNotification(`Tema ${newTheme === 'light' ? 'claro' : 'oscuro'} activado`);
-    
-    // Remover transición después
-    setTimeout(() => {
-      document.body.style.transition = '';
-    }, 300);
-  };
-  
-  // Cambiar tamaño de fuente
-  const setFont = (size) => {
-    root.setAttribute('data-font', size);
-    localStorage.setItem('font', size);
-    
-    const sizeLabels = {
-      'base': 'Normal',
-      'lg': 'Grande',
-      'xl': 'Muy Grande'
+    // ============ SISTEMA DE TEMAS Y PREFERENCIAS ============
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('btnTheme');
+    const themeBtnMobile = document.getElementById('btnThemeMobile');
+    const themeIcon = themeBtn?.querySelector('i');
+
+    // Cargar preferencias guardadas
+    const loadPreferences = () => {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const savedFont = localStorage.getItem('font') || 'base';
+
+      root.setAttribute('data-theme', savedTheme);
+      root.setAttribute('data-font', savedFont);
+
+      // Actualizar icono del tema
+      updateThemeIcon(savedTheme);
     };
-    
-    showNotification(`Tamaño de texto: ${sizeLabels[size]}`);
-  };
-  
-  // Sistema de notificaciones visuales mejorado
-  const showNotification = (message) => {
-    // Remover notificación existente
-    const existing = document.querySelector('.theme-notification');
-    if (existing) {
-      existing.remove();
-    }
-    
-    const notification = document.createElement('div');
-    notification.className = 'theme-notification';
-    notification.innerHTML = `
+
+    // Actualizar icono del botón de tema
+    const updateThemeIcon = (theme) => {
+      if (themeIcon) {
+        themeIcon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+      }
+      if (themeBtnMobile) {
+        const icon = themeBtnMobile.querySelector('i');
+        if (icon) {
+          icon.className = theme === 'light' ? 'bi bi-moon-fill' : 'bi bi-sun-fill';
+        }
+      }
+    };
+
+    // Toggle tema con animación
+    const toggleTheme = () => {
+      const currentTheme = root.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+      // Añadir clase para animación suave
+      document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+
+      root.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+
+      // Mostrar notificación visual
+      showNotification(`Tema ${newTheme === 'light' ? 'claro' : 'oscuro'} activado`);
+
+      // Remover transición después
+      setTimeout(() => {
+        document.body.style.transition = '';
+      }, 300);
+    };
+
+    // Cambiar tamaño de fuente
+    const setFont = (size) => {
+      root.setAttribute('data-font', size);
+      localStorage.setItem('font', size);
+
+      const sizeLabels = {
+        'base': 'Normal',
+        'lg': 'Grande',
+        'xl': 'Muy Grande'
+      };
+
+      showNotification(`Tamaño de texto: ${sizeLabels[size]}`);
+    };
+
+    // Sistema de notificaciones visuales mejorado
+    const showNotification = (message) => {
+      // Remover notificación existente
+      const existing = document.querySelector('.theme-notification');
+      if (existing) {
+        existing.remove();
+      }
+
+      const notification = document.createElement('div');
+      notification.className = 'theme-notification';
+      notification.innerHTML = `
       <i class="bi bi-check-circle-fill" style="font-size: 1.25rem;"></i>
       <span>${message}</span>
     `;
-    notification.style.cssText = `
+      notification.style.cssText = `
       position: fixed;
       bottom: 2rem;
       right: 2rem;
@@ -981,18 +1089,18 @@
       gap: 0.75rem;
       border: 2px solid rgba(255, 255, 255, 0.2);
     `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      notification.style.animation = 'slideOutDown 0.3s ease-out';
-      setTimeout(() => notification.remove(), 300);
-    }, 2500);
-  };
-  
-  // Añadir estilos de animación mejorados
-  const style = document.createElement('style');
-  style.textContent = `
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.animation = 'slideOutDown 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+      }, 2500);
+    };
+
+    // Añadir estilos de animación mejorados
+    const style = document.createElement('style');
+    style.textContent = `
     @keyframes slideInUp {
       0% {
         opacity: 0;
@@ -1018,66 +1126,67 @@
       }
     }
   `;
-  document.head.appendChild(style);
-  
-  // ============ EVENT LISTENERS ============
-  // Cargar preferencias al iniciar
-  loadPreferences();
-  
-  // Botón de tema (desktop)
-  if (themeBtn) {
-    themeBtn.addEventListener('click', toggleTheme);
-  }
-  
-  // Botón de tema (mobile)
-  if (themeBtnMobile) {
-    themeBtnMobile.addEventListener('click', (e) => {
-      e.preventDefault();
-      toggleTheme();
-    });
-  }
-  
-  // Botones de tamaño de fuente
-  const btnFontBase = document.getElementById('fBase');
-  const btnFontLg = document.getElementById('fLg');
-  const btnFontXl = document.getElementById('fXl');
-  
-  if (btnFontBase) btnFontBase.addEventListener('click', () => setFont('base'));
-  if (btnFontLg) btnFontLg.addEventListener('click', () => setFont('lg'));
-  if (btnFontXl) btnFontXl.addEventListener('click', () => setFont('xl'));
-  
-  // ============ ATAJOS DE TECLADO ============
-  document.addEventListener('keydown', (e) => {
-    // Ctrl/Cmd + D = Toggle tema
-    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-      e.preventDefault();
-      toggleTheme();
+    document.head.appendChild(style);
+
+    // ============ EVENT LISTENERS ============
+    // Cargar preferencias al iniciar
+    loadPreferences();
+
+    // Botón de tema (desktop)
+    if (themeBtn) {
+      themeBtn.addEventListener('click', toggleTheme);
     }
-  });
-  
-  // ============ DETECCIÓN DE PREFERENCIA DEL SISTEMA ============
-  // Detectar tema del sistema operativo
-  if (window.matchMedia) {
-    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    // Solo aplicar si no hay preferencia guardada
-    if (!localStorage.getItem('theme')) {
-      root.setAttribute('data-theme', darkModeQuery.matches ? 'dark' : 'light');
-      updateThemeIcon(darkModeQuery.matches ? 'dark' : 'light');
+
+    // Botón de tema (mobile)
+    if (themeBtnMobile) {
+      themeBtnMobile.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleTheme();
+      });
     }
-    
-    // Escuchar cambios en la preferencia del sistema
-    darkModeQuery.addEventListener('change', (e) => {
-      if (!localStorage.getItem('theme')) {
-        const newTheme = e.matches ? 'dark' : 'light';
-        root.setAttribute('data-theme', newTheme);
-        updateThemeIcon(newTheme);
+
+    // Botones de tamaño de fuente
+    const btnFontBase = document.getElementById('fBase');
+    const btnFontLg = document.getElementById('fLg');
+    const btnFontXl = document.getElementById('fXl');
+
+    if (btnFontBase) btnFontBase.addEventListener('click', () => setFont('base'));
+    if (btnFontLg) btnFontLg.addEventListener('click', () => setFont('lg'));
+    if (btnFontXl) btnFontXl.addEventListener('click', () => setFont('xl'));
+
+    // ============ ATAJOS DE TECLADO ============
+    document.addEventListener('keydown', (e) => {
+      // Ctrl/Cmd + D = Toggle tema
+      if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        toggleTheme();
       }
     });
-  }
-  
-  console.log('✨ TECHO - Sistema de navegación moderna cargado correctamente');
-</script>
+
+    // ============ DETECCIÓN DE PREFERENCIA DEL SISTEMA ============
+    // Detectar tema del sistema operativo
+    if (window.matchMedia) {
+      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+      // Solo aplicar si no hay preferencia guardada
+      if (!localStorage.getItem('theme')) {
+        root.setAttribute('data-theme', darkModeQuery.matches ? 'dark' : 'light');
+        updateThemeIcon(darkModeQuery.matches ? 'dark' : 'light');
+      }
+
+      // Escuchar cambios en la preferencia del sistema
+      darkModeQuery.addEventListener('change', (e) => {
+        if (!localStorage.getItem('theme')) {
+          const newTheme = e.matches ? 'dark' : 'light';
+          root.setAttribute('data-theme', newTheme);
+          updateThemeIcon(newTheme);
+        }
+      });
+    }
+
+    console.log('✨ TECHO - Sistema de navegación moderna cargado correctamente');
+  </script>
 
 </body>
+
 </html>

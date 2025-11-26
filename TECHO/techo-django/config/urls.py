@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core.views import (
     home, viviendas_list, proyectos_list, reportes_home, 
-    reporte_proyecto_pdf, reporte_proyecto_enviar,
+    reporte_proyecto_pdf, reporte_proyecto_enviar, reporte_general_pdf, ver_informe_general,
     admin_proyectos, admin_proyecto_form, admin_proyecto_delete, 
     subir_evidencia, cambiar_estado_registro,
     monitoreo_ds49, actualizar_fecha_entrega,
@@ -12,7 +12,8 @@ from core.views import (
     admin_constructoras, crear_constructora, editar_constructora, eliminar_constructora,
     reportar_observacion_familia, reportar_observacion_trabajador, buscar_familia_por_rut,
     fichas_inmuebles, detalle_ficha_inmueble, buscar_usuario_por_rut,
-    asignar_trabajadores_proyecto, detalle_registro_postventa, agregar_comentario_registro
+    asignar_trabajadores_proyecto, detalle_registro_postventa, agregar_comentario_registro,
+    notificaciones_list, marcar_notificacion_leida
 )
 from accounts.views import (
     login_view, logout_view, dashboard, perfil, ayuda, tutorial, 
@@ -31,6 +32,8 @@ urlpatterns = [
     path("viviendas/", viviendas_list, name="viviendas_list"),
     path("proyectos/", proyectos_list, name="proyectos_list"),
     path("reportes/", reportes_home, name="reportes_home"),
+    path("reportes/general/", ver_informe_general, name="ver_informe_general"),
+    path("reportes/general/pdf/", reporte_general_pdf, name="reporte_general_pdf"),
     path("reportes/proyecto/pdf/", reporte_proyecto_pdf, name="reporte_proyecto_pdf"),
     path("reportes/proyecto/enviar/", reporte_proyecto_enviar, name="reporte_proyecto_enviar"),
     path("reportes/registro/<int:registro_id>/", detalle_registro_postventa, name="detalle_registro_postventa"),
@@ -75,6 +78,9 @@ urlpatterns = [
     path("fichas-inmuebles/<int:ficha_id>/actualizar-fecha-entrega/", actualizar_fecha_entrega, name="actualizar_fecha_entrega"),
     # API - Buscar usuario por RUT
     path("api/buscar-usuario-rut/", buscar_usuario_por_rut, name="buscar_usuario_por_rut"),
+    # Notificaciones
+    path("notificaciones/", notificaciones_list, name="notificaciones_list"),
+    path("notificaciones/marcar-leida/<int:notif_id>/", marcar_notificacion_leida, name="marcar_notificacion_leida"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

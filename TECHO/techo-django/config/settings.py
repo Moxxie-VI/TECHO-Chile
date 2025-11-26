@@ -67,6 +67,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "accounts.context_processors.user_data",  # Context processor personalizado
+                "core.context_processors.notificaciones_context",  # Notificaciones globales
             ],
         },
     },
@@ -125,9 +126,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-cl'  # Español de Chile
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'  # Zona horaria de Chile
 
 USE_I18N = True
 

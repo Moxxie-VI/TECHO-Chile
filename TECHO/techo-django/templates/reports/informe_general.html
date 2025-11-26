@@ -1,0 +1,261 @@
+{% extends 'reports/base_pdf.html' %}
+{% load static %}
+
+{% block title %}Informe General de Proyectos - TECHO Chile{% endblock %}
+{% block report_title %}Informe General de Proyectos{% endblock %}
+
+{% block content %}
+
+<!-- KPIs Principales -->
+<div class="section no-break">
+    <h2 class="section-title">Indicadores Clave de Desempeño</h2>
+    <div class="kpi-container">
+        <div class="kpi-box">
+            <span class="kpi-value">{{ total_proyectos }}</span>
+            <span class="kpi-label">Proyectos Totales</span>
+        </div>
+        <div class="kpi-box">
+            <span class="kpi-value">{{ total_viviendas }}</span>
+            <span class="kpi-label">Viviendas</span>
+        </div>
+        <div class="kpi-box">
+            <span class="kpi-value">{{ total_observaciones }}</span>
+            <span class="kpi-label">Observaciones</span>
+        </div>
+        <div class="kpi-box">
+            <span class="kpi-value">{{ tasa_resolucion|floatformat:1 }}%</span>
+            <span class="kpi-label">Resolución</span>
+        </div>
+    </div>
+</div>
+
+<!-- Estado General -->
+<div class="section">
+    <h2 class="section-title">Estado General del Sistema</h2>
+    <div class="two-columns">
+        <div class="column">
+            <div class="info-box">
+                <h3 class="subsection-title">📊 Proyectos</h3>
+                <ul>
+                    <li><strong>Activos:</strong> {{ proyectos_activos }}</li>
+                    <li><strong>Finalizados:</strong> {{ proyectos_finalizados }}</li>
+                    <li><strong>Total Constructoras:</strong> {{ total_constructoras }}</li>
+                </ul>
+            </div>
+        </div>
+        <div class="column">
+            <div class="info-box">
+                <h3 class="subsection-title">🏠 Viviendas</h3>
+                <ul>
+                    <li><strong>Total Viviendas:</strong> {{ total_viviendas }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Postventa -->
+<div class="section">
+    <h2 class="section-title">Sistema de Postventa</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Estado</th>
+                <th style="text-align: center;">Cantidad</th>
+                <th style="text-align: center;">Porcentaje</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge badge-success">Resueltas</span></td>
+                <td style="text-align: center;"><strong>{{ obs_resueltas }}</strong></td>
+                <td style="text-align: center;">{{ porcentaje_resueltas|floatformat:1 }}%</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-warning">Pendientes</span></td>
+                <td style="text-align: center;"><strong>{{ obs_pendientes }}</strong></td>
+                <td style="text-align: center;">{{ porcentaje_pendientes|floatformat:1 }}%</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-danger">Alta Urgencia</span></td>
+                <td style="text-align: center;"><strong>{{ obs_alta_urgencia }}</strong></td>
+                <td style="text-align: center;">{{ porcentaje_alta_urgencia|floatformat:1 }}%</td>
+            </tr>
+        </tbody>
+    </table>
+    {% if obs_alta_urgencia > 0 %}
+    <div class="danger-box mt-20">
+        <strong>⚠️ Atención:</strong> Hay {{ obs_alta_urgencia }} observación(es) de alta urgencia que requieren
+        atención inmediata.
+    </div>
+    {% endif %}
+</div>
+
+<!-- Distribución Geográfica -->
+<div class="section">
+    <h2 class="section-title">Distribución Geográfica</h2>
+    <div class="two-columns">
+        <div class="column">
+            <h3 class="subsection-title">Por Región</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Región</th>
+                        <th style="text-align: center;">Proyectos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in distribucion_regiones %}
+                    <tr>
+                        <td>{{ item.region }}</td>
+                        <td style="text-align: center;"><strong>{{ item.count }}</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align: center;" class="text-muted">Sin datos</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="column">
+            <h3 class="subsection-title">Principales Comunas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Comuna</th>
+                        <th style="text-align: center;">Proyectos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_comunas %}
+                    <tr>
+                        <td>{{ item.comuna }}</td>
+                        <td style="text-align: center;"><strong>{{ item.count }}</strong></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align: center;" class="text-muted">Sin datos</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Top Constructoras -->
+<div class="section">
+    <h2 class="section-title">Ranking de Constructoras</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Posición</th>
+                <th>Constructora</th>
+                <th style="text-align: center;">Score</th>
+                <th style="text-align: center;">Proyectos</th>
+                <th style="text-align: center;">Tasa Resolución</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for constructora in top_constructoras %}
+            <tr>
+                <td style="text-align: center;"><strong>{{ forloop.counter }}</strong></td>
+                <td>{{ constructora.nombre }}</td>
+                <td style="text-align: center;">
+                    <span
+                        class="badge {% if constructora.score >= 80 %}badge-success{% elif constructora.score >= 50 %}badge-warning{% else %}badge-danger{% endif %}">
+                        {{ constructora.score|floatformat:1 }}
+                    </span>
+                </td>
+                <td style="text-align: center;">{{ constructora.num_proyectos }}</td>
+                <td style="text-align: center;">{{ constructora.tasa_resolucion|floatformat:1 }}%</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center;" class="text-muted">Sin constructoras registradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Proyectos Recientes -->
+<div class="section">
+    <h2 class="section-title">Proyectos Recientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Comuna</th>
+                <th style="text-align: center;">Viviendas</th>
+                <th style="text-align: center;">Fecha Inicio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proyecto in proyectos_recientes %}
+            <tr>
+                <td><strong>{{ proyecto.codigo }}</strong></td>
+                <td>{{ proyecto.nombre }}</td>
+                <td>{{ proyecto.comuna }}</td>
+                <td style="text-align: center;">{{ proyecto.cantidad_viviendas }}</td>
+                <td style="text-align: center;">{{ proyecto.fecha_inicio|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center;" class="text-muted">Sin proyectos recientes</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Distribución de Fallas -->
+{% if distribucion_recintos %}
+<div class="section">
+    <h2 class="section-title">Distribución de Fallas por Tipo de Recinto</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo de Recinto</th>
+                <th style="text-align: center;">Cantidad de Fallas</th>
+                <th style="text-align: center;">Porcentaje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in distribucion_recintos %}
+            <tr>
+                <td>{{ item.recinto }}</td>
+                <td style="text-align: center;"><strong>{{ item.cantidad }}</strong></td>
+                <td style="text-align: center;">{{ item.porcentaje|floatformat:1 }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<!-- Resumen Final -->
+<div class="section">
+    <div class="info-box">
+        <h3 class="subsection-title">📝 Resumen Ejecutivo</h3>
+        <p>
+            Este informe consolida la información de <strong>{{ total_proyectos }} proyectos</strong>
+            que abarcan un total de <strong>{{ total_viviendas }} viviendas</strong> distribuidas
+            en múltiples regiones y comunas de Chile.
+        </p>
+        <p class="mt-10">
+            El sistema de postventa ha registrado <strong>{{ total_observaciones }} observaciones</strong>,
+            con una tasa de resolución global del <strong>{{ tasa_resolucion|floatformat:1 }}%</strong>.
+            {% if obs_alta_urgencia > 0 %}
+            Se identificaron <strong>{{ obs_alta_urgencia }} observaciones de alta urgencia</strong>
+            que requieren atención prioritaria.
+            {% else %}
+            Actualmente no hay observaciones de alta urgencia pendientes.
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+{% endblock %}

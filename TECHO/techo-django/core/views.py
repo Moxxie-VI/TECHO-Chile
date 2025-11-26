@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.db.models import Count, Q
 from .forms import ProyectoForm, ViviendaForm, RegistroPostventaForm, EvidenciaForm, RegistroComentarioForm
-from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario, RegistroComentario
+from .models import Proyecto, Vivienda, RegistroPostventa, Evidencia, ESTADOS, FichaInmueble, PerfilUsuario, RegistroComentario, Notificacion
 from .pdf_utils import render_to_pdf, pdf_http_response
 
 def home(request):
@@ -97,6 +97,274 @@ def reporte_proyecto_pdf(request):
         return HttpResponseBadRequest("No se pudo generar PDF")
 
     filename = f"reporte_{proyecto.codigo}_{timezone.now().strftime('%Y%m%d')}.pdf"
+    return pdf_http_response(filename, pdf_bytes, as_attachment=True)
+
+@login_required
+def ver_informe_general(request):
+    """
+    Vista HTML del informe general - permite visualizar antes de descargar PDF
+    """
+    from .models import Constructora
+    
+    # KPIs Principales
+    total_proyectos = Proyecto.objects.count()
+    total_viviendas = Vivienda.objects.count()
+    total_observaciones = RegistroPostventa.objects.count()
+    
+    # Estado de proyectos y viviendas
+    proyectos_finalizados = Proyecto.objects.filter(estado='FINALIZADO').count()
+    proyectos_activos = total_proyectos - proyectos_finalizados
+    
+    total_constructoras = Constructora.objects.count()
+    
+    # Viviendas - Modelo no tiene campo 'estado'
+    viviendas_entregadas = 0
+    viviendas_pendientes = 0
+    porcentaje_entrega = 0
+    
+    # Observaciones de postventa
+    obs_resueltas = RegistroPostventa.objects.filter(estado='RESUELTO').count()
+    obs_pendientes = RegistroPostventa.objects.filter(estado='PENDIENTE').count()
+    obs_alta_urgencia = RegistroPostventa.objects.filter(urgencia='ALTA', estado='PENDIENTE').count()
+    
+    tasa_resolucion = (obs_resueltas / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_resueltas = (obs_resueltas / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_pendientes = (obs_pendientes / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_alta_urgencia = (obs_alta_urgencia / total_observaciones * 100) if total_observaciones > 0 else 0
+    
+    # Distribución geográfica
+    distribucion_regiones = (
+        Proyecto.objects
+        .values('region')
+        .annotate(count=Count('id'))
+        .order_by('-count')[:10]
+    )
+    
+    top_comunas = (
+        Proyecto.objects
+        .values('comuna')
+        .annotate(count=Count('id'))
+        .order_by('-count')[:10]
+    )
+    
+    # Top Constructoras
+    constructoras = Constructora.objects.all()
+    top_constructoras_data = []
+    
+    for constructora in constructoras:
+        proyectos_constructora = Proyecto.objects.filter(constructora=constructora)
+        num_proyectos = proyectos_constructora.count()
+        
+        if num_proyectos > 0:
+            obs_total = RegistroPostventa.objects.filter(proyecto__constructora=constructora).count()
+            obs_resueltas_c = RegistroPostventa.objects.filter(proyecto__constructora=constructora, estado='RESUELTO').count()
+            
+            tasa_resolucion_c = (obs_resueltas_c / obs_total * 100) if obs_total > 0 else 0
+            score = tasa_resolucion_c
+            
+            top_constructoras_data.append({
+                'nombre': constructora.nombre,
+                'num_proyectos': num_proyectos,
+                'score': score,
+                'tasa_resolucion': tasa_resolucion_c
+            })
+    
+    top_constructoras = sorted(top_constructoras_data, key=lambda x: x['score'], reverse=True)[:10]
+    
+    # Proyectos recientes (ordenados por fecha de inicio)
+    proyectos_recientes = Proyecto.objects.order_by('-fecha_inicio')[:10]
+    
+    # Distribución de fallas por recinto
+    distribucion_recintos = (
+        RegistroPostventa.objects
+        .values('recinto')
+        .annotate(cantidad=Count('id'))
+        .order_by('-cantidad')[:10]
+    )
+    
+    distribucion_recintos_list = []
+    for item in distribucion_recintos:
+        porcentaje = (item['cantidad'] / total_observaciones * 100) if total_observaciones > 0 else 0
+        distribucion_recintos_list.append({
+            'recinto': item['recinto'] or 'No especificado',
+            'cantidad': item['cantidad'],
+            'porcentaje': porcentaje
+        })
+    
+    ctx = {
+        'fecha_generacion': timezone.localtime(),
+        'total_proyectos': total_proyectos,
+        'total_viviendas': total_viviendas,
+        'total_observaciones': total_observaciones,
+        'tasa_resolucion': tasa_resolucion,
+        'proyectos_activos': proyectos_activos,
+        'proyectos_finalizados': proyectos_finalizados,
+        'total_constructoras': total_constructoras,
+        'viviendas_entregadas': viviendas_entregadas,
+        'viviendas_pendientes': viviendas_pendientes,
+        'porcentaje_entrega': porcentaje_entrega,
+        'obs_resueltas': obs_resueltas,
+        'obs_pendientes': obs_pendientes,
+        'obs_alta_urgencia': obs_alta_urgencia,
+        'porcentaje_resueltas': porcentaje_resueltas,
+        'porcentaje_pendientes': porcentaje_pendientes,
+        'porcentaje_alta_urgencia': porcentaje_alta_urgencia,
+        'distribucion_regiones': distribucion_regiones,
+        'top_comunas': top_comunas,
+        'top_constructoras': top_constructoras,
+        'proyectos_recientes': proyectos_recientes,
+        'distribucion_recintos': distribucion_recintos_list,
+    }
+    
+    return render(request, 'core/informe_general.html', ctx)
+
+@login_required
+def reporte_general_pdf(request):
+    """
+    Genera un informe general consolidado de todos los proyectos
+    con KPIs, distribución geográfica, rankings y métricas clave
+    """
+    from .models import Constructora
+    import os
+    from django.conf import settings
+    
+    # KPIs Principales
+    total_proyectos = Proyecto.objects.count()
+    total_viviendas = Vivienda.objects.count()
+    total_observaciones = RegistroPostventa.objects.count()
+    
+    # Estado de proyectos y viviendas
+    # Asumimos que proyectos sin estado 'FINALIZADO' están activos
+    proyectos_finalizados = Proyecto.objects.filter(estado='FINALIZADO').count()
+    proyectos_activos = total_proyectos - proyectos_finalizados
+    
+    total_constructoras = Constructora.objects.count()
+    
+    # Viviendas - Modelo no tiene campo 'estado'
+    viviendas_entregadas = 0
+    viviendas_pendientes = 0
+    porcentaje_entrega = 0
+    
+    # Observaciones de postventa
+    obs_resueltas = RegistroPostventa.objects.filter(estado='RESUELTO').count()
+    obs_pendientes = RegistroPostventa.objects.filter(estado='PENDIENTE').count()
+    obs_alta_urgencia = RegistroPostventa.objects.filter(urgencia='ALTA', estado='PENDIENTE').count()
+    
+    tasa_resolucion = (obs_resueltas / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_resueltas = (obs_resueltas / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_pendientes = (obs_pendientes / total_observaciones * 100) if total_observaciones > 0 else 0
+    porcentaje_alta_urgencia = (obs_alta_urgencia / total_observaciones * 100) if total_observaciones > 0 else 0
+    
+    # Distribución geográfica - Por Región
+    distribucion_regiones = (
+        Proyecto.objects
+        .values('region')
+        .annotate(count=Count('id'))
+        .order_by('-count')[:10]
+    )
+    
+    # Distribución geográfica - Top Comunas
+    top_comunas = (
+        Proyecto.objects
+        .values('comuna')
+        .annotate(count=Count('id'))
+        .order_by('-count')[:10]
+    )
+    
+    # Top Constructoras con score calculado
+    constructoras = Constructora.objects.all()
+    top_constructoras_data = []
+    
+    for constructora in constructoras:
+        proyectos_constructora = Proyecto.objects.filter(constructora=constructora)
+        num_proyectos = proyectos_constructora.count()
+        
+        if num_proyectos > 0:
+            # Calcular observaciones para esta constructora
+            obs_total = RegistroPostventa.objects.filter(proyecto__constructora=constructora).count()
+            obs_resueltas_c = RegistroPostventa.objects.filter(proyecto__constructora=constructora, estado='RESUELTO').count()
+            
+            tasa_resolucion_c = (obs_resueltas_c / obs_total * 100) if obs_total > 0 else 0
+            
+            # Calcular score simplificado (basado en tasa de resolución)
+            score = tasa_resolucion_c
+            
+            top_constructoras_data.append({
+                'nombre': constructora.nombre,
+                'num_proyectos': num_proyectos,
+                'score': score,
+                'tasa_resolucion': tasa_resolucion_c
+            })
+    
+    # Ordenar por score descendente y tomar top 10
+    top_constructoras = sorted(top_constructoras_data, key=lambda x: x['score'], reverse=True)[:10]
+    
+    # Proyectos recientes (ordenados por fecha de inicio)
+    proyectos_recientes = Proyecto.objects.order_by('-fecha_inicio')[:10]
+    
+    # Distribución de fallas por recinto
+    distribucion_recintos = (
+        RegistroPostventa.objects
+        .values('recinto')
+        .annotate(cantidad=Count('id'))
+        .order_by('-cantidad')[:10]
+    )
+    
+    # Calcular porcentajes para distribución de recintos
+    distribucion_recintos_list = []
+    for item in distribucion_recintos:
+        porcentaje = (item['cantidad'] / total_observaciones * 100) if total_observaciones > 0 else 0
+        distribucion_recintos_list.append({
+            'recinto': item['recinto'] or 'No especificado',
+            'cantidad': item['cantidad'],
+            'porcentaje': porcentaje
+        })
+    
+    # Ruta del logo
+    logo_path = os.path.join(settings.STATIC_ROOT or settings.BASE_DIR / 'static', 'img', 'techo_logo.png')
+    
+    # Contexto para el template
+    ctx = {
+        'fecha_generacion': timezone.localtime(),
+        'logo_path': logo_path,
+        
+        # KPIs principales
+        'total_proyectos': total_proyectos,
+        'total_viviendas': total_viviendas,
+        'total_observaciones': total_observaciones,
+        'tasa_resolucion': tasa_resolucion,
+        
+        # Estado general
+        'proyectos_activos': proyectos_activos,
+        'proyectos_finalizados': proyectos_finalizados,
+        'total_constructoras': total_constructoras,
+        
+        # Viviendas
+        'viviendas_entregadas': viviendas_entregadas,
+        'viviendas_pendientes': viviendas_pendientes,
+        'porcentaje_entrega': porcentaje_entrega,
+        
+        # Postventa
+        'obs_resueltas': obs_resueltas,
+        'obs_pendientes': obs_pendientes,
+        'obs_alta_urgencia': obs_alta_urgencia,
+        'porcentaje_resueltas': porcentaje_resueltas,
+        'porcentaje_pendientes': porcentaje_pendientes,
+        'porcentaje_alta_urgencia': porcentaje_alta_urgencia,
+        
+        # Distribución
+        'distribucion_regiones': distribucion_regiones,
+        'top_comunas': top_comunas,
+        'top_constructoras': top_constructoras,
+        'proyectos_recientes': proyectos_recientes,
+        'distribucion_recintos': distribucion_recintos_list,
+    }
+    
+    pdf_bytes = render_to_pdf("reports/informe_general.html", ctx)
+    if not pdf_bytes:
+        return HttpResponseBadRequest("No se pudo generar el PDF")
+    
+    filename = f"informe_general_techo_{timezone.now().strftime('%Y%m%d_%H%M')}.pdf"
     return pdf_http_response(filename, pdf_bytes, as_attachment=True)
 
 @login_required
@@ -277,8 +545,23 @@ def cambiar_estado_registro(request, reg_id):
     nuevo = request.POST.get("estado")
     if nuevo not in dict(ESTADOS):
         return HttpResponseBadRequest("Estado inválido")
+    
+    estado_anterior = reg.estado
     reg.estado = nuevo
     reg.save()
+    
+    # 🔔 NOTIFICACIÓN AUTOMÁTICA cuando se resuelve una observación
+    if nuevo == "RESUELTO" and estado_anterior != "RESUELTO":
+        # Notificar a la familia propietaria de la vivienda
+        if reg.vivienda and hasattr(reg.vivienda, 'perfilusuario_set'):
+            for perfil in reg.vivienda.perfilusuario_set.filter(rol='Familia'):
+                crear_notificacion(
+                    usuario=perfil.user,
+                    tipo='OBSERVACION_RESUELTA',
+                    titulo='¡Tu observación ha sido resuelta!',
+                    mensaje=f'La observación en {reg.recinto} ha sido marcada como resuelta.',
+                    url_destino=f'/dashboard/'
+                )
 
     next_url = request.POST.get("next")
     if next_url:
@@ -314,6 +597,21 @@ def agregar_comentario_registro(request, reg_id):
         comentario.registro = registro
         comentario.autor = request.user
         comentario.save()
+        
+        # 🔔 NOTIFICACIÓN AUTOMÁTICA - Nuevo comentario agregado
+        # Notificar a la familia propietaria
+        if registro.ficha and registro.ficha.vivienda and hasattr(registro.ficha.vivienda, 'perfilusuario_set'):
+            for perfil in registro.ficha.vivienda.perfilusuario_set.filter(rol='Familia'):
+                # No notificar si el autor es la misma familia
+                if perfil.user != request.user:
+                    crear_notificacion(
+                        usuario=perfil.user,
+                        tipo='COMENTARIO_AGREGADO',
+                        titulo='Nuevo comentario en tu observación',
+                        mensaje=f'{request.user.username}: {comentario.texto[:100]}...',
+                        url_destino=f'/fichas-inmuebles/'
+                    )
+        
         messages.success(request, "Comentario agregado correctamente.")
     else:
         messages.error(request, "No pudimos guardar tu comentario. Revisa el formulario.")
@@ -855,6 +1153,8 @@ def reportar_observacion_familia(request):
             registro.proyecto = vivienda.proyecto
             registro.ficha = ficha
             registro.reportante = request.user
+            # Estado seguimiento por defecto cuando familia reporta
+            registro.estado_seguimiento = 'EN_REVISION'  # Admin lo cambiará después
             registro.save()
             
             # Procesar evidencias (archivos múltiples)
@@ -871,10 +1171,42 @@ def reportar_observacion_familia(request):
                     )
                     evidencias_creadas += 1
             
+            # 🔔 NOTIFICACIÓN AUTOMÁTICA - Familia reportó observación
+            # Notificar al trabajador asignado al proyecto
+            trabajadores_notificados = 0
+            if vivienda.proyecto:
+                # Notificar trabajadores asignados a este proyecto
+                trabajadores = PerfilUsuario.objects.filter(
+                    rol='Trabajador',
+                    proyecto_asignado=vivienda.proyecto
+                )
+                for trabajador in trabajadores:
+                    crear_notificacion(
+                        usuario=trabajador.user,
+                        tipo='NUEVA_OBSERVACION',
+                        titulo=f'Nueva observación reportada - {vivienda.proyecto.nombre}',
+                        mensaje=f'Familia reportó problema en {registro.recinto}. Urgencia: {registro.get_urgencia_display()}',
+                        url_destino=f'/fichas-inmuebles/{ficha.id}/'
+                    )
+                    trabajadores_notificados += 1
+                
+                # Notificar también a todos los administradores
+                admins = PerfilUsuario.objects.filter(rol='Admin')
+                for admin in admins:
+                    crear_notificacion(
+                        usuario=admin.user,
+                        tipo='NUEVA_OBSERVACION',
+                        titulo=f'Nueva observación - {vivienda.proyecto.nombre}',
+                        mensaje=f'Familia reportó: {registro.observacion[:80]}...',
+                        url_destino=f'/fichas-inmuebles/{ficha.id}/'
+                    )
+            
             # Mensaje de éxito
             mensaje = f"✅ Tu observación sobre '{registro.recinto}' ha sido registrada exitosamente."
             if evidencias_creadas > 0:
                 mensaje += f" Se guardaron {evidencias_creadas} archivo(s) de evidencia."
+            if trabajadores_notificados > 0:
+                mensaje += f" Se notificó al equipo técnico."
             
             messages.success(request, mensaje)
             return redirect("dashboard")
@@ -1389,3 +1721,69 @@ def reportar_observacion_trabajador(request):
     }
     
     return render(request, "core/reportar_observacion_trabajador.html", context)
+
+
+# ==================== NOTIFICACIONES ====================
+
+@login_required
+def notificaciones_list(request):
+    """Vista del historial completo de notificaciones del usuario actual"""
+    # Obtener todas las notificaciones del usuario
+    notificaciones = Notificacion.objects.filter(usuario=request.user)
+    
+    # Filtrar por estado si se especifica
+    filtro = request.GET.get('filtro', 'todas')
+    if filtro == 'no_leidas':
+        notificaciones = notificaciones.filter(leida=False)
+    elif filtro == 'leidas':
+        notificaciones = notificaciones.filter(leida=True)
+    
+    # Paginación
+    from django.core.paginator import Paginator
+    paginator = Paginator(notificaciones, 20)  # 20 por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Contador de no leídas
+    no_leidas_count = Notificacion.objects.filter(usuario=request.user, leida=False).count()
+    
+    context = {
+        'page_obj': page_obj,
+        'filtro_actual': filtro,
+        'no_leidas_count': no_leidas_count,
+    }
+    
+    return render(request, 'core/notificaciones_list.html', context)
+
+
+@login_required
+@require_POST
+def marcar_notificacion_leida(request, notif_id):
+    """Vista AJAX para marcar una notificación como leída"""
+    try:
+        notificacion = Notificacion.objects.get(id=notif_id, usuario=request.user)
+        notificacion.marcar_leida()
+        
+        # Contador actualizado
+        no_leidas_count = Notificacion.objects.filter(usuario=request.user, leida=False).count()
+        
+        return JsonResponse({
+            'success': True,
+            'no_leidas_count': no_leidas_count
+        })
+    except Notificacion.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Notificación no encontrada'
+        }, status=404)
+
+
+def crear_notificacion(usuario, tipo, titulo, mensaje, url_destino):
+    """Helper function para crear una notificación"""
+    Notificacion.objects.create(
+        usuario=usuario,
+        tipo=tipo,
+        titulo=titulo,
+        mensaje=mensaje,
+        url_destino=url_destino
+    )

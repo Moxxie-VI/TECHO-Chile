@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Informe - TECHO Chile{% endblock %}</title>
+    {% include 'reports/pdf_styles.html' %}
+</head>
+
+<body>
+    <!-- Header con logo TECHO -->
+    <div class="header">
+        <div class="logo-container">
+            <img src="{{ logo_path }}" alt="TECHO Chile" class="logo">
+        </div>
+        <div class="header-info">
+            <h1 class="report-title">{% block report_title %}Informe TECHO Chile{% endblock %}</h1>
+            <p class="generation-date">
+                Generado el {{ fecha_generacion|date:"d 'de' F 'de' Y" }} a las {{ fecha_generacion|date:"H:i" }} hrs
+            </p>
+        </div>
+    </div>
+
+    <!-- Contenido del reporte -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            <strong>TECHO Chile</strong> |
+            Construyendo comunidades sin pobreza |
+            www.techo.org/chile
+        </p>
+        <p class="page-number">Página <span class="page"></span> de <span class="topage"></span></p>
+    </div>
+</body>
+
+</html>

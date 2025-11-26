@@ -1,0 +1,273 @@
+<style>
+    /* Reset y configuración básica */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    @page {
+        size: A4;
+        margin: 2cm 1.5cm;
+    }
+
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 11pt;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    /* Header */
+    .header {
+        width: 100%;
+        border-bottom: 3px solid #E84119;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+
+    .logo-container {
+        float: left;
+        width: 150px;
+    }
+
+    .logo {
+        width: 120px;
+        height: auto;
+    }
+
+    .header-info {
+        float: right;
+        text-align: right;
+        padding-top: 10px;
+    }
+
+    .report-title {
+        font-size: 22pt;
+        color: #E84119;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .generation-date {
+        font-size: 9pt;
+        color: #666;
+        font-style: italic;
+    }
+
+    /* KPI Boxes */
+    .kpi-container {
+        width: 100%;
+        margin: 20px 0;
+        clear: both;
+    }
+
+    .kpi-box {
+        float: left;
+        width: 23%;
+        margin: 0 1%;
+        border: 2px solid #E84119;
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+        background-color: #FFF5F2;
+    }
+
+    .kpi-value {
+        font-size: 28pt;
+        font-weight: bold;
+        color: #E84119;
+        display: block;
+    }
+
+    .kpi-label {
+        font-size: 9pt;
+        color: #666;
+        margin-top: 5px;
+        text-transform: uppercase;
+    }
+
+    /* Secciones */
+    .section {
+        margin: 25px 0;
+        clear: both;
+        page-break-inside: avoid;
+    }
+
+    .section-title {
+        font-size: 16pt;
+        color: #2C3E50;
+        border-bottom: 2px solid #E84119;
+        padding-bottom: 8px;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .subsection-title {
+        font-size: 13pt;
+        color: #2C3E50;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    /* Tablas */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 15px 0;
+        font-size: 10pt;
+    }
+
+    th {
+        background-color: #E84119;
+        color: white;
+        padding: 10px;
+        text-align: left;
+        font-weight: bold;
+    }
+
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    /* Badges y estados */
+    .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 9pt;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .badge-success {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .badge-warning {
+        background-color: #f59e0b;
+        color: white;
+    }
+
+    .badge-danger {
+        background-color: #ef4444;
+        color: white;
+    }
+
+    .badge-info {
+        background-color: #3b82f6;
+        color: white;
+    }
+
+    .badge-secondary {
+        background-color: #6b7280;
+        color: white;
+    }
+
+    /* Grid de 2 columnas */
+    .two-columns {
+        width: 100%;
+        clear: both;
+    }
+
+    .column {
+        float: left;
+        width: 48%;
+        margin: 0 1%;
+    }
+
+    /* Info box */
+    .info-box {
+        background-color: #f0f9ff;
+        border-left: 4px solid #3b82f6;
+        padding: 12px;
+        margin: 15px 0;
+    }
+
+    .warning-box {
+        background-color: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 12px;
+        margin: 15px 0;
+    }
+
+    .danger-box {
+        background-color: #fee2e2;
+        border-left: 4px solid #ef4444;
+        padding: 12px;
+        margin: 15px 0;
+    }
+
+    /* Utilidades */
+    .text-center {
+        text-align: center;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-muted {
+        color: #666;
+    }
+
+    .mb-10 {
+        margin-bottom: 10px;
+    }
+
+    .mb-20 {
+        margin-bottom: 20px;
+    }
+
+    .mt-10 {
+        margin-top: 10px;
+    }
+
+    .mt-20 {
+        margin-top: 20px;
+    }
+
+    /* Evitar saltos de página */
+    .no-break {
+        page-break-inside: avoid;
+    }
+
+    /* Lista con viñetas */
+    ul {
+        margin-left: 20px;
+        margin-bottom: 10px;
+    }
+
+    li {
+        margin-bottom: 5px;
+    }
+
+    /* Énfasis */
+    strong {
+        font-weight: bold;
+        color: #2C3E50;
+    }
+
+    em {
+        font-style: italic;
+        color: #666;
+    }
+
+    /* Footer */
+    .footer {
+        width: 100%;
+        text-align: center;
+        font-size: 8pt;
+        color: #666;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+        margin-top: 30px;
+    }
+</style>

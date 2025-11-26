@@ -189,15 +189,36 @@ class EstadoInmueble(models.Model):
     creado_en = models.DateTimeField(auto_now_add=True)
 
 class RegistroPostventa(models.Model):
+    URGENCIA_CHOICES = [
+        ('BAJA', 'Baja'),
+        ('MEDIA', 'Media'),
+        ('ALTA', 'Alta'),
+    ]
+    
+    ESTADO_SEGUIMIENTO_CHOICES = [
+        ('EN_REVISION', 'En Revisión'),
+        ('APROBADO', 'Aprobado'),
+        ('RECHAZADO', 'Rechazado'),
+        ('EN_PROCESO', 'En Proceso'),
+        ('COMPLETADO', 'Completado'),
+    ]
+    
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
     ficha = models.ForeignKey(FichaInmueble, on_delete=models.CASCADE)
     reportante = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     recinto = models.CharField(max_length=150)  # baño, cocina, etc.
-    observacion = models.TextField()
-    urgencia = models.CharField(max_length=20, default="MEDIA")
+    observacion = models.TextField()  # Descripción de la observación
+    urgencia = models.CharField(max_length=20, choices=URGENCIA_CHOICES, default="MEDIA")
     vence_en = models.DateField(null=True, blank=True)
     estado = models.CharField(max_length=20, choices=ESTADOS, default="ABIERTA")
+    estado_seguimiento = models.CharField(
+        max_length=20, 
+        choices=ESTADO_SEGUIMIENTO_CHOICES, 
+        default='EN_REVISION',
+        verbose_name='Estado de Seguimiento'
+    )
     creado_en = models.DateTimeField(auto_now_add=True)
+    ultima_actualizacion = models.DateTimeField(auto_now=True, verbose_name='Última Actualización')
 
 class Evidencia(models.Model):
     registro = models.ForeignKey("RegistroPostventa", on_delete=models.CASCADE, related_name="evidencias")
@@ -288,8 +309,7 @@ class PerfilUsuario(models.Model):
         elif self.nombre:
             return self.nombre
         elif self.apellido:
-            return self.apellido
-        return self.user.username
+            return self.user.get_full_name() or self.user.username
     
     def get_rut_formateado(self):
         """Retorna el RUT formateado con puntos y guión"""
@@ -309,3 +329,57 @@ class PerfilUsuario(models.Model):
     class Meta:
         verbose_name = "Perfil de Usuario"
         verbose_name_plural = "Perfiles de Usuarios"
+
+
+class Notificacion(models.Model):
+    """
+    Modelo para sistema de notificaciones del usuario
+    Permite notificar eventos relevantes y redirigir a la vista correspondiente
+    """
+    TIPO_CHOICES = [
+        ('NUEVA_OBSERVACION', 'Nueva Observación'),
+        ('OBSERVACION_RESUELTA', 'Observación Resuelta'),
+        ('OBSERVACION_ACTUALIZADA', 'Observación Actualizada'),
+        ('PROYECTO_ACTUALIZADO', 'Proyecto Actualizado'),
+        ('COMENTARIO_AGREGADO', 'Comentario Agregado'),
+        ('DS49_VENCIMIENTO', 'DS49 Próximo a Vencer'),
+        ('SISTEMA', 'Notificación del Sistema'),
+    ]
+    
+    usuario = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='notificaciones',
+        verbose_name='Usuario'
+    )
+    tipo = models.CharField(
+        max_length=50, 
+        choices=TIPO_CHOICES,
+        verbose_name='Tipo de Notificación'
+    )
+    titulo = models.CharField(max_length=200, verbose_name='Título')
+    mensaje = models.TextField(verbose_name='Mensaje')
+    url_destino = models.CharField(
+        max_length=500, 
+        verbose_name='URL de Destino',
+        help_text='URL a donde redirigir al hacer click'
+    )
+    leida = models.BooleanField(default=False, verbose_name='Leída')
+    creada_en = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de Creación')
+    
+    class Meta:
+        ordering = ['-creada_en']
+        verbose_name = 'Notificación'
+        verbose_name_plural = 'Notificaciones'
+        indexes = [
+            models.Index(fields=['usuario', 'leida']),
+            models.Index(fields=['-creada_en']),
+        ]
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.usuario.username}"
+    
+    def marcar_leida(self):
+        """Marca la notificación como leída"""
+        self.leida = True
+        self.save(update_fields=['leida'])
