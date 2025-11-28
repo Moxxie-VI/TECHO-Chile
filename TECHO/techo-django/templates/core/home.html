@@ -1,6 +1,7 @@
 {% load static %}
 <!doctype html>
 <html lang="es" data-theme="light">
+
 <head>
   <meta charset="utf-8">
   <title>TECHO Chile · Recepción y Postventa Habitacional</title>
@@ -23,25 +24,28 @@
       --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
       --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.24);
     }
-    
-    * { box-sizing: border-box; }
-    
-    html, body {
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
       margin: 0;
       padding: 0;
       width: 100%;
       overflow-x: hidden;
     }
-    
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       background: var(--light);
     }
-    
+
     html {
       scroll-behavior: smooth;
     }
-    
+
     /* Asegurar que no haya espacios blancos */
     .hero,
     .navbar,
@@ -49,7 +53,7 @@
     footer {
       max-width: 100vw;
     }
-    
+
     /* ============ NAVBAR MEJORADO ============ */
     .navbar {
       position: sticky;
@@ -61,28 +65,28 @@
       transition: all 0.3s ease;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
-    
+
     .navbar.scrolled {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     }
-    
+
     .navbar-brand {
       font-size: 1.125rem;
       font-weight: 700;
       transition: transform 0.3s ease;
     }
-    
+
     .navbar-brand:hover {
       transform: translateY(-2px);
     }
-    
+
     .nav-link {
       font-weight: 500;
       position: relative;
       transition: all 0.3s ease;
       color: var(--secondary) !important;
     }
-    
+
     .nav-link::after {
       content: '';
       position: absolute;
@@ -94,15 +98,15 @@
       transition: all 0.3s ease;
       transform: translateX(-50%);
     }
-    
+
     .nav-link:hover {
       color: var(--primary) !important;
     }
-    
+
     .nav-link:hover::after {
       width: 80%;
     }
-    
+
     /* ============ HERO FULL WIDTH MODERNO ============ */
     .hero {
       position: relative;
@@ -118,7 +122,7 @@
       width: 100%;
       margin: 0;
     }
-    
+
     .hero-background {
       position: absolute;
       top: 0;
@@ -128,12 +132,19 @@
       z-index: 0;
       pointer-events: none;
     }
-    
+
     @keyframes gradientFlow {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+
+      0%,
+      100% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
     }
-    
+
     .hero::before {
       content: "";
       position: absolute;
@@ -143,29 +154,41 @@
       animation: slowZoom 30s ease-in-out infinite alternate;
       z-index: 0;
     }
-    
+
     @keyframes slowZoom {
-      from { transform: scale(1); }
-      to { transform: scale(1.08); }
+      from {
+        transform: scale(1);
+      }
+
+      to {
+        transform: scale(1.08);
+      }
     }
-    
+
     .hero::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: 
+      background:
         radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 35%),
         radial-gradient(circle at 85% 80%, rgba(56, 189, 248, 0.2) 0%, transparent 45%),
         radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 60%);
       animation: pulseGlow 10s ease-in-out infinite;
       z-index: 0;
     }
-    
+
     @keyframes pulseGlow {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
+
+      0%,
+      100% {
+        opacity: 0.7;
+      }
+
+      50% {
+        opacity: 1;
+      }
     }
-    
+
     /* Ondas decorativas suaves en la parte inferior */
     .hero-waves {
       position: absolute;
@@ -176,7 +199,7 @@
       line-height: 0;
       z-index: 2;
     }
-    
+
     .hero-waves svg {
       position: relative;
       display: block;
@@ -184,15 +207,15 @@
       height: 150px;
       transform: scaleX(-1);
     }
-    
+
     .hero-waves .shape-fill {
       fill: var(--light);
     }
-    
+
     [data-theme="dark"] .hero-waves .shape-fill {
       fill: #1e293b;
     }
-    
+
     /* Patrón de puntos sutil en el fondo */
     .hero-pattern {
       position: absolute;
@@ -202,12 +225,12 @@
       z-index: 0;
       opacity: 0.5;
     }
-    
+
     .hero .content {
       position: relative;
       z-index: 2;
     }
-    
+
     /* Elementos flotantes decorativos más grandes */
     .hero-decoration {
       position: absolute;
@@ -218,7 +241,7 @@
       z-index: 1;
       pointer-events: none;
     }
-    
+
     .hero-decoration-1 {
       top: 5%;
       right: 5%;
@@ -227,7 +250,7 @@
       background: radial-gradient(circle, rgba(125, 211, 252, 0.5) 0%, rgba(56, 189, 248, 0.2) 50%, transparent 100%);
       animation-delay: 0s;
     }
-    
+
     .hero-decoration-2 {
       bottom: 10%;
       left: 0%;
@@ -236,7 +259,7 @@
       background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(56, 189, 248, 0.1) 50%, transparent 100%);
       animation-delay: 3s;
     }
-    
+
     .hero-decoration-3 {
       top: 40%;
       right: 20%;
@@ -245,19 +268,23 @@
       background: radial-gradient(circle, rgba(14, 165, 233, 0.3) 0%, rgba(56, 189, 248, 0.1) 50%, transparent 100%);
       animation-delay: 6s;
     }
-    
+
     @keyframes floatSlow {
-      0%, 100% {
+
+      0%,
+      100% {
         transform: translate(0, 0) scale(1);
       }
+
       33% {
         transform: translate(30px, -40px) scale(1.1);
       }
+
       66% {
         transform: translate(-20px, 20px) scale(0.9);
       }
     }
-    
+
     .hero h1 {
       font-size: clamp(2rem, 5vw, 3.5rem);
       line-height: 1.2;
@@ -265,25 +292,26 @@
       text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
       animation: fadeInUp 0.8s ease-out;
     }
-    
+
     .hero .lead {
       font-size: clamp(1rem, 2vw, 1.25rem);
       opacity: 0.95;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       animation: fadeInUp 0.8s ease-out 0.2s backwards;
     }
-    
+
     @keyframes fadeInUp {
       from {
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-    
+
     /* ============ BOTONES MODERNOS ============ */
     .btn {
       font-weight: 600;
@@ -296,7 +324,7 @@
       text-transform: none;
       font-size: 1rem;
     }
-    
+
     .btn::before {
       content: '';
       position: absolute;
@@ -309,50 +337,50 @@
       transform: translate(-50%, -50%);
       transition: width 0.6s ease, height 0.6s ease;
     }
-    
+
     .btn:hover::before {
       width: 300px;
       height: 300px;
     }
-    
+
     .btn-primary {
       background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
       color: white;
       box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
     }
-    
+
     .btn-primary:hover {
       transform: translateY(-3px);
       box-shadow: 0 12px 32px rgba(14, 165, 233, 0.5);
       background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
     }
-    
+
     .btn-outline-light {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(10px);
       border: 2px solid rgba(255, 255, 255, 0.3);
       color: white;
     }
-    
+
     .btn-outline-light:hover {
       background: rgba(255, 255, 255, 0.2);
       border-color: rgba(255, 255, 255, 0.5);
       transform: translateY(-3px);
       box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
     }
-    
+
     .btn.primary {
       background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
       color: white !important;
       padding: 0.75rem 1.75rem;
       box-shadow: 0 4px 16px rgba(14, 165, 233, 0.3);
     }
-    
+
     .btn.primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
     }
-    
+
     /* ============ BADGE TRUST MEJORADO ============ */
     .badge-trust {
       display: inline-flex;
@@ -371,7 +399,7 @@
       position: relative;
       z-index: 3;
     }
-    
+
     .badge-trust::before {
       content: '';
       position: absolute;
@@ -385,12 +413,19 @@
       mask-composite: exclude;
       opacity: 0.5;
     }
-    
+
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
     }
-    
+
     /* ============ GLASS EFFECT MEJORADO ============ */
     .glass {
       background: rgba(255, 255, 255, 0.85);
@@ -400,13 +435,13 @@
       box-shadow: var(--shadow-md);
       transition: all 0.3s ease;
     }
-    
+
     .glass:hover {
       background: rgba(255, 255, 255, 0.95);
       box-shadow: var(--shadow-lg);
       transform: translateY(-5px);
     }
-    
+
     /* ============ CARDS IMPRESIONANTES ============ */
     .card {
       border: none;
@@ -416,28 +451,28 @@
       box-shadow: var(--shadow-md);
       background: white;
     }
-    
+
     .card:hover {
       transform: translateY(-12px) scale(1.02);
       box-shadow: var(--shadow-xl);
     }
-    
+
     .card-img-top {
       transition: transform 0.6s ease;
       height: 220px;
       object-fit: cover;
     }
-    
+
     .card:hover .card-img-top {
       transform: scale(1.1);
     }
-    
+
     .card-body h4 {
       font-weight: 700;
       margin-bottom: 1rem;
       font-size: 1.375rem;
     }
-    
+
     /* ============ TOOLBAR ACCESIBILIDAD MODERNA ============ */
     .a11y-toolbar {
       position: fixed;
@@ -455,37 +490,37 @@
       gap: 0.75rem;
       transition: all 0.3s ease;
     }
-    
+
     .a11y-toolbar:hover {
       box-shadow: 0 16px 56px rgba(0, 0, 0, 0.2);
       transform: translateY(-4px);
     }
-    
+
     .a11y-toolbar .btn {
       padding: 0.5rem 0.875rem;
       font-size: 0.875rem;
       border-radius: 10px;
       min-width: 44px;
     }
-    
+
     .a11y-toolbar #font-val {
       font-weight: 700;
       color: var(--primary);
       font-size: 0.875rem;
     }
-    
+
     /* ============ SECCIONES ============ */
     section {
       padding: 5rem 0;
     }
-    
+
     section h2 {
       font-size: clamp(2rem, 4vw, 2.75rem);
       font-weight: 800;
       margin-bottom: 1rem;
       color: var(--dark);
     }
-    
+
     /* ============ LOGOS PARTNERS ============ */
     .partner-logos img {
       height: 48px;
@@ -493,20 +528,20 @@
       filter: grayscale(100%);
       transition: all 0.3s ease;
     }
-    
+
     .partner-logos img:hover {
       filter: none;
       opacity: 1;
       transform: scale(1.1);
     }
-    
+
     /* ============ FOOTER MODERNO ============ */
     footer {
       background: var(--gradient-2);
       position: relative;
       overflow: hidden;
     }
-    
+
     footer::before {
       content: '';
       position: absolute;
@@ -516,94 +551,99 @@
       height: 4px;
       background: var(--gradient-1);
     }
-    
+
     footer h5 {
       font-weight: 700;
       margin-bottom: 1.25rem;
       font-size: 1.125rem;
     }
-    
+
     footer .link-light {
       transition: all 0.3s ease;
       text-decoration: none;
     }
-    
+
     footer .link-light:hover {
       color: var(--primary) !important;
       transform: translateX(4px);
       display: inline-block;
     }
-    
+
     footer .icon {
       width: 24px;
       height: 24px;
       filter: brightness(0) invert(1);
       transition: all 0.3s ease;
     }
-    
+
     footer .icon:hover {
       filter: none;
       transform: scale(1.2);
     }
-    
+
     /* ============ RESPONSIVE ============ */
     @media (max-width: 992px) {
       .hero {
         min-height: 90vh;
         padding: 6rem 0 10rem;
       }
-      
+
       .hero-waves svg {
         height: 120px;
       }
-      
+
       .hero-decoration-1 {
         width: 350px;
         height: 350px;
       }
-      
+
       .hero-decoration-2 {
         width: 400px;
         height: 400px;
       }
-      
+
       .hero-decoration-3 {
         width: 300px;
         height: 300px;
       }
-      
-      section { padding: 3.5rem 0; }
-      .btn { padding: 0.75rem 1.5rem; }
+
+      section {
+        padding: 3.5rem 0;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+      }
     }
-    
+
     @media (max-width: 768px) {
       .hero {
         min-height: 85vh;
         padding: 5rem 0 8rem;
       }
-      
+
       .hero-waves svg {
         height: 100px;
       }
-      
+
       .hero-decoration-1 {
         width: 250px;
         height: 250px;
         filter: blur(70px);
       }
-      
+
       .hero-decoration-2 {
         width: 300px;
         height: 300px;
         filter: blur(70px);
       }
-      
+
       .hero-decoration-3 {
         width: 200px;
         height: 200px;
         filter: blur(70px);
       }
-      
+
       .a11y-toolbar {
         right: 1rem;
         bottom: 1rem;
@@ -611,82 +651,84 @@
         flex-wrap: wrap;
         gap: 0.5rem;
       }
-      
+
       .a11y-toolbar .btn {
         padding: 0.5rem 0.75rem;
         font-size: 0.8rem;
       }
-      
-      section { padding: 2.5rem 0; }
+
+      section {
+        padding: 2.5rem 0;
+      }
     }
-    
+
     @media (max-width: 576px) {
       .hero {
         min-height: 80vh;
         padding: 4rem 0 6rem;
       }
-      
+
       .hero-waves svg {
         height: 80px;
       }
-      
+
       .hero-decoration {
         display: none;
       }
-      
+
       .hero-pattern {
         opacity: 0.3;
       }
     }
-    
+
     /* ============ TEMA OSCURO ============ */
     [data-theme="dark"] {
       --light: #1e293b;
       --dark: #f1f5f9;
     }
-    
+
     [data-theme="dark"] .navbar {
       background: rgba(15, 23, 42, 0.95) !important;
       border-bottom-color: rgba(255, 255, 255, 0.1);
     }
-    
+
     [data-theme="dark"] .navbar-brand span {
       color: white !important;
     }
-    
+
     [data-theme="dark"] .bg-light {
       background: #1e293b !important;
     }
-    
+
     [data-theme="dark"] .card {
       background: #1e293b;
       color: white;
     }
-    
+
     [data-theme="dark"] section h2,
     [data-theme="dark"] .card-body h4 {
       color: white;
     }
-    
+
     [data-theme="dark"] .text-secondary {
       color: #94a3b8 !important;
     }
-    
+
     [data-theme="dark"] .a11y-toolbar {
       background: rgba(30, 41, 59, 0.95);
       border-color: rgba(255, 255, 255, 0.1);
     }
-    
+
     [data-theme="dark"] .glass {
       background: rgba(30, 41, 59, 0.85);
       border-color: rgba(255, 255, 255, 0.1);
     }
-    
+
     /* ============ ALTO CONTRASTE ============ */
     .hc {
       filter: contrast(1.5);
     }
-    
+
     /* ============ ICONOS ============ */
     .icon {
       width: 24px;
@@ -694,6 +736,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Barra Accesibilidad -->
   <div class="a11y-toolbar glass shadow-sm p-2" role="toolbar" aria-label="Accesibilidad">
@@ -711,7 +754,8 @@
         <img src="{% static 'img/techo_logo.png' %}" alt="TECHO Chile" height="44" class="me-2">
         <span class="fw-bold text-primary">Gestión Habitacional</span>
       </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain" aria-controls="navMain" aria-expanded="false" aria-label="Abrir navegación">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+        aria-controls="navMain" aria-expanded="false" aria-label="Abrir navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div id="navMain" class="collapse navbar-collapse">
@@ -731,12 +775,12 @@
   <header class="hero">
     <!-- Patrón de puntos sutil -->
     <div class="hero-pattern"></div>
-    
+
     <!-- Decoraciones flotantes -->
     <div class="hero-decoration hero-decoration-1"></div>
     <div class="hero-decoration hero-decoration-2"></div>
     <div class="hero-decoration hero-decoration-3"></div>
-    
+
     <!-- Contenido principal -->
     <div class="container content">
       <div class="row align-items-center">
@@ -745,9 +789,11 @@
             <img src="{% static 'img/lock.svg' %}" class="icon" alt="" style="width: 20px; height: 20px;">
             <span>Conexiones seguras y control de acceso</span>
           </span>
-          <h1 class="display-5 fw-bold">Transformamos la recepción y postventa en una experiencia digital, humana y eficiente.</h1>
+          <h1 class="display-5 fw-bold">Transformamos la recepción y postventa en una experiencia digital, humana y
+            eficiente.</h1>
           <p class="lead mt-3">
-            Plataforma TECHO Chile para registrar observaciones, adjuntar evidencias y dar seguimiento con transparencia.
+            Plataforma TECHO Chile para registrar observaciones, adjuntar evidencias y dar seguimiento con
+            transparencia.
           </p>
           <div class="mt-4 d-flex flex-wrap gap-3">
             <a href="/login/" class="btn btn-primary btn-lg px-4">
@@ -762,20 +808,25 @@
           <div style="position: relative; z-index: 3;">
             <div style="position: relative; display: inline-block; width: 100%;">
               <!-- Glow effect detrás de la imagen -->
-              <div style="position: absolute; inset: -20px; background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%); filter: blur(30px); z-index: 0;"></div>
+              <div
+                style="position: absolute; inset: -20px; background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%); filter: blur(30px); z-index: 0;">
+              </div>
               <!-- Imagen con borde elegante -->
-              <img src="{% static 'img/hero_side.png' %}" class="img-fluid rounded-4" alt="Familias y viviendas" style="position: relative; box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; border: 5px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); transform: translateZ(0);">
+              <img src="{% static 'img/hero_side.png' %}" class="img-fluid rounded-4" alt="Familias y viviendas"
+                style="position: relative; box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset; border: 5px solid rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); transform: translateZ(0);">
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Ondas decorativas suaves en la parte inferior -->
     <div class="hero-waves">
       <svg viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,0 C150,80 350,80 600,50 C850,20 1050,20 1200,50 L1200,120 L0,120 Z" class="shape-fill" style="opacity: 0.3;"></path>
-        <path d="M0,20 C200,70 400,70 600,40 C800,10 1000,10 1200,40 L1200,120 L0,120 Z" class="shape-fill" style="opacity: 0.5;"></path>
+        <path d="M0,0 C150,80 350,80 600,50 C850,20 1050,20 1200,50 L1200,120 L0,120 Z" class="shape-fill"
+          style="opacity: 0.3;"></path>
+        <path d="M0,20 C200,70 400,70 600,40 C800,10 1000,10 1200,40 L1200,120 L0,120 Z" class="shape-fill"
+          style="opacity: 0.5;"></path>
         <path d="M0,40 C250,90 450,90 600,70 C750,50 950,50 1200,70 L1200,120 L0,120 Z" class="shape-fill"></path>
       </svg>
     </div>
@@ -787,7 +838,8 @@
       <div class="row text-center mb-5">
         <div class="col-12">
           <h2 data-aos="fade-down" style="margin-bottom: 0.75rem;">Simple, claro y accesible para todos</h2>
-          <p class="text-secondary" style="font-size: 1.125rem;">Diseño inclusivo: modo oscuro/claro, letras ajustables y navegación por teclado.</p>
+          <p class="text-secondary" style="font-size: 1.125rem;">Diseño inclusivo: modo oscuro/claro, letras ajustables
+            y navegación por teclado.</p>
         </div>
       </div>
       <div class="row g-4">
@@ -816,6 +868,121 @@
               <h4 class="text-primary">Confianza</h4>
               <p>Buenas prácticas, privacidad y controles de acceso. Hecho para TECHO Chile y sus familias.</p>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Sobre TECHO Chile -->
+  <section class="py-5"
+    style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); position: relative; overflow: hidden;">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6" data-aos="fade-right">
+          <h2 class="fw-bold mb-4" style="color: var(--primary);">Sobre TECHO Chile</h2>
+
+          <div class="mb-4">
+            <h3 class="h5 fw-bold mb-2" style="color: var(--dark);">Nuestra Misión</h3>
+            <p class="text-secondary" style="line-height: 1.7;">
+              TECHO es una organización presente en Latinoamérica y El Caribe que busca superar la situación de pobreza
+              que viven millones de personas en los asentamientos precarios, a través de la acción conjunta de sus
+              habitantes y jóvenes voluntarios.
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h3 class="h5 fw-bold mb-2" style="color: var(--dark);">Nuestra Visión</h3>
+            <p class="text-secondary" style="line-height: 1.7;">
+              Trabajamos para construir una sociedad justa, sin pobreza, donde todas las personas tengan la oportunidad
+              de desarrollar sus capacidades y ejercer plenamente sus derechos.
+            </p>
+          </div>
+
+          <div class="row g-3 mt-4 pt-4" style="border-top: 2px solid rgba(14, 165, 233, 0.2);">
+            <div class="col-4">
+              <div class="text-center p-3 rounded-3"
+                style="background: rgba(255, 255, 255, 0.7); transition: transform 0.3s ease;">
+                <div class="display-6 fw-bold text-primary">+50K</div>
+                <small class="text-secondary d-block mt-1">Viviendas Construidas</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="text-center p-3 rounded-3"
+                style="background: rgba(255, 255, 255, 0.7); transition: transform 0.3s ease;">
+                <div class="display-6 fw-bold text-primary">+1M</div>
+                <small class="text-secondary d-block mt-1">Personas Impactadas</small>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="text-center p-3 rounded-3"
+                style="background: rgba(255, 255, 255, 0.7); transition: transform 0.3s ease;">
+                <div class="display-6 fw-bold text-primary">19</div>
+                <small class="text-secondary d-block mt-1">Países en Latinoamérica</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6" data-aos="fade-left">
+          <div style="position: relative;">
+            <img src="{% static 'img/techo_voluntarios.jpg' %}" class="img-fluid rounded-4 shadow-lg"
+              alt="Voluntarios de TECHO Chile construyendo viviendas de emergencia"
+              style="box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2) !important;">
+            <p class="text-center mt-3 fst-italic text-secondary">Voluntarios construyendo esperanza y dignidad</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Valores -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row text-center mb-5">
+        <div class="col-12">
+          <h2 class="fw-bold mb-3" style="color: var(--primary);" data-aos="fade-down">Nuestros Valores</h2>
+          <p class="text-secondary" style="font-size: 1.125rem;">Los principios que guían nuestro trabajo diario</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3" data-aos="fade-up">
+          <div class="card border-0 shadow-sm h-100 text-center p-4"
+            style="transition: all 0.3s ease; border: 2px solid transparent;">
+            <div class="mb-3" style="font-size: 3rem;">🤝</div>
+            <h3 class="h5 fw-bold mb-2">Solidaridad</h3>
+            <p class="text-secondary small mb-0">Trabajamos junto a las comunidades para construir soluciones conjuntas.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+          <div class="card border-0 shadow-sm h-100 text-center p-4"
+            style="transition: all 0.3s ease; border: 2px solid transparent;">
+            <div class="mb-3" style="font-size: 3rem;">⚖️</div>
+            <h3 class="h5 fw-bold mb-2">Justicia</h3>
+            <p class="text-secondary small mb-0">Creemos en la igualdad de oportunidades y derechos para todas las
+              personas.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+          <div class="card border-0 shadow-sm h-100 text-center p-4"
+            style="transition: all 0.3s ease; border: 2px solid transparent;">
+            <div class="mb-3" style="font-size: 3rem;">💪</div>
+            <h3 class="h5 fw-bold mb-2">Excelencia</h3>
+            <p class="text-secondary small mb-0">Nos comprometemos con la calidad en cada proyecto que realizamos.</p>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+          <div class="card border-0 shadow-sm h-100 text-center p-4"
+            style="transition: all 0.3s ease; border: 2px solid transparent;">
+            <div class="mb-3" style="font-size: 3rem;">🌱</div>
+            <h3 class="h5 fw-bold mb-2">Transformación</h3>
+            <p class="text-secondary small mb-0">Buscamos generar cambios profundos y sostenibles en las comunidades.
+            </p>
           </div>
         </div>
       </div>
@@ -862,7 +1029,8 @@
     <div class="container">
       <div class="row align-items-center g-4">
         <div class="col-lg-6" data-aos="fade-right">
-          <img src="{% static 'img/security.jpg' %}" class="img-fluid rounded-4" alt="Seguridad" style="box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);">
+          <img src="{% static 'img/security.jpg' %}" class="img-fluid rounded-4" alt="Seguridad"
+            style="box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);">
         </div>
         <div class="col-lg-6" data-aos="fade-left">
           <h2 style="margin-bottom: 1.25rem;">Seguridad y privacidad</h2>
@@ -885,9 +1053,12 @@
             </li>
           </ul>
           <div class="mt-4 d-flex flex-wrap gap-2">
-            <span class="badge bg-success" style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">SSL Activo</span>
-            <span class="badge bg-primary" style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">Roles: Admin / Trabajador / Familia</span>
-            <span class="badge bg-secondary" style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">Privacidad</span>
+            <span class="badge bg-success" style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">SSL
+              Activo</span>
+            <span class="badge bg-primary" style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">Roles:
+              Admin / Trabajador / Familia</span>
+            <span class="badge bg-secondary"
+              style="padding: 0.625rem 1rem; font-size: 0.875rem; font-weight: 600;">Privacidad</span>
           </div>
         </div>
       </div>
@@ -931,11 +1102,16 @@
   </section>
 
   <!-- CTA -->
-  <section class="py-5 text-center" style="position: relative; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); overflow: hidden;">
-    <div style="position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(circle at 2px 2px, #0ea5e9 1px, transparent 0); background-size: 32px 32px;"></div>
+  <section class="py-5 text-center"
+    style="position: relative; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); overflow: hidden;">
+    <div
+      style="position: absolute; inset: 0; opacity: 0.05; background-image: radial-gradient(circle at 2px 2px, #0ea5e9 1px, transparent 0); background-size: 32px 32px;">
+    </div>
     <div class="container" data-aos="fade-up" style="position: relative; z-index: 1;">
-      <h2 class="mb-3" style="font-size: clamp(1.75rem, 4vw, 2.5rem);">¿Eres parte del equipo o familia beneficiaria?</h2>
-      <p class="text-secondary mb-4" style="font-size: 1.125rem; max-width: 600px; margin: 0 auto 2rem;">Accede con tus credenciales para registrar o hacer seguimiento.</p>
+      <h2 class="mb-3" style="font-size: clamp(1.75rem, 4vw, 2.5rem);">¿Eres parte del equipo o familia beneficiaria?
+      </h2>
+      <p class="text-secondary mb-4" style="font-size: 1.125rem; max-width: 600px; margin: 0 auto 2rem;">Accede con tus
+        credenciales para registrar o hacer seguimiento.</p>
       <a href="/login/" class="btn btn-primary btn-lg px-5">
         <span style="position: relative; z-index: 1;">Iniciar sesión →</span>
       </a>
@@ -948,7 +1124,8 @@
       <div class="row g-4">
         <div class="col-md-4">
           <img src="{% static 'img/techo_logo_white.png' %}" alt="TECHO Chile" height="40" class="mb-3">
-          <p>Plataforma de TECHO Chile para recepción y postventa habitacional. Construimos confianza con procesos claros y seguros.</p>
+          <p>Plataforma de TECHO Chile para recepción y postventa habitacional. Construimos confianza con procesos
+            claros y seguros.</p>
           <div class="d-flex gap-2">
             <span class="badge bg-success">SSL</span>
             <span class="badge bg-secondary">Privacidad</span>
@@ -964,11 +1141,16 @@
           </ul>
           <h5 class="mt-3">Redes</h5>
           <div class="d-flex gap-3">
-            <a class="link-light" href="#" aria-label="Facebook"><img src="{% static 'img/social_facebook.svg' %}" class="icon" alt=""></a>
-            <a class="link-light" href="#" aria-label="Instagram"><img src="{% static 'img/social_instagram.svg' %}" class="icon" alt=""></a>
-            <a class="link-light" href="#" aria-label="LinkedIn"><img src="{% static 'img/social_linkedin.svg' %}" class="icon" alt=""></a>
-            <a class="link-light" href="#" aria-label="YouTube"><img src="{% static 'img/social_youtube.svg' %}" class="icon" alt=""></a>
-            <a class="link-light" href="#" aria-label="X/Twitter"><img src="{% static 'img/social_x.svg' %}" class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="Facebook"><img src="{% static 'img/social_facebook.svg' %}"
+                class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="Instagram"><img src="{% static 'img/social_instagram.svg' %}"
+                class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="LinkedIn"><img src="{% static 'img/social_linkedin.svg' %}"
+                class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="YouTube"><img src="{% static 'img/social_youtube.svg' %}"
+                class="icon" alt=""></a>
+            <a class="link-light" href="#" aria-label="X/Twitter"><img src="{% static 'img/social_x.svg' %}"
+                class="icon" alt=""></a>
           </div>
         </div>
         <div class="col-md-4">
@@ -976,9 +1158,11 @@
           <ul class="list-unstyled">
             <li><a class="link-light" href="#" aria-label="Política de privacidad">Política de privacidad</a></li>
             <li><a class="link-light" href="#" aria-label="Términos y condiciones">Términos y condiciones</a></li>
-            <li><a class="link-light" href="#" aria-label="Declaración de accesibilidad">Declaración de accesibilidad</a></li>
+            <li><a class="link-light" href="#" aria-label="Declaración de accesibilidad">Declaración de
+                accesibilidad</a></li>
           </ul>
-          <p class="small text-secondary mt-3">Este sitio no expone datos personales. Para acceder a la información de proyectos o viviendas se requiere autenticación.</p>
+          <p class="small text-secondary mt-3">Este sitio no expone datos personales. Para acceder a la información de
+            proyectos o viviendas se requiere autenticación.</p>
         </div>
       </div>
       <div class="border-top border-secondary mt-4 py-3 text-center small text-secondary">
@@ -999,28 +1183,28 @@
     });
 
     // ============ ACCESIBILIDAD Y PREFERENCIAS ============
-    (function(){
+    (function () {
       const html = document.documentElement;
       const val = document.getElementById('font-val');
       const dec = document.getElementById('font-dec');
       const inc = document.getElementById('font-inc');
       const tgl = document.getElementById('theme-toggle');
       const hc = document.getElementById('hc-toggle');
-      
+
       let size = +localStorage.getItem('fontSize') || 100;
       let theme = localStorage.getItem('theme') || 'light';
       let high = localStorage.getItem('hc') === '1';
-      
-      function apply(){
+
+      function apply() {
         html.style.fontSize = size + '%';
         val.textContent = size + '%';
         html.setAttribute('data-theme', theme);
         html.classList.toggle('hc', high);
-        
+
         // Actualizar icono del botón de tema
         tgl.textContent = theme === 'light' ? '☀︎/☾' : '☾/☀︎';
       }
-      
+
       // Event Listeners
       dec.onclick = () => {
         size = Math.max(85, size - 10);
@@ -1028,44 +1212,44 @@
         apply();
         showNotification('Tamaño de texto reducido');
       };
-      
+
       inc.onclick = () => {
         size = Math.min(140, size + 10);
         localStorage.setItem('fontSize', size);
         apply();
         showNotification('Tamaño de texto aumentado');
       };
-      
+
       tgl.onclick = () => {
         theme = theme === 'light' ? 'dark' : 'light';
         localStorage.setItem('theme', theme);
         apply();
         showNotification(theme === 'dark' ? 'Tema oscuro activado' : 'Tema claro activado');
       };
-      
+
       hc.onclick = () => {
         high = !high;
         localStorage.setItem('hc', high ? '1' : '0');
         apply();
         showNotification(high ? 'Alto contraste activado' : 'Alto contraste desactivado');
       };
-      
+
       apply();
     })();
 
     // ============ NAVBAR SCROLL EFFECT ============
     const navbar = document.querySelector('.navbar');
     let lastScroll = 0;
-    
+
     window.addEventListener('scroll', () => {
       const currentScroll = window.pageYOffset;
-      
+
       if (currentScroll > 50) {
         navbar.classList.add('scrolled');
       } else {
         navbar.classList.remove('scrolled');
       }
-      
+
       lastScroll = currentScroll;
     });
 
@@ -1094,7 +1278,7 @@
       if (existing) {
         existing.remove();
       }
-      
+
       const notification = document.createElement('div');
       notification.className = 'toast-notification';
       notification.innerHTML = `
@@ -1103,7 +1287,7 @@
         </svg>
         <span>${message}</span>
       `;
-      
+
       notification.style.cssText = `
         position: fixed;
         top: 100px;
@@ -1121,9 +1305,9 @@
         animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         border: 2px solid rgba(255, 255, 255, 0.2);
       `;
-      
+
       document.body.appendChild(notification);
-      
+
       setTimeout(() => {
         notification.style.animation = 'slideOutRight 0.3s ease-out';
         setTimeout(() => notification.remove(), 300);
@@ -1192,4 +1376,5 @@
     console.log('%c¿Interesado en contribuir? Contáctanos en contacto@techo.cl', 'font-size: 12px; color: #0284c7;');
   </script>
 </body>
+
 </html>
