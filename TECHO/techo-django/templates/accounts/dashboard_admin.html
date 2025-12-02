@@ -592,34 +592,71 @@
   </div>
 </div>
 
-<!-- Alertas Importantes -->
-{% if registros %}
-  {% with urgentes=registros|slice:":5" %}
-    {% if urgentes %}
-      <div class="alerts-section">
-        <h2 class="section-title mb-3">
-          <i class="bi bi-exclamation-triangle-fill"></i>
-          Atención Inmediata Requerida
-        </h2>
-        {% for reg in urgentes %}
-          {% if reg.urgencia == "ALTA" %}
-            <div class="alert-item">
-              <div class="alert-icon">
-                <i class="bi bi-exclamation-triangle"></i>
-              </div>
-              <div>
-                <h4 class="mb-1" style="font-weight: 700;">{{ reg.recinto }} - Urgente</h4>
-                <p class="mb-1">{{ reg.observacion|truncatewords:15 }}</p>
-                <small style="color: #92400e;">
-                  <i class="bi bi-clock me-1"></i>{{ reg.creado_en|timesince }} atrás
-                </small>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+<!-- Alertas Inteligentes -->
+{% if obs_criticas or obs_nuevas %}
+<div class="alerts-section">
+  <h2 class="section-title mb-3">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    Requiere Atención Inmediata
+  </h2>
+  
+  <!-- Observaciones Críticas (>7 días) -->
+  {% if obs_criticas %}
+  <h4 style="color: #dc2626; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="bi bi-clock-history"></i>
+    Críticas (más de 7 días sin resolver)
+  </h4>
+  {% for obs in obs_criticas %}
+  <div class="alert-item" style="border-left: 4px solid #dc2626;">
+    <div class="alert-icon" style="background: #dc2626;">
+      <i class="bi bi-exclamation-triangle"></i>
+    </div>
+    <div style="flex: 1;">
+      <h4 class="mb-1" style="font-weight: 700;">{{ obs.recinto }}</h4>
+      <p class="mb-1">{{ obs.observacion|truncatewords:15 }}</p>
+      <small style="color: #92400e; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <span class="badge" style="background: #ef4444; color: white; padding: 0.25rem 0.75rem; border-radius: 12px;">
+          <i class="bi bi-clock me-1"></i>Hace {{ obs.creado_en|timesince }}
+        </span>
+        <span class="badge {% if obs.estado == 'ABIERTA' %}bg-primary{% elif obs.estado == 'EN_GESTION' %}bg-warning{% else %}bg-success{% endif %}" style="padding: 0.25rem 0.75rem; border-radius: 12px;">
+          {{ obs.get_estado_display }}
+        </span>
+        <span style="color: #64748b;">
+          <i class="bi bi-building me-1"></i>{{ obs.proyecto.nombre }}
+        </span>
+      </small>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+  
+  <!-- Observaciones Nuevas (<24 horas) -->
+  {% if obs_nuevas %}
+  <h4 style="color: #0369a1; font-weight: 700; margin: {% if obs_criticas %}1.5rem{% else %}0{% endif %} 0 1rem 0; display: flex; align-items: center; gap: 0.5rem;">
+    <i class="bi bi-bell-fill"></i>
+    Nuevas (últimas 24 horas)
+  </h4>
+  {% for obs in obs_nuevas %}
+  <div class="alert-item" style="border-left: 4px solid #0ea5e9;">
+    <div class="alert-icon" style="background: #0ea5e9;">
+      <i class="bi bi-bell"></i>
+    </div>
+    <div style="flex: 1;">
+      <h4 class="mb-1" style="font-weight: 700;">{{ obs.recinto }}</h4>
+      <p class="mb-1">{{ obs.observacion|truncatewords:15 }}</p>
+      <small style="color: #0369a1; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <span class="badge" style="background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 12px;">
+          <i class="bi bi-clock me-1"></i>Hace {{ obs.creado_en|timesince }}
+        </span>
+        <span style="color: #64748b;">
+          <i class="bi bi-building me-1"></i>{{ obs.proyecto.nombre }}
+        </span>
+      </small>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
 {% endif %}
 
 <!-- Acciones Rápidas -->
@@ -742,28 +779,23 @@
     {% for reg in registros|slice:":8" %}
       <div class="activity-item">
         <div class="activity-icon-circle" style="background: 
-          {% if reg.urgencia == 'ALTA' %}#fee2e2; color: #991b1b;
-          {% elif reg.urgencia == 'MEDIA' %}#fef3c7; color: #92400e;
-          {% else %}#dbeafe; color: #1e40af;{% endif %}">
-          <i class="bi bi-{% if reg.urgencia == 'ALTA' %}exclamation-triangle{% elif reg.urgencia == 'MEDIA' %}clock{% else %}info-circle{% endif %}"></i>
+          {% if reg.estado == 'ABIERTA' %}#dbeafe; color: #1e40af;
+          {% elif reg.estado == 'EN_GESTION' %}#fef3c7; color: #92400e;
+          {% else %}#d1fae5; color: #065f46;{% endif %}">
+          <i class="bi bi-{% if reg.estado == 'ABIERTA' %}inbox{% elif reg.estado == 'EN_GESTION' %}gear{% else %}check-circle{% endif %}"></i>
         </div>
         <div class="activity-content">
-          <div class="activity-title">{{ reg.recinto }} - {{ reg.get_urgencia_display }}</div>
+          <div class="activity-title">{{ reg.recinto }}</div>
           <div class="activity-meta">
             <i class="bi bi-building me-1"></i>{{ reg.proyecto.nombre }}
             <span class="mx-2">•</span>
-            <i class="bi bi-clock me-1"></i>{{ reg.creado_en|timesince }} atrás
+            <span class="badge" style="background: {{ reg.tiempo_color }}; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
+              <i class="bi bi-clock me-1"></i>{{ reg.tiempo_transcurrido }}
+            </span>
             <span class="mx-2">•</span>
-            <i class="bi bi-person me-1"></i>
-            {% if reg.reportante %}
-              {% if reg.reportante.first_name %}
-                {{ reg.reportante.first_name }} {{ reg.reportante.last_name|default:"" }}
-              {% else %}
-                {{ reg.reportante.username }}
-              {% endif %}
-            {% else %}
-              Sin reportante
-            {% endif %}
+            <span class="badge {% if reg.estado == 'ABIERTA' %}bg-primary{% elif reg.estado == 'EN_GESTION' %}bg-warning{% else %}bg-success{% endif %}" style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.8rem;">
+              {{ reg.get_estado_display }}
+            </span>
           </div>
         </div>
       </div>

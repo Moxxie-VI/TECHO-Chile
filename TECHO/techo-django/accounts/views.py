@@ -30,6 +30,28 @@ def logout_view(request):
 
 
 
+def calcular_tiempo_transcurrido(fecha_creacion):
+    """Calcula el tiempo transcurrido y retorna texto + color"""
+    from django.utils import timezone
+    delta = timezone.now() - fecha_creacion
+    
+    if delta.days == 0:
+        horas = delta.seconds // 3600
+        if horas == 0:
+            minutos = delta.seconds // 60
+            if minutos < 5:
+                return "Hace menos de 5 min", "#10b981"  # Verde brillante
+            return f"Hace {minutos} min", "#10b981"  # Verde
+        return f"Hace {horas} hora{'s' if horas > 1 else ''}", "#10b981"  # Verde
+    elif delta.days == 1:
+        return "Hace 1 día", "#f59e0b"  # Amarillo
+    elif delta.days <= 3:
+        return f"Hace {delta.days} días", "#f59e0b"  # Amarillo
+    elif delta.days <= 7:
+        return f"Hace {delta.days} días", "#f97316"  # Naranja
+    else:
+        return f"Hace {delta.days} días", "#ef4444"  # Rojo
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -55,7 +77,36 @@ def dashboard(request):
     if rol == "Admin":
         ctx["proyectos"] = Proyecto.objects.all().order_by("codigo")[:200]
         ctx["viviendas"] = Vivienda.objects.select_related("proyecto").all()[:200]
-        ctx["registros"] = RegistroPostventa.objects.select_related("proyecto").order_by("-creado_en")[:20]
+        
+        # Enriquecer registros con tiempo transcurrido
+        registros_raw = RegistroPostventa.objects.select_related("proyecto").order_by("-creado_en")[:20]
+        registros_enriquecidos = []
+        for reg in registros_raw:
+            tiempo, color = calcular_tiempo_transcurrido(reg.creado_en)
+            reg.tiempo_transcurrido = tiempo
+            reg.tiempo_color = color
+            registros_enriquecidos.append(reg)
+        ctx["registros"] = registros_enriquecidos
+        
+        # Alertas inteligentes
+        from datetime import timedelta
+        fecha_critica = timezone.now() - timedelta(days=7)
+        fecha_reciente = timezone.now() - timedelta(hours=24)
+        
+        # Observaciones críticas (>7 días sin resolver)
+        obs_criticas = RegistroPostventa.objects.filter(
+            creado_en__lt=fecha_critica
+        ).exclude(estado='RESUELTA').select_related('proyecto').order_by('creado_en')[:5]
+        
+        # Observaciones nuevas (<24 horas, sin atender)
+        obs_nuevas = RegistroPostventa.objects.filter(
+            creado_en__gte=fecha_reciente,
+            estado='ABIERTA'
+        ).select_related('proyecto').order_by('-creado_en')[:5]
+        
+        ctx["obs_criticas"] = obs_criticas
+        ctx["obs_nuevas"] = obs_nuevas
+        
         # Actividad reciente (últimas evidencias y cambios)
         ev = Evidencia.objects.select_related("registro","subido_por").order_by("-creado_en")[:10]
         ctx["actividad"] = ev
@@ -90,14 +141,30 @@ def dashboard(request):
                 )
                 # Obtener TODAS las observaciones de la vivienda (no solo las del usuario)
                 # Para que las familias vean lo que reportan admin/trabajadores
-                observaciones = RegistroPostventa.objects.filter(
+                observaciones_query = RegistroPostventa.objects.filter(
                     ficha=ficha
-                ).select_related('proyecto', 'reportante').prefetch_related('evidencias').order_by("-creado_en")[:50]
+                ).select_related('proyecto', 'reportante').prefetch_related('evidencias')
+                
+                # Contar observaciones por estado ANTES del slice
+                ctx["obs_abiertas"] = observaciones_query.filter(estado="ABIERTA").count()
+                ctx["obs_en_gestion"] = observaciones_query.filter(estado="EN_GESTION").count()
+                ctx["obs_resueltas"] = observaciones_query.filter(estado="RESUELTA").count()
+                
+                # Ahora sí hacer el slice para limitar resultados
+                observaciones = observaciones_query.order_by("-creado_en")[:50]
             except FichaInmueble.DoesNotExist:
                 # Si no hay ficha, solo mostrar las observaciones del usuario
-                observaciones = RegistroPostventa.objects.filter(
+                observaciones_query = RegistroPostventa.objects.filter(
                     reportante=user
-                ).select_related('proyecto', 'reportante').prefetch_related('evidencias').order_by("-creado_en")[:50]
+                ).select_related('proyecto', 'reportante').prefetch_related('evidencias')
+                
+                # Contar observaciones por estado ANTES del slice
+                ctx["obs_abiertas"] = observaciones_query.filter(estado="ABIERTA").count()
+                ctx["obs_en_gestion"] = observaciones_query.filter(estado="EN_GESTION").count()
+                ctx["obs_resueltas"] = observaciones_query.filter(estado="RESUELTA").count()
+                
+                # Ahora sí hacer el slice
+                observaciones = observaciones_query.order_by("-creado_en")[:50]
             
             ctx["observaciones"] = observaciones
             ctx["registros"] = observaciones  # Para compatibilidad con templates existentes

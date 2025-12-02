@@ -154,6 +154,27 @@ class ProyectoForm(forms.ModelForm):
             'estado': 'Estado del Proyecto',
         }
 
+    
+    def clean_estado(self):
+        """Validar que no se pueda marcar como ENTREGADO si hay observaciones pendientes"""
+        estado = self.cleaned_data.get('estado')
+        
+        # Solo validar si se está cambiando a ENTREGADO
+        if estado == 'ENTREGADO' and self.instance.pk:
+            # Contar observaciones no resueltas de este proyecto
+            observaciones_pendientes = RegistroPostventa.objects.filter(
+                proyecto=self.instance
+            ).exclude(estado='RESUELTA').count()
+            
+            if observaciones_pendientes > 0:
+                raise forms.ValidationError(
+                    f'No se puede marcar el proyecto como ENTREGADO. '
+                    f'Hay {observaciones_pendientes} observacion(es) sin resolver. '
+                    f'Por favor, resuelve todas las observaciones antes de marcar como entregado.'
+                )
+        
+        return estado
+
 class ViviendaForm(forms.ModelForm):
     class Meta:
         model = Vivienda
@@ -261,12 +282,6 @@ class ObservacionFamiliaForm(forms.ModelForm):
         ('Otro', 'Otro'),
     )
     
-    URGENCIAS = (
-        ('BAJA', 'Baja - No es urgente'),
-        ('MEDIA', 'Media - Requiere atención pronto'),
-        ('ALTA', 'Alta - Requiere atención inmediata'),
-    )
-    
     recinto = forms.ChoiceField(
         choices=CATEGORIAS,
         widget=forms.Select(attrs={
@@ -287,18 +302,6 @@ class ObservacionFamiliaForm(forms.ModelForm):
         help_text='Cuéntanos qué está pasando con el mayor detalle posible'
     )
     
-    urgencia = forms.ChoiceField(
-        choices=URGENCIAS,
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label='Nivel de urgencia',
-        initial='MEDIA',
-        help_text='¿Qué tan urgente es este problema?'
-    )
-    
-    # Campo para evidencia (se manejará el múltiple en la vista)
-    # No usamos el atributo 'multiple' en el widget porque Django no lo soporta directamente
-    # En su lugar, lo añadimos manualmente en el template
-    
     class Meta:
         model = RegistroPostventa
-        fields = ['recinto', 'observacion', 'urgencia']
+        fields = ['recinto', 'observacion']  # Urgencia se establece automáticamente como ALTA

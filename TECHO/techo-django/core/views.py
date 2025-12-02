@@ -550,17 +550,31 @@ def cambiar_estado_registro(request, reg_id):
     reg.estado = nuevo
     reg.save()
     
-    # 🔔 NOTIFICACIÓN AUTOMÁTICA cuando se resuelve una observación
-    if nuevo == "RESUELTO" and estado_anterior != "RESUELTO":
+    # 🔔 NOTIFICACIÓN AUTOMÁTICA cuando cambia el estado de una observación
+    if nuevo != estado_anterior:
         # Notificar a la familia propietaria de la vivienda
-        if reg.vivienda and hasattr(reg.vivienda, 'perfilusuario_set'):
-            for perfil in reg.vivienda.perfilusuario_set.filter(rol='Familia'):
+        if reg.ficha and reg.ficha.vivienda and hasattr(reg.ficha.vivienda, 'perfilusuario_set'):
+            for perfil in reg.ficha.vivienda.perfilusuario_set.filter(rol='Familia'):
+                # Determinar el tipo y mensaje según el nuevo estado
+                if nuevo == "RESUELTA":
+                    tipo_notif = 'OBSERVACION_RESUELTA'
+                    titulo_notif = '¡Tu observación ha sido resuelta!'
+                    mensaje_notif = f'La observación en {reg.recinto} ha sido marcada como resuelta.'
+                elif nuevo == "EN_GESTION":
+                    tipo_notif = 'ESTADO_ACTUALIZADO'
+                    titulo_notif = 'Tu observación está siendo atendida'
+                    mensaje_notif = f'La observación en {reg.recinto} ahora está en gestión.'
+                else:
+                    tipo_notif = 'ESTADO_ACTUALIZADO'
+                    titulo_notif = 'Actualización en tu observación'
+                    mensaje_notif = f'El estado de tu observación en {reg.recinto} cambió a: {dict(ESTADOS).get(nuevo, nuevo)}'
+                
                 crear_notificacion(
                     usuario=perfil.user,
-                    tipo='OBSERVACION_RESUELTA',
-                    titulo='¡Tu observación ha sido resuelta!',
-                    mensaje=f'La observación en {reg.recinto} ha sido marcada como resuelta.',
-                    url_destino=f'/dashboard/'
+                    tipo=tipo_notif,
+                    titulo=titulo_notif,
+                    mensaje=mensaje_notif,
+                    url_destino=f'/reportes/registro/{reg.id}/'
                 )
 
     next_url = request.POST.get("next")
@@ -609,7 +623,7 @@ def agregar_comentario_registro(request, reg_id):
                         tipo='COMENTARIO_AGREGADO',
                         titulo='Nuevo comentario en tu observación',
                         mensaje=f'{request.user.username}: {comentario.texto[:100]}...',
-                        url_destino=f'/fichas-inmuebles/'
+                        url_destino=f'/reportes/registro/{registro.id}/'
                     )
         
         messages.success(request, "Comentario agregado correctamente.")
@@ -1153,6 +1167,7 @@ def reportar_observacion_familia(request):
             registro.proyecto = vivienda.proyecto
             registro.ficha = ficha
             registro.reportante = request.user
+            registro.urgencia = 'ALTA'  # Todos los reportes de familias son urgentes
             # Estado seguimiento por defecto cuando familia reporta
             registro.estado_seguimiento = 'EN_REVISION'  # Admin lo cambiará después
             registro.save()

@@ -337,31 +337,11 @@
                     </div>
                 </div>
                 
-                <!-- Sección 3: Urgencia -->
-                <div class="form-section" id="tour-urgencia">
-                    <div class="form-section-title">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Paso 3: Nivel de urgencia
-                    </div>
-                    <div class="urgency-options">
-                        {% for radio in form.urgencia %}
-                            <label class="urgency-option urgency-{{ radio.choice_label|lower }}">
-                                {{ radio.tag }}
-                                <div class="urgency-icon">
-                                    <i class="bi bi-{% if 'Baja' in radio.choice_label %}check-circle{% elif 'Media' in radio.choice_label %}exclamation-circle{% else %}x-circle{% endif %}"></i>
-                                </div>
-                                <span class="form-check-label">{{ radio.choice_label }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                    <div class="help-text mt-2">{{ form.urgencia.help_text }}</div>
-                </div>
-                
                 <!-- Sección 4: Evidencia -->
                 <div class="form-section" id="tour-evidencia">
                     <div class="form-section-title">
                         <i class="bi bi-camera"></i>
-                        Paso 4: Adjunta fotos o videos (opcional)
+                        Paso 3: Adjunta fotos o videos (opcional)
                     </div>
                     <div class="mb-3">
                         <label for="id_evidencias" class="form-label">Fotos o videos (opcional)</label>
@@ -419,13 +399,11 @@ document.getElementById('id_evidencias').addEventListener('change', function(e) 
 });
 
 // Animación de los radio buttons
-document.querySelectorAll('.urgency-option').forEach(option => {
     const radio = option.querySelector('input[type="radio"]');
     option.addEventListener('click', function() {
         radio.checked = true;
         
         // Remover selected de todos
-        document.querySelectorAll('.urgency-option').forEach(opt => {
             opt.style.borderColor = 'var(--border)';
             opt.style.background = 'transparent';
         });
@@ -463,8 +441,6 @@ document.getElementById('form-observacion').addEventListener('submit', function(
     }
     
     // Verificar que haya seleccionado urgencia
-    const urgenciaChecked = document.querySelector('input[name="urgencia"]:checked');
-    if (!urgenciaChecked) {
         e.preventDefault();
         alert('Por favor selecciona el nivel de urgencia');
         return false;
